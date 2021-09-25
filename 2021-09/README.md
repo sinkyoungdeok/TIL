@@ -5,7 +5,7 @@
 - [DDD] DDD START - Chapter2 (0% -> 50%) 
 
 ## 개인 공부
-- [Spring] Querydsl - 기본 문법 (0% -> 50%) 
+- [Spring] Querydsl - Chapter3 (0% -> 50%) 
 
 </details>
 
@@ -16,7 +16,7 @@
 - [DDD] DDD START - Chapter2 (50% -> 100%) 
 
 ## 개인 공부
-- [Spring] Querydsl - 기본 문법 (50% -> 100%) 
+- [Spring] Querydsl - Chapter3 (50% -> 100%) 
 
 </details>
 
@@ -25,7 +25,7 @@
 ## 회사 업무
 
 ## 개인 공부
-- [Spring] Querydsl - 중급 문법 (0% -> 100%) 
-- [Spring] Querydsl - 순수 JPA와 Querydsl (0% -> 25%)
+- [Spring] Querydsl - Chapter4 (0% -> 100%) 
+- [Spring] Querydsl - Chapter5 (0% -> 25%)
 
 </details>
