@@ -50,3 +50,13 @@
   - Chapter1 (0% -> 25%)
 
 </details>
+
+<details> <summary>2021년 9월 27일</summary>
+
+## 회사 업무
+- [DDD] DDD START
+  - Chapter3 (0% -> 67%) 
+  
+## 개인 공부
+
+</details>
