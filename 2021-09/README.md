@@ -71,3 +71,17 @@
 ## 개인 공부
 
 </details>
+
+<details> <summary>2021년 9월 29일</summary>
+
+## 회사 업무
+- [DDD] DDD START
+  - Chapter4 (0% -> 50%) 
+
+## 개인 공부
+- [Spring] Security
+  - Chapter1 (25% -> 50%)
+- [Spring] Cloud START
+  - Chapter1 (0% -> 50%)
+
+</details>
