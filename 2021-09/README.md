@@ -60,3 +60,14 @@
 ## 개인 공부
 
 </details>
+
+<details> <summary>2021년 9월 28일</summary>
+
+## 회사 업무
+- [DDD] DDD START
+  - Chapter3 (67% -> 100%) 
+- 오더 상태 변경 코드 분석 완료
+  
+## 개인 공부
+
+</details>
