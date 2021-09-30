@@ -85,3 +85,18 @@
   - Chapter1 (0% -> 50%)
 
 </details>
+
+<details> <summary>2021년 9월 30일</summary>
+
+## 회사 업무
+- [DDD] DDD START
+  - Chapter4 (50% -> 90%) 
+- '지점오더필터링 소개' 참석 
+- Intellij, Datagrip 라이선스 재요청 
+
+## 개인 공부
+- [Spring] Cloud 
+  - Chapter1 (50% -> 100%)
+  - Chapter2 (0% -> 100%)
+
+</details>
