@@ -12,3 +12,16 @@
   - Chapter3 (0% -> 10%) 
 
 </details>
+
+<details> <summary>2021년 10월 2일</summary>
+
+## 회사 업무
+
+## 개인 공부
+- [Spring] Cloud
+  - Chapter3 (10% -> 15%) 
+- [공모전] Modak
+  - Server: AI와의 통신을 위한 intro API 추가, m1전용 mysql 명령어 추가
+  - AI: Django REST API에 실제 AI 동작 추가 
+
+</details>
