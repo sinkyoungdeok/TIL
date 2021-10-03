@@ -25,3 +25,22 @@
   - AI: Django REST API에 실제 AI 동작 추가 
 
 </details>
+
+<details> <summary>2021년 10월 3일</summary>
+
+## 회사 업무
+
+## 개인 공부
+- [공모전] Modak
+  - 회의
+    - 앞으로 해야될 일 정리
+    - Flutter 업무 분배 
+    - Server & AI 시연 및 진행 사항 보고 
+  - Server
+    - Firestore 연동 및 저장 테스트 
+  - Flutter
+    - 환경설정 세팅
+    - DBRepository 코드리뷰
+   
+
+</details>
