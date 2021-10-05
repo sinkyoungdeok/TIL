@@ -44,3 +44,19 @@
    
 
 </details>
+
+<details> <summary>2021년 10월 4일</summary>
+
+## 회사 업무
+
+## 개인 공부
+- [공모전] Modak
+  - Server
+    - Firestore 연동 및 Camping 데이터 저장 api 추가
+    - querydsl 세팅 
+    - 지역별 검색을 위한 groups api 추가
+    - 운영형태 검색을 위한 groups api 추가
+    - 입자구분(환경) 검색을 위한 groups api 추가 
+   
+
+</details>
