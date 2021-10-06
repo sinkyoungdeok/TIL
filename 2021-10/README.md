@@ -60,3 +60,19 @@
    
 
 </details>
+
+<details> <summary>2021년 10월 5일</summary>
+
+## 회사 업무
+- 오더 정보 변경 코드 분석
+- [DDD] DDD START
+  - Chapter 7 (50% -> 100%)
+
+## 개인 공부
+- [공모전] Modak
+  - Server
+    - camping 동적 검색 기능 및 페이징 기능 완성
+    - groups api URI refactorying
+   
+
+</details>
