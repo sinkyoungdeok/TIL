@@ -4,6 +4,7 @@
 - [docker](https://github.com/sinkyoungdeok/docker)
 - [ps](https://github.com/sinkyoungdeok/ps)
 - [kubernetes](https://github.com/sinkyoungdeok/kubernetes)
+- [aws](https://github.com/sinkyoungdeok/aws)
 
 
 # 날짜별 TIL

@@ -76,3 +76,22 @@
    
 
 </details>
+
+<details> <summary>2021년 10월 6일</summary>
+
+## 회사 업무
+- 오더 정보 변경 코드 분석
+- [DDD] DDD START
+  - Chapter 8 (0% -> 80%)
+- msa 스터디 참석
+- [AWS] aws-class-youtube 
+  - 세팅 완료 
+
+## 개인 공부
+- [공모전] Modak
+  - Server
+    - camping 동적 검색 기능 및 페이징 기능 완성
+    - groups api URI refactorying
+   
+
+</details>
