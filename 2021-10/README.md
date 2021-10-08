@@ -95,3 +95,19 @@
    
 
 </details>
+
+
+
+<details> <summary>2021년 10월 7일</summary>
+
+## 회사 업무
+- [DDD] DDD START
+  - Chapter 8 (80% -> 100%)
+- msa 스터디 참석
+- 라스트마일 개발 Talk Talk 미팅 참석
+
+
+## 개인 공부
+   
+
+</details>
