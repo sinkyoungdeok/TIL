@@ -111,3 +111,20 @@
    
 
 </details>
+
+
+<details> <summary>2021년 10월 8일</summary>
+
+## 회사 업무
+- [DDD] DDD START
+  - Chapter 9 (0% -> 50%)
+- [AWS] aws-class-youtube 
+  - Chapter 1 (0% -> 100%)
+
+## 개인 공부
+- [공모전] Modak
+  - Server
+    - CampingImage DTO 추가 및 Camping과 연관관계 추가
+   
+
+</details>
