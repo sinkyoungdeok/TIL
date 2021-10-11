@@ -144,3 +144,16 @@
    
 
 </details>
+
+<details> <summary>2021년 10월 10일</summary>
+
+## 회사 업무
+
+## 개인 공부
+- [공모전] Modak
+  - App(Flutter)
+    - 검색 UI 기본틀 완성 및 Map 페이지와 연결
+  - Server
+    - Camping 조회 api에 description 필드 추가 
+   
+</details>
