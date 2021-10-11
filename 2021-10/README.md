@@ -128,3 +128,19 @@
    
 
 </details>
+
+<details> <summary>2021년 10월 9일</summary>
+
+## 회사 업무
+
+## 개인 공부
+- [공모전] Modak
+  - Server
+    - Swagger 버그 수정
+    - Camping 저장할때 Camping의 Image정보 같이 저장되도록 변경
+    - Camping 조회 api request를 body에서 parameter로 변경
+- [msa]
+  - 초기 세팅 완료
+   
+
+</details>
