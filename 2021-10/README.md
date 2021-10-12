@@ -157,3 +157,17 @@
     - Camping 조회 api에 description 필드 추가 
    
 </details>
+
+
+<details> <summary>2021년 10월 11일</summary>
+
+## 회사 업무
+
+## 개인 공부
+- [공모전] Modak
+  - App(Flutter)
+    - 검색 UI 디자인 수정 및 API와 연동 완성 
+  - Server
+    - Camping 조회 api에 contentId로 검색할 수 있도록 파라미터 추가 
+   
+</details>
