@@ -187,3 +187,22 @@
    
 </details>
 
+
+<details> <summary>2021년 10월 13일</summary>
+
+## 회사 업무
+- [DDD] DDD START
+  - Chapter 10 (0% -> 40%)
+- '관제화면 오더 리스트 엑셀 다운로드' 코드 분석
+- redis 소개 참여
+
+
+## 개인 공부
+- [공모전] Modak
+  - Server
+    - request를 dto패키지 포함되게 변경
+    - 유저의 정보로 좋아요한 camping들 리스트가 보여지는 User 조회 api 추가
+    - 좋아요 기능을 위한 Good 애그리거트 생성 및 생성 api 추가
+    - User객체 생성 및 생성 api 추가 
+   
+</details>
