@@ -206,3 +206,22 @@
     - User객체 생성 및 생성 api 추가 
    
 </details>
+
+
+<details> <summary>2021년 10월 14일</summary>
+
+## 회사 업무
+- [DDD] DDD START
+  - Chapter 10 (40% -> 70%)
+- 메쉬톡데이
+- [AWS] aws-class-youtube 
+  - Chapter 4 (0% -> 100%)
+
+
+## 개인 공부
+- [공모전] Modak
+  - Server
+    - User 조회시 좋아요 없는 경우에 조회 안되는 버그 수정
+    - Camping 조회시 environtment가 없는 경우에 조회 안되는 버그 수정 
+   
+</details>
