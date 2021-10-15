@@ -225,3 +225,15 @@
     - Camping 조회시 environtment가 없는 경우에 조회 안되는 버그 수정 
    
 </details>
+
+<details> <summary>2021년 10월 15일</summary>
+
+## 회사 업무
+- [DDD] DDD START
+  - Chapter 10 (70% -> 100%)
+  - Chapter 11 (0% -> 50%)
+
+
+## 개인 공부
+   
+</details>
