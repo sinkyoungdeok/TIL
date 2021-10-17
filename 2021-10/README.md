@@ -237,3 +237,18 @@
 ## 개인 공부
    
 </details>
+
+<details> <summary>2021년 10월 16일</summary>
+
+## 회사 업무
+
+
+## 개인 공부
+- [공모전] Modak
+  - App(Flutter)
+    - Map Page 마커 기능 추가, 들어올때 바로 현재 위치가 반영되게 기능 구현, 최종적으로 안쓰게되서, Camping Search Page가 메인에 보이도록 변경
+    - Camping Search Page 일부 수정 작업
+  - Server
+    - Camping 조회 API에 name으로 검색하는 기능 추가
+   
+</details>
