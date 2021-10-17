@@ -252,3 +252,22 @@
     - Camping 조회 API에 name으로 검색하는 기능 추가
    
 </details>
+
+<details> <summary>2021년 10월 17일</summary>
+
+## 회사 업무
+
+
+## 개인 공부
+- [공모전] Modak
+  - App(Flutter)
+    - Camping Search에서 검색한 내용을 CampingSearchResultPage에서 결과가 보여지도록 구성
+  - Server
+    - Camping 조회시 유저의 email값으로 각 캠핑들을 좋아요 눌렀는지에 대한 값, Thumbnail(대표이미지) 값, 좋아요 갯수 값 추가 
+    - SWAGGER 설명 추가 
+    - 이미 존재하는 '좋아요' 일 경우에는 저장 안되게 수정
+    - '좋아요' 취소 기능 완성
+    - '오늘의 캠핑 추천' 기능 추가 
+
+   
+</details>
