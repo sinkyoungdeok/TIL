@@ -6,6 +6,7 @@
 - [kubernetes](https://github.com/sinkyoungdeok/kubernetes)
 - [aws](https://github.com/sinkyoungdeok/aws)
 - [msa](https://github.com/sinkyoungdeok/msa)
+- [mysql](https://github.com/sinkyoungdeok/mysql)
 
 
 # 날짜별 TIL

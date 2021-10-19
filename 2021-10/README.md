@@ -271,3 +271,17 @@
 
    
 </details>
+
+<details> <summary>2021년 10월 18일</summary>
+
+## 회사 업무
+- [mysql] Real-MySQL
+  - 세팅
+- [DDD] DDD START
+  - Chapter 11 (50% -> 100%)
+- 위클리 미팅
+
+## 개인 공부
+
+   
+</details>
