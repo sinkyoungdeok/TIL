@@ -285,3 +285,21 @@
 
    
 </details>
+
+<details> <summary>2021년 10월 19일</summary>
+
+## 회사 업무
+- [mysql] Real-MySQL
+  - Chapter 2 (0% -> 100%)
+- [AWS] aws-class-youtube 
+  - Chapter 5 (0% -> 80%)
+- 오더 생성 ~ 취소 테스트 진행
+- Order 테이블(객체) 분석
+
+## 개인 공부
+- [공모전] Modak
+  - App(Flutter)
+    - (Camping Search Page) 버튼 누를 때 색이 변했다가 풀릴 수 있도록 구성, 각 필터마다 1개씩만 누를 수 있게 구성, Progress Bar 색 변경
+
+   
+</details>
