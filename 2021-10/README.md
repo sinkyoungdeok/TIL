@@ -319,3 +319,20 @@
 
    
 </details>
+
+<details> <summary>2021년 10월 21일</summary>
+
+## 회사 업무
+- [mysql] Real-MySQL
+  - Chapter 3 (5% -> 10%)
+- Order 테이블(객체) 분석
+- 라스트마일 개발 Talk 참여
+
+## 개인 공부
+- [공모전] Modak
+  - Server
+    - (Camping) 캠핑 검색할 때 필터 값 여러개 지정할 수 있도록 구성 
+    - (Camping) 기존 캠핑 함수 리팩토링
+
+   
+</details>
