@@ -303,3 +303,19 @@
 
    
 </details>
+
+<details> <summary>2021년 10월 20일</summary>
+
+## 회사 업무
+- [mysql] Real-MySQL
+  - Chapter 3 (0% -> 5%)
+- Order 테이블(객체) 분석
+- PR 2개 분석
+
+## 개인 공부
+- [공모전] Modak
+  - App(Flutter)
+    - (Camping Search) 필터 버튼 누른것에 대해서 API로 전달함으로써 동적 검색 기능 완성
+
+   
+</details>
