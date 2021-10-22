@@ -336,3 +336,20 @@
 
    
 </details>
+
+<details> <summary>2021년 10월 22일</summary>
+
+## 회사 업무
+- "B마트 접수오더가 n건이상 발생시 슬랙알림" - 지라 스토리 생성 및 부작업 생성
+- "B마트 접수오더가 n건이상 발생시 슬랙알림" - 5분마다 스케줄러 동작 코드 추가, 오더 건수 조회 QueryDSL 작성
+
+## 개인 공부
+- [공모전] Modak
+  - Server
+    - (Camping) 필터 여러개로 검색하는 기능에 name도 검색할 수 있도록 구성
+    - (Camping) 필터 제대로 안되던 버그 수정 
+  - App(Flutter)
+    - (Camping Search) 필터값 여러개로 검색하는 기능 완성
+
+   
+</details>
