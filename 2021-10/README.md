@@ -353,3 +353,18 @@
 
    
 </details>
+
+<details> <summary>2021년 10월 23일</summary>
+
+## 회사 업무
+
+## 개인 공부
+- [공모전] Modak
+  - App(Flutter)
+    - (MatchingPage) 디자인 다듬기
+    - (DashBoardPage) 디자인 다듬기
+    - 전체 페이지에서 색상이 하드코딩 되어 있는 부분을 MainColor를 참조하도록 변경
+    - 새로운 폰트 적용 
+
+   
+</details>
