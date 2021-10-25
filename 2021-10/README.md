@@ -368,3 +368,20 @@
 
    
 </details>
+
+<details> <summary>2021년 10월 24일</summary>
+
+## 회사 업무
+
+## 개인 공부
+- [공모전] Modak
+  - App(Flutter)
+    - 디자인 다듬기
+  - AI
+    - Dockerfile과 requirments를 ubuntu에 맞춰서 작업
+    - ai 서버 실행 방법 설명 추가
+  - Server
+    - ncp 서버 세팅, modak-server 배포
+
+   
+</details>
