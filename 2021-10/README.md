@@ -385,3 +385,19 @@
 
    
 </details>
+
+<details> <summary>2021년 10월 25일</summary>
+
+## 회사 업무
+- "B마트 접수오더가 n건이상 발생시 슬랙알림" 
+  - 5분마다 스케줄러 동작 코드 검토
+  - 오더 건수 조회 QueryDSL 검토
+  - 신규 slack 채널 생성 및 web hook 발급 
+
+## 개인 공부
+- [공모전] Modak
+  - App(Flutter)
+    - (DashBoardPage) 디자인 다듬기
+
+   
+</details>
