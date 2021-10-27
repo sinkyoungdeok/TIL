@@ -401,3 +401,21 @@
 
    
 </details>
+
+<details> <summary>2021년 10월 26일</summary>
+
+## 회사 업무
+- "B마트 접수오더가 n건이상 발생시 슬랙알림" 
+  - Slack 알림 코드 작성
+- 배송서비스서버거왕의 행차 참석
+- 1:1 캐주얼 미팅 참석  
+
+## 개인 공부
+- [공모전] Modak
+  - App(Flutter)
+    - (CampingSearchPage) 다른 페이지로 이동했을 때 재 로딩 안되던 버그 수정, 더보기 버튼 및 접기 버튼 기능 추가 
+    - (CampingSearchResultPage) 다른 페이지로 이동했을 때 재 로딩 안되던 버그 수정
+    - (DashBoardPage) 디자인 다듬기 
+
+   
+</details>
