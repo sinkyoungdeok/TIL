@@ -419,3 +419,21 @@
 
    
 </details>
+
+<details> <summary>2021년 10월 27일</summary>
+
+## 회사 업무
+- "B마트 접수오더가 n건이상 발생시 슬랙알림" 
+  - DBA 쿼리 검수 요청
+- "AWS Dev Workshop" 참석
+
+## 개인 공부
+- [공모전] Modak
+  - AI
+    - 전체 Camping embedding을 json으로 저장하는 API추가
+    - 개별 Camping embedding을 json으로 저장하는 API추가
+    - Camping을 추천하는 API추가
+    - Camping을 추천할 때 embedding json을 활용함으로써 gpu없이도 AI가 돌아 갈 수 있도록 성능 최적화
+
+   
+</details>
