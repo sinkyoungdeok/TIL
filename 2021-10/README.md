@@ -437,3 +437,21 @@
 
    
 </details>
+
+<details> <summary>2021년 10월 28일</summary>
+
+## 회사 업무
+- AWS General Immersion Day
+- AWS Work shop 실습
+
+## 개인 공부
+- [공모전] Modak
+  - AI
+    - AI에서 최대한 저장되어 있는 것을 활용할 수 있도록 Camping idx 저장 및 활용
+    - embedder를 필요한 곳에만 사용함으로써 gpu없이 AI가 빠르게 동작할 수 있도록 구성
+  - Server
+    - email 입력 없이도 AI 추천 받을 수 있도록 구성
+    - Camping을 AI로 추천하는 API 완성
+
+   
+</details>
