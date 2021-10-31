@@ -472,3 +472,24 @@
 
    
 </details>
+
+
+<details> <summary>2021년 10월 30일</summary>
+
+## 회사 업무
+
+## 개인 공부
+- [공모전] Modak
+  - App
+    - (CampingDetailPage) 문의처가 없을 경우엔 문의처 문구 자체가 안보이게 변경
+    - (GoodsPage) 좋아요 문구 변경 
+    - (CampingSearch) 필터에 이용시설 버튼 추가 및 이용시설로 검색할 수 있도록 구성 완성
+  - Server
+    - (Camping) Facility 연관관곌르 이름을 다르게 하고, 기존의 String으로 되어 있는것을 Entity에 추가
+    - (Camping) 조회에서 "이용시설", "환경" 데이터 검색 쿼리 속도 최적화
+    - (전체) generatedValue를 autu increament으로 사용할 수 있도록 변경
+    - (Camping) 조회에서 "이용시설" 검색할 수 있도록 동적쿼리 기능 추가
+    - (Camping) "이용시설" 필터 API 추가
+
+   
+</details>
