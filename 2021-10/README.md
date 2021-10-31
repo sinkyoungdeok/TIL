@@ -455,3 +455,20 @@
 
    
 </details>
+
+<details> <summary>2021년 10월 29일</summary>
+
+## 회사 업무
+- B마트 접수오더가 n건이상 발생시 슬랙알림
+  - dev1 배포
+  - PR 작성
+  - 코드 리뷰 반영
+
+## 개인 공부
+- [공모전] Modak
+  - Server
+    - Camping에서 Facility 애그리거트로 분리하는 작업 완성
+    - openapi에서 image를 불러올 때 넘겨받은 contentId부터 시작할 수 있도록 구성 
+
+   
+</details>
