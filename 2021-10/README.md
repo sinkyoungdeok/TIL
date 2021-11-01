@@ -493,3 +493,15 @@
 
    
 </details>
+
+<details> <summary>2021년 10월 31일</summary>
+
+## 회사 업무
+
+## 개인 공부
+- [공모전] Modak
+  - 공모전 ppt 팀원들이랑 같이 제작
+  - 공모전 최종 제출
+
+   
+</details>
