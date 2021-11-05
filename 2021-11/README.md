@@ -43,7 +43,7 @@
 
 </details>
 
-<details> <summary>2021년 11월 3일</summary>
+<details> <summary>2021년 11월 4일</summary>
 
 ## 회사 업무
 - B마트 접수 오더가 n건이상 발생시 슬랙알림
