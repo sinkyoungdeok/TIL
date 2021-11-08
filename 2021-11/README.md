@@ -83,3 +83,14 @@
 
 
 </details>
+
+<details> <summary>2021년 11월 7일</summary>
+
+## 회사 업무
+
+## 개인 공부
+- [Spring] 스프링 핵심 원리 - 고급편
+  - Chapter3 (50% -> 60%)
+
+
+</details>
