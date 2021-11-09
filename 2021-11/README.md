@@ -94,3 +94,22 @@
 
 
 </details>
+
+<details> <summary>2021년 11월 8일</summary>
+
+## 회사 업무
+- sentry disable in local
+  - 코드 작성
+  - PR 작성
+  - develop 머지
+- enforcedAssignmentConfirm API의 OptimisticLocking 에러 응답 수정
+  - 코드 분석
+ 
+
+
+## 개인 공부
+- [Spring] 스프링 핵심 원리 - 고급편
+  - Chapter3 (60% -> 100%)
+
+
+</details>
