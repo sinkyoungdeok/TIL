@@ -113,3 +113,20 @@
 
 
 </details>
+
+<details> <summary>2021년 11월 9일</summary>
+
+## 회사 업무
+- enforcedAssignmentConfirm API의 OptimisticLocking 에러 응답을 수정합니다
+  - 코드 분석
+- B마트 접수오더가 n건이상 발생시 슬랙알림
+  - PR피드백 반영
+ 
+
+
+## 개인 공부
+- [Spring] 스프링 핵심 원리 - 고급편
+  - Chapter4 (0% -> 15%)
+
+
+</details>
