@@ -147,3 +147,23 @@
 
 
 </details>
+
+<details> <summary>2021년 11월 11일</summary>
+
+## 회사 업무
+- enforcedAssignmentConfirm API의 OptimisticLocking 에러 응답을 수정합니다
+  - 코드 분석
+- [AWS] aws-class-youtube 
+  - Chapter 6 (70% -> 100%)
+  - Chapter 7 (0% -> 100%)
+  - Chapter 8 (0% -> 30%)
+ 
+
+
+## 개인 공부
+- [Spring] 스프링 핵심 원리 - 고급편
+  - Chapter4 (90% -> 100%)
+  - Chapter5 (0% -> 100%)
+
+
+</details>
