@@ -196,3 +196,17 @@
 
 
 </details>
+
+<details> <summary>2021년 11월 14일</summary>
+
+## 회사 업무
+
+
+## 개인 공부
+- [Spring] 스프링 핵심 원리 - 고급편
+  - Chapter7 (33% -> 100%)
+  - Chapter8 (0% -> 100%)
+  - Chapter9 (0% -> 60%)
+
+
+</details>
