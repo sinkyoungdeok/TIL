@@ -210,3 +210,17 @@
 
 
 </details>
+
+<details> <summary>2021년 11월 15일</summary>
+
+## 회사 업무
+- 주간 weekly 미팅 참여
+- 온보딩 체크리스트
+  - 전체적으로 검토
+
+## 개인 공부
+- [Spring] 스프링 핵심 원리 - 고급편
+  - Chapter9 (60% -> 100%)
+  - Chapter10 (0% -> 50%)
+
+</details>
