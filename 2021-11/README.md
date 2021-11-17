@@ -224,3 +224,17 @@
   - Chapter10 (0% -> 50%)
 
 </details>
+
+<details> <summary>2021년 11월 16일</summary>
+
+## 회사 업무
+- [AWS] aws-class-youtube 
+  - Chapter11 (0% -> 100%)
+  - Chapter12 (0% -> 100%)
+
+## 개인 공부
+- [Spring] 스프링 핵심 원리 - 고급편
+  - Chapter10 (50% -> 100%)
+  - Chapter11 (0% -> 25%)
+
+</details>
