@@ -238,3 +238,20 @@
   - Chapter11 (0% -> 25%)
 
 </details>
+
+<details> <summary>2021년 11월 17일</summary>
+
+## 회사 업무
+- [AWS] aws-class-youtube 
+  - Chapter13 (0% -> 100%)
+  - Chapter14 (0% -> 100%)
+- 지점오더필터링 필터 갯수 상향조정
+  - 코드 작성
+  - PR 작성
+
+
+## 개인 공부
+- [Spring] 스프링 핵심 원리 - 고급편
+  - Chapter11 (0% -> 100%)
+
+</details>
