@@ -290,3 +290,13 @@
   - Chapter1 (0% -> 100%)
 
 </details>
+
+<details> <summary>2021년 11월 20일</summary>
+
+## 회사 업무
+
+## 개인 공부
+- [ELK] ELK 스택으로 데이터 분석
+  - Chapter2 (0% -> 25%)
+
+</details>
