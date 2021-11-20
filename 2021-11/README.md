@@ -271,3 +271,22 @@
   - Chapter13 (0% -> 100%)
 
 </details>
+
+<details> <summary>2021년 11월 19일</summary>
+
+## 회사 업무
+- kafka-데브원영
+  - 토픽
+  - 브로커, 복제, ISR
+  - 파티셔너
+  - 컨슈머 랙
+  - 카프카 버로우
+- 메쉬 톡데이 참여
+- 코드리뷰
+  - [ITSMCHG-5572] OptimisticLocking 예외 발생 시 재시도 애노테이션 추가
+
+## 개인 공부
+- [ELK] ELK 스택으로 데이터 분석
+  - Chapter1 (0% -> 100%)
+
+</details>
