@@ -255,3 +255,19 @@
   - Chapter11 (0% -> 100%)
 
 </details>
+
+<details> <summary>2021년 11월 18일</summary>
+
+## 회사 업무
+- aws-생활코딩
+  - route53
+- 코드리뷰
+  - [ITSMCHG-5572] OptimisticLocking 예외 발생 시 재시도 애노테이션 추가
+- 라스트마일 개발 TALK 참여
+
+## 개인 공부
+- [Spring] 스프링 핵심 원리 - 고급편
+  - Chapter12 (0% -> 100%)
+  - Chapter13 (0% -> 100%)
+
+</details>
