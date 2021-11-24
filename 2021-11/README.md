@@ -307,6 +307,15 @@
 
 ## 개인 공부
 - [ELK] ELK 스택으로 데이터 분석
-  - Chapter2 (0% -> 30%)
+  - Chapter2 (25% -> 30%)
+
+</details>
+
+<details> <summary>2021년 11월 22일</summary>
+
+## 회사 업무
+
+## 개인 공부
+- 여태까지 진행한 공모전 정리
 
 </details>
