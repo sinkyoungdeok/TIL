@@ -337,3 +337,16 @@
 ## 개인 공부
 
 </details>
+
+<details> <summary>2021년 11월 24일</summary>
+
+## 회사 업무
+- 상용배포
+- "New Relic Webinar" 참석
+- "New Relic 교육" 참석
+- 온보딩 체크리스트
+  - 스프링 내용들 검토
+
+## 개인 공부
+
+</details>
