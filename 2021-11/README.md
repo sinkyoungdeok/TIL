@@ -350,3 +350,19 @@
 ## 개인 공부
 
 </details>
+
+<details> <summary>2021년 11월 25일</summary>
+
+## 회사 업무
+- "프라임 데이터베이스 이대로 괜찮은가?" 미팅 참석
+- 온보딩 체크리스트
+  - 스프링 내용들 검토
+- 코드 리뷰
+  - ITSMCHG-5734 mcash, cron 에서도 setnry report 하도록 개선
+
+## 개인 공부
+- [ELK] ELK 스택으로 데이터 분석
+  - Chapter2 (30% -> 75%)
+
+
+</details>
