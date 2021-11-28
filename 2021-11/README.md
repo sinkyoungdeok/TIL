@@ -366,3 +366,20 @@
 
 
 </details>
+
+<details> <summary>2021년 11월 26일</summary>
+
+## 회사 업무
+- 온보딩 체크리스트
+  - KafKa 내용 검토
+  - JPA 내용 검토
+- 코드리뷰
+  - [ITSMCHG-5711] 불필요한 mcash pubnub event 삭제
+
+## 개인 공부
+- [ELK] ELK 스택으로 데이터 분석
+  - Chapter2 (75% -> 100%)
+  - Chapter3 (0% -> 50%)
+
+
+</details>
