@@ -407,3 +407,22 @@
 
 
 </details>
+
+<details> <summary>2021년 11월 29일</summary>
+
+## 회사 업무
+- JpaSystemException은 sentry 알림이 뜨지 않도록 제외한다.
+  - 코드 작성
+  - PR 작성
+- 코드리뷰
+  - [ITSMCHG-5793] Mcash 조정정책 재시도 로직 수정
+- 위클리 미팅 참여
+- 에러관리 리뷰 참여
+## 개인 공부
+- [개인 플젝 - 맛집 소개 사이트]
+  - 장고 세팅
+  - mysql 세팅 
+  - orm 세팅
+  - 우리나라 "시", "구" 정보 데이터 저장하는 API 추가
+ 
+</details>
