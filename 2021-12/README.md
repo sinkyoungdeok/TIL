@@ -26,3 +26,19 @@
   - save_towns API에 시작값 추가, 동이 따로 없는 "구"들은 저장안하게 변경
 
 </details>
+
+
+<details> <summary>2021년 12월 3일</summary>
+
+## 회사 업무
+- 온보딩 체크리스트 검토
+- Vroong Lastmile bootcamp 재검토
+- 코드리뷰
+  - ITSMCHG-5768 MDCInfo 리팩토링 (M캐시서버 transaction_id 이슈 연관)
+- B마트 미배차오더의 알림주기를 5분으로 변경
+  - 코드, PR 작성
+  - dev1배포 
+
+## 개인 공부
+
+</details>
