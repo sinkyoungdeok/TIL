@@ -53,3 +53,13 @@
   - Chapter2 (0% -> 100%)
 
 </details>
+
+<details> <summary>2021년 12월 5일</summary>
+
+## 회사 업무
+
+## 개인 공부
+- [MSA] The Red : 비즈니스 성공을 위한 Java/Spring 기반 서비스 개발과 MSA 구축
+  - Chapter3 (0% -> 50%)
+
+</details>
