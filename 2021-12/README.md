@@ -79,3 +79,15 @@
   - Chapter3 (50% -> 70%)
 
 </details>
+
+<details> <summary>2021년 12월 7일</summary>
+
+## 회사 업무
+- 온보딩 체크리스트 검토
+- Vroong Lastmile bootcamp 내용 검토
+
+## 개인 공부
+- [MSA] The Red : 비즈니스 성공을 위한 Java/Spring 기반 서비스 개발과 MSA 구축
+  - Chapter3 (70% -> 100%)
+
+</details>
