@@ -91,3 +91,19 @@
   - Chapter3 (70% -> 100%)
 
 </details>
+
+<details> <summary>2021년 12월 8일</summary>
+
+## 회사 업무
+- 상용 배포 준비
+- 가게도착 API 내용 검토 
+
+## 개인 공부
+- [MSA] The Red : 비즈니스 성공을 위한 Java/Spring 기반 서비스 개발과 MSA 구축
+  - Chapter4 (0% -> 100%)
+  - Chapter5 (0% -> 75%)
+- [개인 플젝] 맛집 소개 사이트
+  - kakao 기본 url 추가 
+  - kakao 맵 기본 크롤링 추가 
+
+</details>
