@@ -122,3 +122,13 @@
   - kakao 맵 크롤러에 tag, url 정보 추가
 
 </details>
+
+<details> <summary>2021년 12월 10일</summary>
+
+## 회사 업무
+- 가게도착 API 내용 검토 
+- 인텔리제이 개발 환경 세팅
+
+## 개인 공부
+
+</details>
