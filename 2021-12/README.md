@@ -107,3 +107,18 @@
   - kakao 맵 기본 크롤링 추가 
 
 </details>
+
+<details> <summary>2021년 12월 9일</summary>
+
+## 회사 업무
+- 상용 배포 
+- 가게도착 API 내용 검토 
+- 인텔리제이 업그레이드 후 개발 환경 세팅
+
+## 개인 공부
+- [MSA] The Red : 비즈니스 성공을 위한 Java/Spring 기반 서비스 개발과 MSA 구축
+  - Chapter5 (75% -> 100%)
+- [개인 플젝] 맛집 소개 사이트
+  - kakao 맵 크롤러에 tag, url 정보 추가
+
+</details>
