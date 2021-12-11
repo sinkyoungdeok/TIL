@@ -1,3 +1,23 @@
+# 10월 요약
+- [DDD] DDD START
+  - Chapter4 ~ END
+- [공모전] Modak
+  - Spring Server, AI, Django Server, Flutter App 각각 코드 작성 
+  - 공모전 최종 제출
+- [AWS] aws-class-youtube
+  - Chapter1 ~ Chapter4
+- [mysql] Real-MySQL
+  - Chapter1 ~ Chapter3 
+- 회사 업무(메쉬코리아)
+  - 라스트마일 서버 코드 분석
+  - B마트 접수오더가 n건이상 발생시 슬랙알림
+    - 5분마다 스케줄러 동작 코드 작성
+    - 오더 건수 조회 QueryDSL 코드 작성
+    - 신규 slack 채널 생성 및 web hook 발급
+    - 코드 작성 
+    - dev1 배포
+    - PR 작성, PR 피드백 반영 
+
 <details> <summary>2021년 10월 1일</summary>
 
 ## 회사 업무
