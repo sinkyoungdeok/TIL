@@ -1,3 +1,43 @@
+# 11월 요약
+- [Spring] 스프링 핵심 원리 - 고급편
+  - Chapter1 ~ END
+- [AWS] aws-class-youtube
+  - Chapter4 ~ END
+- [AWS] aws-생활코딩
+  - route53 
+- [ELK] ELK 스택으로 데이터 분석
+  - Chapter1 ~ END
+- [개인 플젝] 맛집 소개 사이트
+  - 전국 시, 동, 구 데이터 저장 하는 API 제작
+  - Django, Mysql 세팅
+- 회사 업무(메쉬코리아) - 온보딩 진행 중
+  - 라스트마일 코드 분석
+  - B마트 접수 오더가 n건이상 발생시 슬랙알림
+    - PR 피드백 반영
+    - DBA 쿼리 피드백 검토 및 반영
+    - dev1 배포
+    - 테스트 코드 작성
+    - 요구 사항 변경에 대한 코드 수정 
+  - enforceAssignmentConfirm API가 Optimistic Locking 에러 시 null 응답이 전달 되지 않도록 수정
+    - 코드 분석
+  - JpaSystemException은 sentry 알림이 뜨지 않도록 제외 한다
+    - 코드 작성, PR 작성
+  - 로컬 환경에서 sentry가 동작 하지 않도록 구성
+    - 코드 작성, PR 작성 
+  - 지점오더필터링 필터 갯수 상향조정
+    - 코드 작성, PR 작성
+  - 상용 배포 준비, 상용 배포
+  - 코드리뷰
+    - [ITSMCHG-5572] OptimisticLocking 예외 발생 시 재시도 애노테이션 추가
+    - [ITSMCHG-5793] Mcash 조정정책 재시도 로직 수정
+    - [ITSMCHG-5583] 픽업요청시간이 없는 오더 예외처리
+    - [ITSMCHG-5711] 불필요한 mcash pubnub event 삭제
+  - [기사앱] 기사는 배송이 완료된 이후, 배송 메시지를 확인할 수 없다.
+    - 배송 메시지 관련 조사
+    - 해당 사항 위키 정리
+
+
+
 <details> <summary>2021년 11월 1일</summary>
 
 ## 회사 업무
