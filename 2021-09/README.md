@@ -1,3 +1,12 @@
+# 9월 요약
+- [DDD] DDD START
+  - Chapter2 ~ Chapter4
+- [Spring] Querydsl
+  - Chapter3 ~ 끝
+- 9월 6일 - 메쉬코리아 입사
+- 라스트마일 서버 코드 분석 
+
+
 <details> <summary>2021년 9월 23일</summary>
 
 ## 회사 업무
