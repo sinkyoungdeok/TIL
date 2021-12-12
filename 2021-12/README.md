@@ -141,3 +141,16 @@
 - [TIL] 9~11월 월별 요약
 
 </details>
+
+<details> <summary>2021년 12월 12일</summary>
+
+## 회사 업무
+
+## 개인 공부
+- [개인 플젝] 맛집 소개 사이트 - Spring Server
+  - 기본 세팅, JWT & CORS 세팅
+  - User 어그리게이트 추가 
+  - mysql 세팅
+  - 유저 SignUp API 완성
+
+</details>
