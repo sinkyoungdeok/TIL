@@ -154,3 +154,23 @@
   - 유저 SignUp API 완성
 
 </details>
+
+<details> <summary>2021년 12월 13일</summary>
+
+## 회사 업무
+- 배민1 가게도착 API 
+  - 스펙 정리
+- [개인 플젝] 맛집 소개 사이트 
+  - Spring Server
+    - README에 기술스택 정리 
+  - Django Server
+    - README에 기술스택 정리 
+- [PS] 
+  - 무지의 먹방 라이브
+
+## 개인 공부
+- [Spring] Spring-Batch
+  - Chapter1 (0% -> 100%)
+- 
+
+</details>
