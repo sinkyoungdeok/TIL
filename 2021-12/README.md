@@ -160,6 +160,10 @@
 ## 회사 업무
 - 배민1 가게도착 API 
   - 스펙 정리
+
+## 개인 공부
+- [Spring] Spring-Batch
+  - Chapter1 (0% -> 100%)
 - [개인 플젝] 맛집 소개 사이트 
   - Spring Server
     - README에 기술스택 정리 
@@ -168,9 +172,21 @@
 - [PS] 
   - 무지의 먹방 라이브
 
+
+</details>
+
+<details> <summary>2021년 12월 14일</summary>
+
+## 회사 업무
+- 배민1 가게도착 API 
+  - 스펙 정리
+- OJT미팅 참석
+- 코드리뷰
+  - [ITSMCHG-5940] dev1 환경에서 로그 masking 제거
+  - [ITSMCHG-5572] OptimisticLocking 예외 발생 시 재시도 애노테이션 추가
+
 ## 개인 공부
 - [Spring] Spring-Batch
-  - Chapter1 (0% -> 100%)
-- 
+  - Chapter2 (0% -> 50%)
 
 </details>
