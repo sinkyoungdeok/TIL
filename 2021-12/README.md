@@ -249,3 +249,19 @@
   - Class
 
 </details>
+
+<details> <summary>2021년 12월 19일</summary>
+
+## 회사 업무
+
+
+## 개인 공부
+- [PS] greedy (python)
+  - greedy관련 문제 4문제 풀이
+- [Kotlin] 새차원의 코틀린
+  - Inheritance
+  - Properties and Fields
+  - Data, Nested classes
+  - Object Expressions and Declarations
+
+</details>
