@@ -204,3 +204,21 @@
   - 코틀린 연습겸 쉬운문제 8문제 풀이
 
 </details>
+
+<details> <summary>2021년 12월 16일</summary>
+
+## 회사 업무
+- 가게도착API
+  - API 개발
+  - 상용 배포
+
+## 개인 공부
+- [PS] 코틀린
+  - 코틀린 연습겸 쉬운문제 1문제 풀이
+- [Kotlin] 새차원의 코틀린
+  - Install
+  - Basic Syntax
+  - Basic Types
+  - Control Flow
+
+</details>
