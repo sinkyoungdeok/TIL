@@ -209,7 +209,7 @@
 
 ## 회사 업무
 - 가게도착API
-  - API 개발
+  - 가게도착버튼을 위한 API 코드 작성
   - 상용 배포
 
 ## 개인 공부
@@ -220,5 +220,19 @@
   - Basic Syntax
   - Basic Types
   - Control Flow
+
+</details>
+
+<details> <summary>2021년 12월 17일</summary>
+
+## 회사 업무
+- 가게도착API
+  - 가게도착버튼을 위한 API 코드 작성
+
+## 개인 공부
+- [PS] 코틀린
+  - 코틀린 연습겸 쉬운문제 12문제 풀이
+- [Kotlin] 새차원의 코틀린
+  - Packages, Return and Jumps
 
 </details>
