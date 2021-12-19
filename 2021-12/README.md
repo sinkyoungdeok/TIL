@@ -236,3 +236,16 @@
   - Packages, Return and Jumps
 
 </details>
+
+<details> <summary>2021년 12월 18일</summary>
+
+## 회사 업무
+
+
+## 개인 공부
+- [PS] 코틀린
+  - 코틀린 연습겸 쉬운문제 11문제 풀이
+- [Kotlin] 새차원의 코틀린
+  - Class
+
+</details>
