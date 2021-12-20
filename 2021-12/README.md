@@ -263,5 +263,7 @@
   - Properties and Fields
   - Data, Nested classes
   - Object Expressions and Declarations
+- 스프링 유스콘 행사 참여 
+  - 링크: https://frost-witch-afb.notion.site/YOUTHCON-21-365e94c3df3443e5b1322520a8b1a2ef
 
 </details>
