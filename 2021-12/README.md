@@ -265,5 +265,27 @@
   - Object Expressions and Declarations
 - 스프링 유스콘 행사 참여 
   - 링크: https://frost-witch-afb.notion.site/YOUTHCON-21-365e94c3df3443e5b1322520a8b1a2ef
+  - TDD를 더 깊이 알 수 있는 기회가 되었다.
+  - 이벤트 처리에 대해서 복습할 수 있었다.
+
+</details>
+
+<details> <summary>2021년 12월 20일</summary>
+
+## 회사 업무
+- 배민1 가게도착 API 
+  - 가게도착버튼을 위한 API 코드 작성
+
+## 개인 공부
+- 당근마켓 밋업 행사 참여
+  - 코틀린과 코틀린의 코루틴이 엄청 강력하다는 것을 깨닫고, 더 열심히 배워야 겠다는 것을 다짐하는 계기가 되었다.
+- [Spring] Kotlin으로 개발하는 Spring Boot Web MVC
+  - Chapter1 (0% -> 100%)
+  - Chapter2 (0% -> 100%)
+- [Kotlin] 새차원의 코루틴
+  - why coroutines
+- [PS] 수학 (python)
+  - 수학관련 문제 1문제 풀이 
+
 
 </details>
