@@ -289,3 +289,20 @@
 
 
 </details>
+
+<details> <summary>2021년 12월 21일</summary>
+
+## 회사 업무
+- 배민1 가게도착 API 
+  - 가게도착버튼을 위한 API 코드 작성
+  - 오더 상태변경에 따라 가게도착시간 정보가 변경되도록 코드 작성
+
+## 개인 공부
+- [Spring] Kotlin으로 개발하는 Spring Boot Web MVC
+  - Chapter3 (0% -> 100%)
+  - Chapter4 (0% -> 60%)
+- [PS] dfs (python)
+  - dfs 문제 1문제 풀이 
+
+
+</details>
