@@ -323,3 +323,21 @@
 
 
 </details>
+
+<details> <summary>2021년 12월 23일</summary>
+
+## 회사 업무
+- 배민1 가게도착 API 
+  - 오더 상태변경에 따라 가게도착시간 정보가 변경되도록 코드 작성
+  - 기존 Prime 동기화 코드 분석
+
+## 개인 공부
+- [Spring] Kotlin으로 개발하는 Spring Boot Web MVC
+  - Chapter6 (0% -> 100%)
+  - Chapter7 (0% -> 100%)
+  - Chapter8 (0% -> 100%) = END
+- [PS] 이분탐색 (python)
+  - 이분탐색 1문제 풀이
+
+
+</details>
