@@ -341,3 +341,18 @@
 
 
 </details>
+
+<details> <summary>2021년 12월 24일</summary>
+
+## 회사 업무
+- 배민1 가게도착 API 
+  - 기존 Prime 동기화 코드 분석
+
+## 개인 공부
+- [Kotlin] 새차원의 코루틴
+  - basics
+- [PS] 우선순위큐 (python)
+  - 우선순위큐 1문제 풀이
+
+
+</details>
