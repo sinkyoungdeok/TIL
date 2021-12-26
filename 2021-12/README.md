@@ -356,3 +356,14 @@
 
 
 </details>
+
+<details> <summary>2021년 12월 25일</summary>
+
+## 회사 업무
+
+## 개인 공부
+- [PS] KMP (python)
+  - KMP 9문제 풀이
+
+
+</details>
