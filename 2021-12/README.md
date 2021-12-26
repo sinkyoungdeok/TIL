@@ -367,3 +367,18 @@
 
 
 </details>
+
+<details> <summary>2021년 12월 26일</summary>
+
+## 회사 업무
+
+## 개인 공부
+- [PS] KMP (python)
+  - KMP 8문제 풀이
+- [Kotlin] 새차원의 코루틴
+  - Cancellation and Timeouts
+  - Composing Suspending Functions
+  - Coroutines under the hood
+  - Coroutine Context and Dispatchers ==> END 
+
+</details>
