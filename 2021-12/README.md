@@ -382,3 +382,29 @@
   - Coroutine Context and Dispatchers ==> END 
 
 </details>
+
+<details> <summary>2021년 12월 27일</summary>
+
+## 회사 업무
+- 배민1 가게도착 API 
+  - 테스트코드 작성
+  - 기존 Prime 동기화 코드 분석
+  - dev1 배포
+
+## 개인 공부
+- [PS] 카카오 (python)
+  - 카카오 기출 1문제 풀이
+- [Kotlin] 코틀린 공식문서
+  - representing multiple values
+  - flow
+  - flow cancellabion basics
+  - flow builders
+  - intermediate flow operators
+  - flows are sequential
+  - flow context
+  - buffering
+  - conflation
+  - composing multiple flows (zip, combine)
+  - 위의 내용들 공부
+
+</details>
