@@ -1,3 +1,69 @@
+# 12월 요약
+- [Kafka] 아파치 카프카 개요 및 설명
+  - Chapter1 ~ END
+- [Spring] Spring Boot JWT Tutorial
+  - Chapter1 ~ END
+- [MSA] The Red : 비즈니스 성공을 위한 Java/Spring 기반 서비스 개발과 MSA 구축
+  - Chapter1 ~ END
+- [PS] 
+  - (kotlin) 코틀린 연습겸 쉬운문제 32문제 풀이
+  - (python) greedy 관련 문제 4문제 풀이 
+  - (python) 수학 관련 문제 1문제 풀이
+  - (python) dfs 관련 문제 1문제 풀이 
+  - (python) 이분탐색 관련 문제 1문제 풀이
+  - (python) 우선순위큐 관련 문제 1문제 풀이
+  - (python) KMP 관련 문제 17문제 풀이
+  - (python) MO's 관련 문제 10문제 풀이
+  - (python) MST 관련 문제 5문제 풀이 
+- [Kotlin] 새차원의 코틀린
+  - Chapter1 ~ END 
+- [Kotlin] 새차원의 코루틴
+  - Chapter1 ~ END 
+- [Kotlin] 코틀린 공식문서
+  - 코틀린 공식문서 보면서 flow, conflation등 공부 
+- [Spring] Kotlin으로 개발하는 Spring Boot Web MVC
+  - Chapter1 ~ END 
+- [Spring] 코틀린 마이크로서비스 개발
+  - Chatper1 ~ Chapter5
+- 스프링 유스콘 행사 참여 
+  - TDD를 더 깊이 알 수 있는 기회가 되었다.
+  - 이벤트 처리에 대해서 복습할 수 있었다.
+- 당근마켓 밋업 행사 참여
+  - 코틀린과 코틀린의 코루틴이 엄청 강력하다는 것을 깨닫고, 더 열심히 배워야 겠다는 것을 다짐하는 계기가 되었다.
+- [개인 플젝] 맛집 소개 사이트
+  - 장고 크롤링 서버 
+    - save_towns API에 시작값 추가, 동이 따로 없는 "구"들은 저장안하게 변경
+    - kakao 기본 url 추가 
+    - kakao 맵 기본 크롤링 추가 
+  - 스프링 백엔드 서버
+    - 기본 세팅, JWT & CORS 세팅
+    - User 어그리게이트 추가 
+    - mysql 세팅
+    - 유저 SignUp API 완성
+- 회사 업무(메쉬코리아) - 온보딩 종료
+  - B마트 미배차오더의 알림주기를 5분으로 변경
+    - 코드, PR 작성
+    - dev1배포 
+    - 상용 배포
+  - 배민1 가게도착 API 
+    - API 스펙 완성
+    - API 스펙 WIKI에 정리
+    - 가게도착버튼을 위한 API 코드 작성
+    - 오더 상태변경에 따라 가게도착시간 정보가 변경되도록 코드 작성
+    - 기존 Prime 동기화 코드 분석
+    - 테스트코드 작성
+    - dev1 배포
+    - 프라임 동기화 코드 작성
+  - (QA 환경) 뉴렐릭 버전 변경
+  - 코드리뷰
+    - [ITSMCHG-5768] MDCInfo 리팩토링 (M캐시서버 transaction_id 이슈 연관)
+    - [ITSMCHG-5940] dev1 환경에서 로그 masking 제거
+    - [ITSMCHG-5572] OptimisticLocking 예외 발생 시 재시도 애노테이션 추가
+    - [ITSMCHG-5560] 기사 고용 보험 - Part1. 고용보험수
+    - [ITSMCHG-5560] 기사 고용 보험 - Part2. 어드민 고용보험 핸들링 로직 및 기사 고용보험 조회성 데이터들
+    - [ITSMCHG-6057] Order, DeliveredPhoto 매핑 변경 1:1 -> 1:n
+
+
 <details> <summary>2021년 12월 1일</summary>
 
 ## 회사 업무
