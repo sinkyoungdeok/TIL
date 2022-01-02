@@ -1,3 +1,10 @@
+# 1월 요약
+- [Spring] 코틀린 마이크로서비스 개발 
+  - Chapter6 ~ END
+- [PS] 
+  - Python
+    - 투포인터 - 1문제
+
 <details> <summary>2022년 1월 1일</summary>
 
 ## 회사 업무
