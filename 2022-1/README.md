@@ -7,6 +7,13 @@
   - Python
     - 투포인터 - 1문제
     - 수학 - 1문제
+- 회사 업무(메쉬코리아)
+  - B마트 미배차오더의 알람 발생 조건을 20건이상으로 변경
+    - PR작성
+  - 배민1 가게도착 API 
+    - PR작성
+  - 코드리뷰
+    - [ITSMCHG-5560] 기사 고용 보험 - Part3. NICE 실명인증 연동
 
 <details> <summary>2022년 1월 1일</summary>
 
@@ -36,5 +43,23 @@
   - 12.모범사례 (0% -> 100%)
 - [Spring] RxJava 리액티브 프로그래밍 
   - 1.RxJava의 기본 (0% -> 50%)
+
+</details>
+
+<details> <summary>2022년 1월 3일</summary>
+
+## 회사 업무
+- B마트 미배차오더의 알람 발생 조건을 20건이상으로 변경
+  - PR작성
+- 배민1 가게도착 API 
+  - PR작성 
+- 코드리뷰
+  - [ITSMCHG-5560] 기사 고용 보험 - Part3. NICE 실명인증 연동
+
+## 개인 공부
+- [PS] python
+  - 구현 알고리즘 1문제
+- [Spring] RxJava 리액티브 프로그래밍 
+  - 1.RxJava의 기본 (50% -> 70%)
 
 </details>
