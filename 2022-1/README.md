@@ -17,8 +17,10 @@
   - 부릉 로지스틱스 오더 상태 이벤트 비동기 전달
     - 기존 프라임 동기화 코드 분석
     - 앞으로 진행할 작업들 부작업으로 생성
+    - URBAN server에 보내는 데이터 스펙 작성
   - 코드리뷰
     - [ITSMCHG-5560] 기사 고용 보험 - Part3. NICE 실명인증 연동
+    - [ITSMCHG-6169] McashEntry 오더 번호 변환 에러 수정
 
 <details> <summary>2022년 1월 1일</summary>
 
@@ -86,5 +88,21 @@
   - 구현 알고리즘 1문제
 - [Spring] RxJava 리액티브 프로그래밍 
   - 1.RxJava의 기본 (70% -> 100%)
+
+</details>
+
+<details> <summary>2022년 1월 5일</summary>
+
+## 회사 업무
+- 부릉 로지스틱스 오더 상태 이벤트 비동기 전달
+  - URBAN server에 보내는 데이터 스펙 작성
+- 코드리뷰
+  - [ITSMCHG-6169] McashEntry 오더 번호 변환 에러 수정
+
+## 개인 공부
+- [PS] python
+  - 구현 알고리즘 1문제
+- [Spring] RxJava 리액티브 프로그래밍 
+  - 2.RxJava를 사용하는 데 필요한 배경 지식 (0% -> 100%)
 
 </details>
