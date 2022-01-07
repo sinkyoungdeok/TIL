@@ -8,7 +8,7 @@
     - 투포인터 - 1문제
     - 수학 - 1문제
     - 구현 - 2문제
-    - 카카오 인턴 1문제
+    - 카카오 인턴 2문제
 - 회사 업무(메쉬코리아)
   - B마트 미배차오더의 알람 발생 조건을 20건이상으로 변경
     - PR작성
@@ -20,6 +20,7 @@
     - 기존 프라임 동기화 코드 분석
     - 앞으로 진행할 작업들 부작업으로 생성
     - URBAN server에 보내는 데이터 스펙 작성 & 협의
+    - 오더 변경에 대한 정보를 lastmile에서 push server SQS전송하는 코드 작성
   - 코드리뷰
     - [ITSMCHG-5560] 기사 고용 보험 - Part3. NICE 실명인증 연동
     - Apply a Special Prefix for Vroong Friends Virtual Account Name
@@ -128,5 +129,21 @@
   - 카카오 인턴 1문제
 - [Spring] RxJava 리액티브 프로그래밍 
   - 3.RxJava의 메커니즘 (0% -> 100%)
+
+</details>
+
+<details> <summary>2022년 1월 7일</summary>
+
+## 회사 업무
+- 부릉 로지스틱스 오더 상태 이벤트 비동기 전달
+  - 오더 변경에 대한 정보를 lastmile에서 push server SQS전송하는 코드 작성
+- 배민1 가게도착 API
+  - PR 피드백 반영
+
+## 개인 공부
+- [PS] python
+  - 카카오 인턴 1문제
+- [Spring] RxJava 리액티브 프로그래밍 
+  - 4.Flowable 과 Oservable의 연산자 (0% -> 40%)
 
 </details>
