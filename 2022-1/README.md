@@ -147,3 +147,17 @@
   - 4.Flowable 과 Oservable의 연산자 (0% -> 40%)
 
 </details>
+
+<details> <summary>2022년 1월 8일</summary>
+
+## 회사 업무
+
+## 개인 공부
+- [PS] python
+  - 정렬 1문제 
+- [Spring] RxJava 리액티브 프로그래밍 
+  - 4.Flowable 과 Oservable의 연산자 (40% -> 100%)
+  - 5.Processor와 Subject (0% -> 100%)
+  - 6.RxJava의 디버깅과 테스트 (0% -> 100%)
+
+</details>
