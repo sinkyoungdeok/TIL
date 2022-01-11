@@ -9,7 +9,7 @@
   - Python
     - 투포인터 - 1문제
     - 수학 - 1문제
-    - 구현 - 4문제
+    - 구현 - 5문제
     - 카카오 인턴 2문제
 - 회사 업무(메쉬코리아)
   - B마트 미배차오더의 알람 발생 조건을 20건이상으로 변경
@@ -29,6 +29,8 @@
     - [ITSMCHG-6169] McashEntry 오더 번호 변환 에러 수정
     - [ITSMCHG-6173] 완료 오더의 환수처리 제한
     - [ITSMCHG-6121] 기사 수행오더 조회 API 개선
+    - [ITSMCHG-6216] M캐시 로그 aop 로 추출 및 소요시간 추가
+    - [ITSMCHG-6162] failed-to-create-store-sales-regjion-when-adding-mass-stores
 
 <details> <summary>2022년 1월 1일</summary>
 
@@ -191,5 +193,21 @@
 - [Spring] 스프링 인 액션
   - 2.웹 애플리케이션 개발하기 (20% -> 100%)
   - 3.데이터로 작업하기 (0% -> 100%)
+
+</details>
+
+<details> <summary>2022년 1월 11일</summary>
+
+## 회사 업무
+- 부릉 로지스틱스 오더 상태 이벤트 비동기 전달
+  - 카프카 연동 검토
+  - 카프카 기존 코드 분석
+- 코드 리뷰
+  - [ITSMCHG-6216] M캐시 로그 aop 로 추출 및 소요시간 추가
+  - [ITSMCHG-6162] failed-to-create-store-sales-regjion-when-adding-mass-stores
+
+## 개인 공부
+- [PS] python
+  - 구현 1문제 
 
 </details>
