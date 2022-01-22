@@ -10,7 +10,7 @@
     - dfs&bfs - 2문제
     - 투포인터 - 1문제
     - 수학 - 1문제
-    - 구현 - 9문제
+    - 구현 - 10문제
     - 카카오 인턴 2문제
     - 카카오 블라인드 3문제 
 - 회사 업무(메쉬코리아)
@@ -352,4 +352,25 @@
   - 주문 프로젝트 요구사항 추가
 
 
+</details>
+
+<details> <summary>2022년 1월 21일</summary>
+
+## 회사 업무
+- 부릉 로지스틱스 오더 상태 이벤트 비동기 전달
+  - 이벤트 별 카프카 전송 코드 작성
+- 라스트마일 기술 정책 회의
+- 코드리뷰
+  - [VRR-523] 도착지 변경 #3 - 클라이언트 연동
+  - mcashTransfer 카운트 inclusive 수정 및 크론 로그 추가
+
+## 개인 공부
+- [PS] python
+  - 구현 문제 1문제 
+- [개인플젝] order-and-gift-project
+  - 주문 프로젝트 세팅 
+  - Partner 도메인 정의
+  - Webflux, Reactive Mongodb 세팅
+  - presentation ~ infrastructure layer 까지 Partner 전체적인 작업 
+   
 </details>
