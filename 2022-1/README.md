@@ -388,3 +388,16 @@
   - 생겼던 오류와 해결방법 3개 정리
    
 </details>
+
+<details> <summary>2022년 1월 23일</summary>
+
+## 회사 업무
+
+## 개인 공부
+- [PS] python
+  - 구현 문제 1문제 
+- [개인플젝] order-and-gift-project
+  - Partner 생성 API - mapstruct 도입 및 리팩토링
+  - Order 생성 API - (0% -> 50%)
+   
+</details>
