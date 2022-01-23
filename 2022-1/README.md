@@ -10,7 +10,7 @@
     - dfs&bfs - 2문제
     - 투포인터 - 1문제
     - 수학 - 1문제
-    - 구현 - 10문제
+    - 구현 - 11문제
     - 카카오 인턴 2문제
     - 카카오 블라인드 3문제 
 - 회사 업무(메쉬코리아)
@@ -372,5 +372,19 @@
   - Partner 도메인 정의
   - Webflux, Reactive Mongodb 세팅
   - presentation ~ infrastructure layer 까지 Partner 전체적인 작업 
+   
+</details>
+
+<details> <summary>2022년 1월 22일</summary>
+
+## 회사 업무
+
+## 개인 공부
+- [PS] python
+  - 구현 문제 1문제 
+- [개인플젝] order-and-gift-project
+  - Partner 생성 API 버그 수정
+  - WebFlux에서 validation 처리 안되는 현상 수정
+  - 생겼던 오류와 해결방법 3개 정리
    
 </details>
