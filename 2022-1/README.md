@@ -401,3 +401,21 @@
   - Order 생성 API - (0% -> 50%)
    
 </details>
+
+<details> <summary>2022년 1월 24일</summary>
+
+## 회사 업무
+- 라스트마일 서버 - qa4환경구축
+  - 다른 qa환경 분석
+- 코드리뷰
+  - Hotfix 고용보험 일차감 DB 커넥션 문제
+  - [ITSMCHG-6358] 관제 성능 개선 전체 적용
+
+## 개인 공부
+- [PS] python
+  - 구현 문제 1문제 
+- [개인플젝] order-and-gift-project
+  - Item 생성 API - (0% -> 50%)
+  - Partner 조회 기능 추가
+   
+</details>
