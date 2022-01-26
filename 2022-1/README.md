@@ -25,6 +25,8 @@
     - 앞으로 진행할 작업들 부작업으로 생성
     - URBAN server에 보내는 데이터 스펙 작성 & 협의
     - 오더 변경에 대한 정보를 lastmile에서 push server SQS전송하는 코드 작성
+  - 라스트마일 서버 - qa4환경구축
+    - 다른 qa환경 분석 - bamboo, aws에 어떤 리소스 띄워져있는지 조사
   - 코드리뷰
     - [ITSMCHG-5560] 기사 고용 보험 - Part3. NICE 실명인증 연동
     - Apply a Special Prefix for Vroong Friends Virtual Account Name
@@ -417,5 +419,19 @@
 - [개인플젝] order-and-gift-project
   - Item 생성 API - (0% -> 50%)
   - Partner 조회 기능 추가
+   
+</details>
+
+<details> <summary>2022년 1월 25일</summary>
+
+## 회사 업무
+- 라스트마일 서버 - qa4환경구축
+  - 다른 qa환경 분석 - bamboo
+  - 다른 qa환경 분석 - aws에 어떤 리소스 띄워져있는지 조사
+
+## 개인 공부
+- [개인플젝] order-and-gift-project
+  - Item 생성 API - 버그 발견해서 수정중 
+  - 발견한 오류 및 해결방법 1개 추가
    
 </details>
