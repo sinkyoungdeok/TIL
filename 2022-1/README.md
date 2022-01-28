@@ -450,3 +450,18 @@
   - 발견한 오류 및 해결방법 1개 추가
    
 </details>
+
+<details> <summary>2022년 1월 27일</summary>
+
+## 회사 업무
+- 라스트마일 서버 - qa4환경구축
+  - QA4 라스트마일 데이터베이스 생성 요청
+  - application-qa4.properties 작성
+
+## 개인 공부
+- [PS] python
+  - 구현 문제 1문제  
+- [개인플젝] order-and-gift-project
+  - Item 생성 API - 완료
+   
+</details>
