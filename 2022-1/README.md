@@ -11,6 +11,7 @@
     - 투포인터 - 1문제
     - 수학 - 1문제
     - 구현 - 13문제
+    - 그리디 - 1문제
     - 카카오 인턴 2문제
     - 카카오 블라인드 3문제 
 - 회사 업무(메쉬코리아)
@@ -480,5 +481,20 @@
   - (Partner) 저장 API request타입을 mono에서 일반 객체로 변경
   - (Partner, Item) dto들의 형식 및 null 될 수 있는 값 정리 
   - (Item) 아이템 판매종료 API 완성
+   
+</details>
+
+<details> <summary>2022년 1월 29일</summary>
+
+## 회사 업무
+
+## 개인 공부
+- [PS] python
+  - 그리디 문제 1문제  
+- [개인플젝] order-and-gift-project
+  - (Item) 아이템 조회 API 완성 
+  - (Order) 오더 생성 API 완성
+  - webflux에 coroutine 도입 하는것에 대한 고민&조사
+ 
    
 </details>
