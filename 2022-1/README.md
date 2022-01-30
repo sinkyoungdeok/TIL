@@ -12,6 +12,7 @@
     - 수학 - 1문제
     - 구현 - 13문제
     - 그리디 - 1문제
+    - DP - 1문제
     - 카카오 인턴 2문제
     - 카카오 블라인드 3문제 
 - 회사 업무(메쉬코리아)
@@ -495,6 +496,22 @@
   - (Item) 아이템 조회 API 완성 
   - (Order) 오더 생성 API 완성
   - webflux에 coroutine 도입 하는것에 대한 고민&조사
+ 
+   
+</details>
+
+<details> <summary>2022년 1월 30일</summary>
+
+## 회사 업무
+
+## 개인 공부
+- [PS] python
+  - DP 문제 1문제  
+- [개인플젝] order-and-gift-project
+  - (Order) 오더 주문 결제, 오더 주문 조회API 완성
+  - (Partner, Item) Webflux 에 코루틴 연동
+  - (Partner, Item) 이메일 알림 서비스 연동 
+  - (Order) 카카오 알림 서비스 연동 
  
    
 </details>
