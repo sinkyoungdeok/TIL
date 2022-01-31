@@ -10,7 +10,7 @@
     - dfs&bfs - 2문제
     - 투포인터 - 1문제
     - 수학 - 1문제
-    - 구현 - 13문제
+    - 구현 - 14문제
     - 그리디 - 1문제
     - DP - 1문제
     - 카카오 인턴 2문제
@@ -512,6 +512,25 @@
   - (Partner, Item) Webflux 에 코루틴 연동
   - (Partner, Item) 이메일 알림 서비스 연동 
   - (Order) 카카오 알림 서비스 연동 
+ 
+   
+</details>
+
+<details> <summary>2022년 1월 31일</summary>
+
+## 회사 업무
+
+## 개인 공부
+- [PS] python
+  - 구현 문제 1문제  
+- [개인플젝] order-and-gift-project
+  - Order 프로젝트 - 남은 작업 정리 및 완료
+  - Gift 프로젝트 
+    - Gift서비스 프로젝트 세팅 ( kafka, reactivemongodb, webflux등 )
+    - Gift서비스 - 선물하기 등록 API
+    - Gift서비스 - 선물하기 결제 중 상태로 변경 API
+    - Order서비스 - 선물하기 주문 결제 처리 API (Kafka로 Gift서비스에 통신)
+    - Gift서비스 - Kafka Listener로 선물하기 주문 결제 처리
  
    
 </details>
