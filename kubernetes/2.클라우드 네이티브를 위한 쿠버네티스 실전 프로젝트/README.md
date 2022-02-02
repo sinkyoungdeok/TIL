@@ -272,3 +272,127 @@
 
 </details>
 
+<details><summary> 2. EKS 클러스터 구축 </summary>
+
+### 2. EKS 클러스터 구축
+
+#### 2.1 기본 리소스 구축
+
+**사용할 도구 설치**
+- AWS CLI 
+  - `brew install awscli`
+- eksctl
+  - `brew tap weaveworks/tap`
+  - `brew install weaveworks/tap/eksctl`
+- kubectl
+  - `brew install kubernetes-cli`
+
+`git clone https://github.com/dybooksIT/k8s-aws-book.git`
+
+**기본 리소스 생성 방법**
+1. aws에서 CloudFormation 서비스 접속 
+2. <스택 생성> 
+   1. 템플릿 지정
+      1. 사전 조건 - 템플릿 준비: 준비된 템플릿을 선택
+      2. 템플릿 소스 - 템플릿 파일 업로드 선택
+      3. 파일 선택 후 k8s-aws-book/eks-env/01_base_resources_cfn.yaml 선택
+      4. 다음 버튼 클릭 
+   2. 스택 세부 정보 지정 
+      1. 스택 이름: eks-work-base
+      2. 다음 
+   3. 스택 옵션 구성
+      1. 다음
+   4. 검토
+      1. 스택 생성
+
+**생성된 리소스 확인**
+- VPC에서 Name항목에 eks-work-VPC라는 이름이 보임녀 리소스가 정상적으로 생성된 것이다. 
+
+#### 2.2 EKS 클러스터 구축 
+
+**기본 리소스 정보 수집**
+- CloudFormation 페이지에서 `eks-work-base` 스택을 클릭
+- '출력'탭 선택
+- `WorkerSubnets`값을 복사
+
+**eksctl실행**
+```
+$ eksctl create cluster \
+--vpc-public-subnets <WorkerSubnets값> \
+--name eks-work-cluster \
+--region ap-northeast-2 \
+--version 1.19 \
+--nodegroup-name eks-work-nodegroup \
+--node-type t2.small \
+--nodes 2 \
+--nodes-min 2 \
+--nodes-max 5
+``` 
+
+**CloudFormation에서 진행 상황 확인**
+- CloudFormation 스택에서 확인하면 2개더 생성된 것을 알 수 있다. 
+- eksctl에서는 CloudFormation 스택 2개를 생성하여 EKS 환경을 구축한다
+  - EKS 클러스터 구축
+  - 워커 노드 구축 
+
+**kubeconfig 설정**
+- eksctl은 EKS 클러스터 구축 중에 kubeconfig 파일을 자동으로 업데이트한다.
+- Kubeconfig 파일은 쿠버네티스 클라이언트인 kubectl이 이용할 설정 파일로 접속 대상 쿠버네티스 클러스터의 접속 정보를 저장하고 있다. 
+- EKS 클러스터에 접속하기 위한 인증 정보는 AWS CLI로 확인 가능하며, eksctl을 사용하면 AWS CLI를 호출하여 인증하기 위한 설정을 kubeconfig 파일에 포함할 수 있다.
+- EKS 인증은 AWS CLI에서 가능하며, eksctl에서도 이것을 이용하도록 설정할 수 있다. 
+
+**새로운 설정이 생성 된 것을 확인**
+```
+$ kubectl config get-contexts
+CURRENT     NAME
+*           k8sbook_admin@eks-work-cluster.ap-northeast-2.eksctl.io
+
+CLUSTER
+eks-work-cluster.ap-northeast-2.eksctl.io
+
+AUTHINFO
+k8sbook_admin@eks-work-cluster.ap-northeast-2.eksctl.io
+
+NAMESPACE
+```
+
+**kubectl에서 EKS 클러스터에 접속 가능 여부 확인**
+```
+$ kubectl get nodes
+NAME                                                STATUS  ROLES   AGE ERSION
+ip-192-168-0-132.ap-northeast-2.compute.internal    Ready   <none>  40m v1.19.6-eks-49a6c0
+ip-192-168-2-219.ap-northeast-2.compute.internal    Ready   <none>  40m v1.19.6-eks-49a6c0
+```
+
+#### 2.3 EKS 클러스터 동작 확인
+
+eks-env의 02_nginx_k8s 파일로 파드 생성
+```
+$ cd eks-env
+$ kubectl apply -f 02_nginx_k8s.yaml
+pod/nginx-pod created
+```
+
+파드 생성된 것을 확인 
+```
+$ kubectl get pods
+NAME        READY   STATUS    RESTARTS   AGE
+nginx-pod   1/1     Running   0          19s
+```
+
+- 아래 명령은 쿠버네티스 클러스터에 대해 포트 포워딩하는 것이다.
+- 8080번 포트에 접속하면 nginx-pod의 80번 포트로 해당 정보를 전송
+- `http://localhost:8080`
+```
+$ kubectl port-forward nginx-pod 8080:80
+Forwarding from 127.0.0.1:8080 -> 80
+Forwarding from [::1]:8080 -> 80
+```
+
+nginx 삭제 
+```
+$ kubectl delete pod nginx-pod 
+pod "nginx-pod" deleted
+```
+
+</details>
