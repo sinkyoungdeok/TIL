@@ -108,4 +108,44 @@
 
 <details><summary> 4. Amazon EKS란 </summary>
 
+### 4. Amazon EKS란
+
+#### 4.1 EKS는 무엇을 해결하는가 
+- 쿠버네티스 도입을 검토할 때 가장 큰 장벽은 '컨트롤 플레인의 유지 및 운영'이다
+  - 쿠버네티스에서는 여러 컴포넌트들이 서로 독립적이고 비동기로 동작하며 전체를 구성한다
+  - 각각의 구성 요소를 정상적으로 동작시키기 위한 설정이나 유지, 운영 장애가 발생했을 때의 복구 방법 등이 간단하지 않는다.
+- EKS의 경우 이런 유지, 운영을 AWS에서 대신해준다.
+
+![image](https://user-images.githubusercontent.com/28394879/152101164-15fa2f33-d04e-42fe-9ee9-33b1010d643d.png)
+
+
+#### 4.2 EKS의 특징
+- 쿠버네티스와 완전한 호환성을 갖는다.
+- AWS의 다른 서비스들과 연결하거나 기존 구조와 같은 환경으로 이용할 수 있다 
+
+**VPC의 통합**
+- 일반적으로 쿠버네티스 클러스터에서는 파드 네트워크로 데이터 플레인의 네트워크와는 다른 자체 네트워크 체계를 배치한다.
+- 클러스터 외부에서 파드에 명시적으로 엔드포인터를 생성하지 않으면 통신이 불가능하다
+- EKS에서는 VPC통합 네트워킹을 지원하고 있어, 파드에서 VPC 내부 주소 대역을 사용할 수 있고 클러스터 외부와의 통신을 SeamLess하게 구현할 수 있다
+  
+![image](https://user-images.githubusercontent.com/28394879/152101592-d93750eb-d7a1-4287-8b25-213c7bc3a3bb.png)
+
+
+**IAM을 통한 인증과 인가**
+- 쿠버네티스 클러스터는 kubectl이라는 명령줄 도구를 사용하여 조작한다.
+- 해당 조작이 허가된 사용자에 의한 것임을 올바르게 인증 해야한다.
+- 인증된 사용자에게 어떤 조작을 허가할지에 대한 인가 구조도 필요하다.
+
+![image](https://user-images.githubusercontent.com/28394879/152101838-cfe1c407-5815-4593-8e37-a33bc086131e.png)
+
+
+**ELB와의 연계**  
+- 쿠버네티스 클러스터 외부에서 접속할 때 사용하는 서비스 중 가장 전형적인 엔드포인트
+- EKS에서 LoadBalancer를 설정하면 자동으로 ELB가 생성됨
+![image](https://user-images.githubusercontent.com/28394879/152111523-d99f2c2b-a199-4bbd-b81b-af434de2bbde.png)
+
+**데이터 플레인 선택**  
+![image](https://user-images.githubusercontent.com/28394879/152112307-5d5cd368-2b14-411d-b441-6b2b5aa0652f.png)
+
+
 </details>
