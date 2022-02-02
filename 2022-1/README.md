@@ -4,7 +4,10 @@
 - [Spring] RxJava 리액티브 프로그래밍 
   - Chapter1 ~ END
 - [Spring] 스프링 인 액션
-  - Chapter1 ~ 
+  - Chapter1 ~ Chapter13
+- [개인 프로젝트] order&gift 프로젝트
+  - Order프로젝트 완성
+  - Gift프로젝트 50% 진행
 - [PS] 
   - Python
     - dfs&bfs - 2문제
