@@ -1,4 +1,6 @@
-
+# 2월 요약
+- [개인 프로젝트] order&gift 프로젝트
+  - Gift프로젝트 완성
 
 
 <details> <summary>2022년 2월 1일</summary>
