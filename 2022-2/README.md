@@ -19,3 +19,17 @@
  
    
 </details>
+
+<details> <summary>2022년 2월 2일</summary>
+
+## 회사 업무
+
+## 개인 공부
+- [PS] python
+  - 구현 문제 1문제
+- [kubernetes] 클라우드 네이티브를 위한 쿠버네티스 실전 프로젝트 
+  - Chapter1 (0% -> 100%)
+  - Chapter2 (0% -> 50%)
+
+
+</details>
