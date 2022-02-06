@@ -85,3 +85,13 @@
   - dfs 문제 1문제
 
 </details>
+
+<details> <summary>2022년 2월 6일</summary>
+
+## 회사 업무
+
+## 개인 공부
+- [PS] python, java 
+  - dfs 문제 4문제
+
+</details>
