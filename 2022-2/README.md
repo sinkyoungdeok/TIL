@@ -59,3 +59,19 @@
 
 
 </details>
+
+<details> <summary>2022년 2월 4일</summary>
+
+## 회사 업무
+- qa4 환경구축
+  - QA4 api 배포 -> 오류생겨서 전체적으로 검토
+- 코드리뷰
+  - ITSMCHG-6373 [배민1] 오더에 배정된 기사의 수행중인 오더 수 조회 api 추가
+  - ITSMCHG-5727 M캐시 대량이체 메인카테고리 오더아이디 추가
+  - ITSMCHG-6384 지점 보험/정산 정보 추가
+
+## 개인 공부
+- [PS] python
+  - dfs 문제 1문제
+
+</details>
