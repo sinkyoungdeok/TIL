@@ -53,9 +53,8 @@
 - [PS] python
   - 구현 문제 1문제
 - [Java] 자바 플레이그라운드 with TDD, 클린코드 
-  - 숫자야구게임 - 단위테스트
-    - Chapter0 (0% -> 100%)
-    - Chapter1 (0% -> 100%)
+  - Chapter1) 숫자야구게임 - 단위테스트 (0% -> 100%)
+    
 
 
 </details>
@@ -93,5 +92,22 @@
 ## 개인 공부
 - [PS] python, java 
   - dfs 문제 4문제
+
+</details>
+
+<details> <summary>2022년 2월 7일</summary>
+
+## 회사 업무
+- qa4 환경구축
+  - QA4api 배포 -> DB SG inbound 요청
+- 코드리뷰
+  - [VRR-526] 도착지 변경 #4 - 라스트마일 수정 및 프라임 연동
+  - ITSMCHG-6125 [배민1] 배달할수있는 지점 찾기 api 추가
+
+## 개인 공부
+- [PS] python 
+  - 구현 1문제
+- [Java] 자바 플레이그라운드 with TDD, 클린코드 
+  - Chapter2) 자동차 경주 - TDD (0% -> 60%)
 
 </details>
