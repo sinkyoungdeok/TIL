@@ -111,3 +111,18 @@
   - Chapter2) 자동차 경주 - TDD (0% -> 60%)
 
 </details>
+
+<details> <summary>2022년 2월 8일</summary>
+
+## 회사 업무
+- 연차
+
+## 개인 공부
+- [PS] python 
+  - DFS&BFS 1문제
+- [Java] 자바 플레이그라운드 with TDD, 클린코드
+  - Chapter2) 자동차 경주 - TDD (60% -> 100%)
+  - Chapter3) 좌표 계산기 - 상속, 인터페이스 (0% -> 100%)
+  - Chapter4) 블랙잭 - 함수형 프로그래밍 (0% -> 25%)
+
+</details>
