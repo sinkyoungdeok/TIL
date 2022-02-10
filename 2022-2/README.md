@@ -145,3 +145,25 @@
   - Chapter1) 타임리프 - 기본 기능 (0% -> 20%)
 
 </details>
+
+<details> <summary>2022년 2월 10일</summary>
+
+## 회사 업무
+- qa4 환경구축
+  - API 배포 
+  - mysql DB연동 성공
+  - redis, kafka 연동 실패 - 원인 분석 및 devops팀에 요청 
+- 코드 리뷰
+  - ITSMCHG-6423 곧도착 이벤트 추가
+- 라스트마일 개발 토크
+  - 발표 준비
+    - Application Layer에서 사용하는 DTO들 명칭 정의
+      - UPDATE, CREATE, DELETE request: ~Command로 사용결정
+      - SELECT request: ~Criteria로 사용결정
+      - response: ~Info로 사용결정
+    - inner class를 적극적으로 사용 하는 것은 어떨까?
+      - class 객체안에 class가 들어가야 하는 상황에는 DTO inner클래스로 만들고, req res에서 쓰는것으로 결정 
+
+## 개인 공부
+
+</details>
