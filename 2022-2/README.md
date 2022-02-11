@@ -167,3 +167,22 @@
 ## 개인 공부
 
 </details>
+
+<details> <summary> 2022년 2월 11일 </summary>
+
+## 회사 업무
+- qa4환경구축
+  - api, cron, mcash service
+    - bamboo script 작성 및 배포
+    - redis host 변경
+    - redis,kafka 연동 확인
+    - point, prime admin계정 추가
+    - kibana에 index pattern 등록을 위해 devops팀에  네트워크 설정 요청
+    - kibana에 index pattern 등록
+  - push service
+    - db생성 요청 (postgresql)
+## 개인 업무
+- [Spring] 스프링 MVC 2편 - 백엔드 웹 개발 활용 기술
+  - Chapter1) 타임리프 - 기본 기능 (20% -> 100%) 
+
+</details>
