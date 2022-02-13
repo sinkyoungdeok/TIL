@@ -199,3 +199,15 @@
   - Chapter3) 메시지, 국제화 (0% -> 50%)
 
 </details>
+
+<details> <summary> 2022년 2월 13일 </summary>
+
+## 회사 업무
+
+## 개인 업무
+- [PS] python&java
+  - sorting 2문제 
+- [Spring] 스프링 MVC 2편 - 백엔드 웹 개발 활용 기술
+  - Chapter3) 메시지, 국제화 (50% -> 100%)
+
+</details>
