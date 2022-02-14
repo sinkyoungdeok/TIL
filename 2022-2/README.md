@@ -211,3 +211,22 @@
   - Chapter3) 메시지, 국제화 (50% -> 100%)
 
 </details>
+
+<details> <summary> 2022년 2월 13일 </summary>
+
+## 회사 업무
+- qa4환경구축
+  - push service
+    - bamboo script 작성 및 배포
+    - kibana에 index pattern 등록
+- 위클리 미팅
+- 1:1 미팅
+
+## 개인 업무
+- [PS] python
+  - sorting 1문제
+- [Spring] 스프링 MVC 2편 - 백엔드 웹 개발 활용 기술
+  - Chapter4) 검증1 - Validation (0% -> 100%)
+  - Chapter5) 검증2 - Bean Validation (0% -> 100%)
+
+</details>
