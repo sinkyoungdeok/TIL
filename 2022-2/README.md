@@ -230,3 +230,23 @@
   - Chapter5) 검증2 - Bean Validation (0% -> 100%)
 
 </details>
+
+
+<details> <summary> 2022년 2월 15일 </summary>
+
+## 회사 업무
+- qa4환경구축
+  - Mcash Service
+    - RDS SG inbound rule 추가 요청
+  - Cron
+    - error 로그 확인 후 조치 (AWS KMS권한 에러)
+- 코드 리뷰   
+  - ITSMCHG-6486 기존 단건배송 오더 정책 수정
+
+## 개인 업무
+- [Spring] 스프링 MVC 2편 - 백엔드 웹 개발 활용 기술
+  - Chapter6) 로그인 처리1 - 쿠키, 세션 (0% -> 100%)
+  - Chapter7) 로그인 처리2 - 필터, 인터셉터 (0% -> 100%)
+  - Chapter8) 예외 처리와 오류 페이지 (0% -> 100%)
+
+</details>
