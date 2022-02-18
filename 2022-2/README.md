@@ -267,3 +267,16 @@
   - Chapter11) 파일 업로드 (0% -> 100%)
 
 </details>
+
+<details> <summary> 2022년 2월 17일 </summary>
+
+## 회사 업무
+- qa4환경구축
+  - API
+    - 오더 생성 테스트
+    - kinesis권한 요청
+    - redis read timeout 원인 분석
+
+## 개인 업무
+
+</details>
