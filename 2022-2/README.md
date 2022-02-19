@@ -293,3 +293,13 @@
 ## 개인 업무
 
 </details>
+
+<details> <summary> 2022년 2월 19일 </summary>
+
+## 회사 업무
+
+## 개인 업무
+- [PS] python
+  - 이진탐색 3문제
+
+</details>
