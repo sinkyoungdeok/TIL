@@ -280,3 +280,16 @@
 ## 개인 업무
 
 </details>
+
+<details> <summary> 2022년 2월 18일 </summary>
+
+## 회사 업무
+- qa4 환경 구축
+  - api
+    - 오더 생성 테스트
+    - redis read timeout 원인 분석
+- Workshop
+
+## 개인 업무
+
+</details>
