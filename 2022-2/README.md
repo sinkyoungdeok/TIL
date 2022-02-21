@@ -303,3 +303,13 @@
   - 이진탐색 3문제
 
 </details>
+
+<details> <summary> 2022년 2월 20일 </summary>
+
+## 회사 업무
+
+## 개인 공부
+- CTO's Tech Talk 2022 컨퍼런스
+  - 0% -> 100%
+
+</details>
