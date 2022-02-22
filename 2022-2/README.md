@@ -327,3 +327,22 @@
   - Chapter1) 도메인 주도 설계란 무엇인가? (0% -> 100%)
 
 </details>
+
+<details> <summary> 2022년 2월 22일 </summary>
+
+## 회사 업무
+- qa4 환경 구축
+  - CreateOrder ~ DeliveryOrder 테스트
+  - 생성, 조회 테스트
+    - 오더, 지점, 기사 
+  - 수정, 삭제 테스트 
+    - 지점, 기사
+    - prime API host가 잘못되었음을 발견 및 변경
+  - SK, KT 안심번호 발급 테스트
+  - 위키 정리
+
+## 개인 공부
+- [DDD] 도메인 주도 설계란 무엇인가? 
+  - Chapter2) 유비쿼터스 언어 (0% -> 100%)
+
+</details>
