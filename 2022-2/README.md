@@ -313,3 +313,17 @@
   - 0% -> 100%
 
 </details>
+
+<details> <summary> 2022년 2월 21일 </summary>
+
+## 회사 업무
+- qa4 환경 구축
+  - api
+    - 오더 생성 테스트 중 redis read timeout 에러 분석
+    - 오더 생성 테스트 중 mcash server에러 분석
+
+## 개인 공부
+- [DDD] 도메인 주도 설계란 무엇인가? 
+  - Chapter1) 도메인 주도 설계란 무엇인가? (0% -> 100%)
+
+</details>
