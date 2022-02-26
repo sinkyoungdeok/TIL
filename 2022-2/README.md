@@ -388,5 +388,22 @@
   - ITSMCHG-6576 접속기록 30일이상 없는 기사 휴직으로 변경시 날짜 업데이트 누락
 
 ## 개인 공부
+- [개인플젝] order-and-gift-project
+  - Order 프로젝트 
+    - Jwt 토큰 기반 로그인 기능 추가를 위한 조사 
+
+</details>
+
+<details> <summary> 2022년 2월 26일 </summary>
+
+## 회사 업무
+
+## 개인 공부
+- [DDD] 도메인 주도 설계란 무엇인가? 
+  - Chapter3) 모델 주도 설계 (70% -> 100%)
+- [개인플젝] order-and-gift-project
+  - Order 프로젝트 
+    - Jwt 토큰 기반 로그인 기능 추가를 위한 조사 
+
 
 </details>
