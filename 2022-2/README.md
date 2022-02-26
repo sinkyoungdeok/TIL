@@ -390,7 +390,7 @@
 ## 개인 공부
 - [개인플젝] order-and-gift-project
   - Order 프로젝트 
-    - Jwt 토큰 기반 로그인 기능 추가를 위한 조사 
+    - Webflux전용 Jwt 토큰 기반 로그인 기능 추가를 위한 조사 
 
 </details>
 
@@ -403,7 +403,7 @@
   - Chapter3) 모델 주도 설계 (70% -> 100%)
 - [개인플젝] order-and-gift-project
   - Order 프로젝트 
-    - Jwt 토큰 기반 로그인 기능 추가를 위한 조사 
+    - Webflux전용 Jwt 토큰 기반 로그인 기능 추가를 위한 조사 
 
 
 </details>
