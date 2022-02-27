@@ -407,3 +407,14 @@
 
 
 </details>
+
+<details> <summary> 2022년 2월 27일 </summary>
+
+## 회사 업무
+
+## 개인 공부
+- [개인플젝] order-and-gift-project
+  - Order 프로젝트 
+    - (Auth) jwt 토큰 기능 로그인 기능 추가
+
+</details>
