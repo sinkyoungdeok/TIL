@@ -415,6 +415,6 @@
 ## 개인 공부
 - [개인플젝] order-and-gift-project
   - Order 프로젝트 
-    - (Auth) jwt 토큰 기능 로그인 기능 추가
+    - (Auth) jwt 토큰 기반 로그인 기능 추가
 
 </details>
