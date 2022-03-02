@@ -1,5 +1,5 @@
 # TIL 진행중인 repository
-- [DDD](https://github.com/sinkyoungdeok/DDD)
+- [DDD](./til-by-topic/ddd/1.DDD-START)
 - [spring](https://github.com/sinkyoungdeok/spring)
 - [docker](https://github.com/sinkyoungdeok/docker)
 - [ps](https://github.com/sinkyoungdeok/ps)
