@@ -16,3 +16,22 @@
   - Chapter1) 도메인 주도 설계 복습 및 정리 (0% -> 100%)
 
 </details>
+
+<details> <summary> 2022년 3월 2일 </summary>
+
+## 회사 업무
+- 부릉 로지스틱스 오더 상태 이벤트 비동기 전달
+  - 각 오더 상태 이벤트마다 다른 스펙으로 카프카에 전송하는 코드 작성
+- 코드리뷰
+  - ITSMCHG-6678 비마트 기사위치 알람 제거
+  - ITSMCHG-6656 기사 출근시 고용보험 체크를 위한 앱버전 체크로직 제거
+  - ITSMCHG-5889 배민1 callback agentlocation
+- 메쉬톡데이
+- DDD 스터디) 도메인 주도 설계란 무엇인가? - Chapter1
+
+## 개인 공부
+- [개인플젝] order-and-gift-project
+  - Order, Gift 프로젝트 
+    - (User) DB에 저장된 User를 활용하도록 리팩토링
+
+</details>
