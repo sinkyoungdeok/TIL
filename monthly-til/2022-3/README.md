@@ -35,3 +35,23 @@
     - (User) DB에 저장된 User를 활용하도록 리팩토링
 
 </details>
+
+<details> <summary> 2022년 3월 3일 </summary>
+
+## 회사 업무
+- 부릉 로지스틱스 오더 상태 이벤트 비동기 전달
+  - 각 오더 상태 이벤트마다 다른 스펙으로 카프카에 전송하는 코드 작성
+  - PR작성
+  - local 테스트
+  - dev1배포 및 테스트
+- 코드리뷰
+  - ITSMCHG-6716 기사 삭제 시 employmentStatus 업데이트
+
+## 개인 공부
+- [개인플젝] order-and-gift-project
+  - Order, Gift 프로젝트 
+    - (ADmin) 어드민 생성 API
+- [PS] python
+  - dp 1문제 풀이
+
+</details>
