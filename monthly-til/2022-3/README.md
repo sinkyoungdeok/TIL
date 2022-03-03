@@ -50,7 +50,7 @@
 ## 개인 공부
 - [개인플젝] order-and-gift-project
   - Order, Gift 프로젝트 
-    - (ADmin) 어드민 생성 API
+    - (Admin) 어드민 생성 API
 - [PS] python
   - dp 1문제 풀이
 
