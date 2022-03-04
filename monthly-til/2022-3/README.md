@@ -55,3 +55,17 @@
   - dp 1문제 풀이
 
 </details>
+
+<details> <summary> 2022년 3월 4일 </summary>
+
+## 회사 업무
+- 부릉 로지스틱스 오더 상태 이벤트 비동기 전달
+  - 테스트코드 작성
+  - PR리뷰 반영
+
+## 개인 공부
+- [개인플젝] order-and-gift-project
+  - Order, Gift 프로젝트 
+    - (User, Admin) 유저, 어드민 생성시 혹은 조회시 검증한다. 
+
+</details>
