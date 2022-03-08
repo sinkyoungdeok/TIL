@@ -82,3 +82,14 @@
     - (User, Admin) 어드민용 다른 유저 재가입 API
 
 </details>
+
+<details> <summary> 2022년 3월 6일 </summary>
+
+## 회사 업무
+
+## 개인 공부
+- [개인플젝] order-and-gift-project
+  - Order, Gift 프로젝트 
+    - (Partner) Partner API에서 Auth활용 및 User 도메인과 연동
+
+</details>
