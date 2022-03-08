@@ -93,3 +93,16 @@
     - (Partner) Partner API에서 Auth활용 및 User 도메인과 연동
 
 </details>
+
+<details> <summary> 2022년 3월 7일 </summary>
+
+## 회사 업무
+- 부릉 로지스틱스 오더 상태 이벤트 비동기 전달
+  - PR피드백 반영
+- 위클리 미팅
+- 코드리뷰
+  - [ITSMCHG-6750] createorder refactoring
+
+## 개인 공부
+
+</details>
