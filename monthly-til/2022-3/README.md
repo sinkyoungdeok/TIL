@@ -124,3 +124,17 @@
   - mysql DB 도커 세팅
 
 </details>
+
+<details> <summary> 2022년 3월 9일 </summary>
+
+## 회사 업무
+
+## 개인 공부
+- [팀 프로젝트] CherryPick
+  - (Auth) Login API 리팩토링
+- [DDD] 도메인 지식 탐구를 위한 이벤트 스토밍
+  - 강의 보고나서 정리
+- [PS] python
+  - greedy 1문제 풀이
+
+</details>
