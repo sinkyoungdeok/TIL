@@ -106,3 +106,21 @@
 ## 개인 공부
 
 </details>
+
+<details> <summary> 2022년 3월 8일 </summary>
+
+## 회사 업무
+- 부릉 로지스틱스 오더 상태 이벤트 비동기 전달
+  - PR피드백 반영
+  - dev1배포 및 테스트
+- 코드리뷰
+  - ITSMCHG-6722 고용보험 이력 업데이트 일자 버그 픽스
+  - [ITSMCHG-6750] createorder refactoring
+  - [ITSMCHG-6675] 도착지 변경 시 클라이언트에서 ClaimCode 를 선택할 수 있도록 수정
+
+## 개인 공부
+- [팀 프로젝트] CherryPick
+  - JWT 설정
+  - mysql DB 도커 세팅
+
+</details>
