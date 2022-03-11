@@ -154,3 +154,18 @@
   - Chapter2) 2. 유비쿼터스 언어 (0% -> 100%)
 
 </details>
+
+<details> <summary> 2022년 3월 11일 </summary>
+
+## 회사 업무
+- createOrder~cancelOrder 위키 재정리
+- 태우님 온보딩 
+  - createOrder ~ cancelOrder 테스트
+- DDD스터디 참여
+
+## 개인 공부
+- [개인플젝] order-and-gift-project
+  - Order, Gift 프로젝트  
+    - (Auth) 유효기간이 만료된 jwt토큰으로 전달된 경우 500에러가 아닌 401에러를 반환한다. - 조사
+
+</details>
