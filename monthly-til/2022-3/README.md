@@ -138,3 +138,19 @@
   - greedy 1문제 풀이
 
 </details>
+
+<details> <summary> 2022년 3월 10일 </summary>
+
+## 회사 업무
+- "라스트마일 온보딩 - 라스트마일 소개" 미팅 참여
+- 부릉 로지스틱스 오더 상태 이벤트 비동기 전달
+  - PR피드백 반영 
+- createOrder ~ cancelOrder 위키 재정리
+- 코드리뷰
+  -  ITSMCHG-6518-allow-without-uaa-token
+
+## 개인 공부
+- [DDD] 도메인 주도 설계란 무엇인가?
+  - Chapter2) 2. 유비쿼터스 언어 (0% -> 100%)
+
+</details>
