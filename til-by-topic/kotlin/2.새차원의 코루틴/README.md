@@ -53,9 +53,9 @@ fun main() = runBlocking {
 }
 ```
 
-### Structed concurrency
+### Structured Concurrency
 - runBlocking안에 GlobalScope(탑 레벨 코루틴)를 쓰게되면, GlobalScope는 runBlocking과는 상관없이 프로그램이 돌게 된다. (join이 없을 경우)
-- runBlocking과 launch에서 실행된 코루틴이 구조적으로 관계를 가지면 서로를 기다릴 수 있게된다. 이것이 Structed Concurrency이다.
+- runBlocking과 launch에서 실행된 코루틴이 구조적으로 관계를 가지면 서로를 기다릴 수 있게된다. 이것이 structured Concurrency이다.
 ```kotlin
 fun main() = runBlocking {
     this.launch {
@@ -348,21 +348,278 @@ fun main() = runBlocking {
 
 # 4. Composing Suspending Functions
 
-<details><summary> 자세히 보기 </summary>
 
-- Async to sequential
-  - Sequential by default
-  - The Dream Code on Android
+### 기본 순차적 코딩
+- 코루틴에서 일반 코드처럼 작성하게되면, 비동기이지만 순차적으로 실행 된다.
+```kotlin
+fun main() = runBlocking {
+    val time = measureTimeMillis {
+        val one = doSomethingUseFulOne()
+        val two = doSomethingUseFulTwo()
+        println("The answer is ${one + two}")
+    }
+    println("Completed in $time ms")
+}
 
-- async
-  - Concurrent using async
-  - Lazily started async
+suspend fun doSomethingUseFulOne(): Int {
+    println("doSomethingUsefulOne - START")
+    delay(1000L)
+    println("doSomethingUsefulOne - END")
+    return 13
+}
 
-- Structured concurrency
-  - Async-style functions (strongly discouraged)
-  - Structured concurrency with async
+suspend fun doSomethingUseFulTwo(): Int {
+    println("doSomethingUsefulTwo - START")
+    delay(1000L)
+    println("doSomethingUsefulTwo - END")
+    return 29
+}
+```
+```
+결과 
+doSomethingUsefulOne - START
+doSomethingUsefulOne - END
+doSomethingUsefulTwo - START
+doSomethingUsefulTwo - END
+The answer is 42
+Completed in 2011 ms
+```
 
-</details>
+### async를 통한 동시성 처리 
+- 바로 위 예제는 1초 걸리는 연산을 2번해서 2초가 걸렸는데, 두 연산의 처리가 의존적이지 않은 상황일 때 동시에 처리하면 더 빠를 것이다.
+- 코루틴 내부에서 순차적으로 코드를 작성하면, 순차적으로 실행이 되는데 이걸 비동기적으로 실행하고 싶으면 명시적으로 async로 콜해야 한다. 
+- async로 1초 짜리 두개의 연산을 실행하면 1초가 걸린다.
+- await은 async가 끝날때 까지 기다린다. 
+- async는 코루틴 빌더이다. 
+
+```kotlin
+fun main() = runBlocking {
+    val time = measureTimeMillis {
+        val one = async { doSomethingUsefulOne() }
+        val two = async { doSomethingUsefulTwo() }
+//        delay(2000L)
+//        println("test..")
+        println("The answer is ${one.await() + two.await()}")
+    }
+    println("Completed in $time ms")
+}
+
+suspend fun doSomethingUsefulOne(): Int {
+    println("doSomethingUsefulOne - START")
+    delay(1000L)
+    println("doSomethingUsefulOne - END")
+    return 13
+}
+
+suspend fun doSomethingUsefulTwo(): Int {
+    println("doSomethingUsefulTwo - START")
+    delay(1000L)
+    println("doSomethingUsefulTwo - END")
+    return 29
+}
+```
+```
+doSomethingUsefulOne - START
+doSomethingUsefulTwo - START
+doSomethingUsefulOne - END
+doSomethingUsefulTwo - END
+The answer is 42
+Completed in 1017 ms
+```
+
+
+### async 코루틴을 지연시켜서 실행시키기 
+- CoroutineStart.LAZY로 async를 쓰면, `start()` 혹은 `await()`을 콜할 때 실행된다.
+```kotlin
+fun main() = runBlocking {
+    val time = measureTimeMillis {
+        val one = async (start = CoroutineStart.LAZY){ doSomethingUsefulOne3() }
+        val two = async (start = CoroutineStart.LAZY){ doSomethingUsefulTwo3() }
+
+        println("START")
+        delay(2000L)
+        one.start()
+        two.start() // one.start(), two.start()값을 제거하면 one.await()이 완료된 후에 two.await()이 실행되므로 두 연산에 2초가 걸린다
+
+        println("The answer is ${one.await() + two.await()}")
+    }
+    println("Completed in $time ms")
+}
+
+suspend fun doSomethingUsefulOne3(): Int {
+    println("doSomethingUsefulOne - START")
+    delay(1000L)
+    println("doSomethingUsefulOne - END")
+    return 13
+}
+
+suspend fun doSomethingUsefulTwo3(): Int {
+    println("doSomethingUsefulTwo - START")
+    delay(1000L)
+    println("doSomethingUsefulTwo - END")
+    return 29
+}
+```
+```
+START
+doSomethingUsefulOne - START
+doSomethingUsefulTwo - START
+doSomethingUsefulOne - END
+doSomethingUsefulTwo - END
+The answer is 42
+Completed in 3022 ms
+```
+
+### async-style 함수 
+- 위의 async 예제들을 작성하다보면, async를 호출하는 것 자체를 함수로 만들어서 사용하고 싶은 유혹이 생길 수 있는데, 그러면 안된다는 것을 보여준다.
+- xxxAsync functions 들은 suspend functions이 아니다.
+- 이 스타일은 코틀린 코루틴에서는 안쓰는 것이 좋다
+- 이러한 문제는 structured concurrency를 통해 해결할 수 있다. 
+```kotlin
+fun main() { // 이렇게 쓰면 안된다 라는 예제를 보여준것임. GlobalScope.async를 하게 되면 exception이 발생했음 에도 불구하고 코루틴이 계속 실행되는것을 볼 수 있음
+    try { // GlobalScope로 선언했기 때문에, 이 어플리케이션 종료와는 무관한 async함수들이 되버린다. 그러므로, 이 어플리케이션이 excpetion이 터져서 종료되도 실행되는 것이다. 
+        val time = measureTimeMillis {
+            val one = somethingUsefulOneAsync4()
+            val two = somethingUsefulTwoAsync4()
+
+            println("my exceptions")
+            throw Exception("my exceptions")
+
+            runBlocking {
+                println("The answer is ${one.await() + two.await()}")
+            }
+        }
+        println("Completed in $time ms")
+    } catch (e: Exception) {
+
+    }
+
+    runBlocking {
+        delay(100000)
+    }
+}
+
+fun somethingUsefulOneAsync4() = GlobalScope.async {
+    println("start, somethingUsefulOneAsync")
+    val res = doSomethingUsefulOne4()
+    println("end, somethingUsefulOneAsync")
+    res
+}
+
+fun somethingUsefulTwoAsync4() = GlobalScope.async {
+    println("start, somethingUsefulTwoAsync")
+    val res = doSomethingUsefulTwo4()
+    println("end, somethingUsefulTwoAsync")
+    res
+}
+
+suspend fun doSomethingUsefulOne4(): Int {
+    println("doSomethingUsefulOne - START")
+    delay(3000L)
+    println("doSomethingUsefulOne - END")
+    return 13
+}
+
+suspend fun doSomethingUsefulTwo4(): Int {
+    println("doSomethingUsefulTwo - START")
+    delay(3000L)
+    println("doSomethingUsefulTwo - END")
+    return 29
+}
+```
+```
+my exceptions
+start, somethingUsefulTwoAsync
+start, somethingUsefulOneAsync
+doSomethingUsefulTwo - START
+doSomethingUsefulOne - START
+doSomethingUsefulTwo - END
+doSomethingUsefulOne - END
+end, somethingUsefulOneAsync
+end, somethingUsefulTwoAsync
+```
+
+### Structured concurrency with async
+```kotlin
+fun main() = runBlocking {
+    try {
+        val time = measureTimeMillis {
+            println("The answer is ${concurrentSum()}")
+        }
+        println("Completed in $time ms")
+    } catch (e: Exception) {
+
+    }
+
+    runBlocking {
+        delay(5000)
+    }
+}
+
+// 바로 이전 예제처럼 아무 곳에서나 쓸 수 있는 것이 아니라, 코루틴 안에서만 사용 가능하다.
+suspend fun concurrentSum(): Int = coroutineScope { // coroutineScope를 사용함으로써 exception이 발생하면 전체 코루틴이 취소된다.
+    val one = async { doSomethingUsefulOne5() }
+    val two = async { doSomethingUsefulTwo5() }
+
+    delay(10)
+    println("Exception")
+    throw Exception()
+
+    one.await() + two.await()
+}
+
+suspend fun doSomethingUsefulOne5(): Int {
+    println("doSomethingUsefulOne - START")
+    delay(3000L)
+    println("doSomethingUsefulOne - END")
+    return 13
+}
+
+suspend fun doSomethingUsefulTwo5(): Int {
+    println("doSomethingUsefulTwo - START")
+    delay(3000L)
+    println("doSomethingUsefulTwo - END")
+    return 29
+}
+```
+```
+doSomethingUsefulOne - START
+doSomethingUsefulTwo - START
+Exception
+```
+
+### 코루틴은 예외가나 취소가 hierarchy하게 전파된다.
+```kotlin
+fun main() = runBlocking<Unit> {
+    try {
+        failedConcurrentSum()
+    } catch (e: ArithmeticException) {
+        println("Computation failed with ArithmeticException")
+    }
+}
+
+suspend fun failedConcurrentSum(): Int = coroutineScope {
+    val one = async<Int> {
+        try {
+            delay(Long.MAX_VALUE)
+            42
+        } finally {
+            println("First child was cancelled")
+        }
+    }
+    val two = async<Int> {
+        println("Second child throws an exception")
+        throw ArithmeticException()
+    }
+
+    one.await() + two.await()
+}
+```
+```
+Second child throws an exception
+First child was cancelled
+Computation failed with ArithmeticException
+```
 
 
 # 5. Coroutines under the hood
