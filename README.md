@@ -1,5 +1,5 @@
 # TIL 진행중인 repository
-- [DDD](./til-by-topic/ddd/1.DDD-START)
+- [DDD](./til-by-topic/ddd)
 - [spring](https://github.com/sinkyoungdeok/spring)
 - [docker](https://github.com/sinkyoungdeok/docker)
 - [ps](https://github.com/sinkyoungdeok/ps)
@@ -9,7 +9,7 @@
 - [mysql](https://github.com/sinkyoungdeok/mysql)
 - [ELK](https://github.com/sinkyoungdeok/ELK)
 - [Kafka](https://github.com/sinkyoungdeok/kafka)
-- [Kotlin](https://github.com/sinkyoungdeok/kotlin)
+- [Kotlin](./til-by-topic/kotlin)
 - [order-and-gift-project](https://github.com/sinkyoungdeok/order-and-gift-project)
 
 
