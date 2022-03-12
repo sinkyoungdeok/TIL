@@ -629,26 +629,238 @@ Computation failed with ArithmeticException
 - 내부적으로 코틀린 컴파일러가 콜백형태로 만들어서 콜백을 해준다. 즉, 일반적인 코드이다.
 - 컴파일해보면, Continuation Pass Style == CPS 스타일로 변경되는 것을 확인할 수 있다.
 
+
+--- 
 # 6. Coroutine Context and Dispatchers
 
-<details><summary> 자세히 보기 </summary>
-
 ### Dispatchers and threads
+- 코루틴은 코루틴 context에서 실행된다. 
+- 코루틴 context는 요소들인 job, dispatcher를 설정할 수 있다. 
 - coroutine context는 coroutine dispatcher를 포함한다.
 - coroutine dispatcher는 어떤 스레드에서 실행될지를 결정한다.
 - 모든 코루틴 빌더들은 optional로 coroutineContext parameter를 가지고 있다.
 
+```kotlin
+fun main() = runBlocking<Unit> {
+    launch { // runblocking와 같은 컨텍스트에서 실행됨(main)
+        println("main runBlocking   :" +
+                " I'm working in thread ${Thread.currentThread().name}")
+    }
+
+    launch(Dispatchers.Unconfined) {
+        println("Unconfined     :" +
+                " I'm working in thread ${Thread.currentThread().name}")
+    }
+
+    launch(Dispatchers.Default) { // 글로벌 스코프에서 실행하는 것과 동일하다. 
+        println("Default        " +
+                "I'm working in thread ${Thread.currentThread().name}")
+    }
+
+    launch(newSingleThreadContext("MyOwnThread")) { // 코루틴을 실행 할 때 마다 스레드를 만드는 방법
+        println("newSingleThreadContext:" +
+                " I'm working in thread ${Thread.currentThread().name}")
+    }
+
+    newSingleThreadContext("MyOwnThread").use {
+        launch (it) {
+            println("newSingleThreadContext:" +
+                    " I'm working in thread ${Thread.currentThread().name}")
+        }
+    }
+}
+```
+```
+Unconfined     : I'm working in thread main
+Default        I'm working in thread DefaultDispatcher-worker-1
+newSingleThreadContext: I'm working in thread MyOwnThread
+newSingleThreadContext: I'm working in thread MyOwnThread
+main runBlocking   : I'm working in thread main
+```
+
+
 ### 코루틴 디버깅 방법
 - JVM option에 -Dkotlinx.coroutines.debug 명령어를 추가 하면 됨 
 
-### 다룬내용
-- Dispatchers and threads
-- Debugging coroutines and threads
-- Jumping between threads
-- Job in the context
-- Children of a coroutine
-- Parental responsibilities
-- Combining context elements
-- Coroutine scope
+```kotlin
+fun log(msg: String) = println("[${Thread.currentThread().name}] $msg")
 
-</details>
+fun main() = runBlocking<Unit> {
+    val a = async {
+        log("I'm computing a piece of the answer")
+        6
+    }
+    val b = async {
+        log("I'm computing another piece of the answer")
+        7
+    }
+    log("The answer is ${a.await() * b.await()}")
+}
+```
+```
+[main] I'm computing a piece of the answer
+[main] I'm computing another piece of the answer
+[main] The answer is 42
+```
+
+### 코루틴에서 스레드들 사이를 넘나드는 방법
+- withContext에 context랑 같이 실행해주면 그 쓰레드에서 실행된다. 
+```kotlin
+fun main()  {
+    newSingleThreadContext("Ctx1").use { ctx1 ->
+        newSingleThreadContext("Ctx2").use { ctx2 ->
+
+            runBlocking (ctx1) {
+                log("Started in ctx1")
+
+                withContext(ctx2) {
+                    log("Working in ctx2")
+                }
+
+                log("Back to ctx1")
+            }
+        }
+    }
+}
+```
+```
+[Ctx1] Started in ctx1
+[Ctx2] Working in ctx2
+[Ctx1] Back to ctx1
+```
+
+### Context안의 Job
+- 코루틴의 잡은 context의 일부분이다.
+```kotlin
+fun main() = runBlocking<Unit>() {
+    println("My job is ${coroutineContext[Job]}")
+
+    launch {
+        println("My job is ${coroutineContext[Job]}")
+    }
+
+    async {
+        println("My job is ${coroutineContext[Job]}")
+    }
+}
+```
+``` 
+My job is BlockingCoroutine{Active}@28c97a5
+My job is StandaloneCoroutine{Active}@32a1bec0
+My job is DeferredCoroutine{Active}@22927a81
+```
+
+
+### 코루틴의 자식들
+- 코루틴 잡들이 계층구조를 갖고 있고, 부모 자식 관계가 있다.
+- 새로운 코루틴이 실행되면 부모 코루틴의 자식이 된다.
+- 단, GlobalScope는 독립적이고, 부모가 존재 하지 않는다. 
+
+```kotlin
+// 여러 다른 쓰레드를 하나의 코루틴으로 처리
+fun main() = runBlocking<Unit>() {
+    val request = launch {
+
+        GlobalScope.launch { // 글로벌 스코프라 종료가 안됨. ( main이 아니다.)
+            println("job1: I run in GlobalScope and execute independently!")
+            delay(1000)
+            println("job1: I am not affected by cancellation of the request")
+        }
+
+        launch {
+            delay(100)
+            println("job2: I am a child of the request coroutine")
+            delay(1000)
+            println("job2: I will not execute this line if my parent request is cancelled")
+        }
+    }
+    delay(500)
+    request.cancel()
+    delay(1000)
+    println("main: Who has survived request cancellation?")
+}
+```
+```
+job1: I run in GlobalScope and execute independently!
+job2: I am a child of the request coroutine
+job1: I am not affected by cancellation of the request
+main: Who has survived request cancellation?
+```
+
+### 부모 코루틴의 책임들
+- 부모 코루틴은 자신의 모든 자식 코루틴이 실행이 종료 될 때 까지 기다린다.
+- 단, 직접 tracking할 필요는 없다.
+- 직접 job.join할 필요도 없다.
+
+```kotlin
+// 부모 코루틴은 자식코루틴이 끝나는 것을 기다린다.
+fun main() = runBlocking<Unit>() {
+    val request = launch {
+        repeat(3) { i ->
+            launch {
+                delay((i+1) * 200L)
+                println("Coroutine $i is done")
+            }
+        }
+        println("request: I'm done and I don't explicitly join my children thread")
+    }
+    println("Now processing of the request is complete")
+}
+```
+
+
+### 코루틴 컨텍스트 요소들을 합치기
+- 코루틴 하나를 만드는데 기존 디스페처 이름 + 커스텀 이름 을 만들고 싶은 경우
+```kotlin
+fun main() = runBlocking<Unit>() {
+    launch(Dispatchers.Default + CoroutineName("test")) {
+        println("I'm working in thread ${Thread.currentThread().name}")
+    }
+}
+```
+```
+I'm working in thread DefaultDispatcher-worker-1 @test#2
+```
+
+### 코루틴 스코프(Scope)
+- 안드로이드 화면에서 코루틴들이 실행되고 있은 경우, 사용자가 백키를 눌러서 나가게 되면 코루틴들을 다 종료시켜줘야 한다.
+- 안그러면, 메모리 leak이 걸리거나 잘못될 수 있다.
+- 그런데, 모두 종료하려면 모든 잡을 cancel해줘야 한다.
+- 그래서 코루틴의 잡들을 다 가지고 있다가, cancel()해줄수도 있지만 다른 추상적인 방법이 있다.
+- 그 추상적인 방법이 코루틴 스코프이다.
+- 코루틴 스코프에서 모든 코루틴이 실행되게끔 하고, 화면에 나간다고 했을때 코루틴 스코프만 cancel해주면 모든 잡들이 cancel된다.
+
+```kotlin
+class Activity {
+    private val mainScope = CoroutineScope(Dispatchers.Default)
+
+    fun destroy() {
+        mainScope.cancel()
+    }
+
+    fun doSomething() {
+        repeat(10) { i ->
+            mainScope.launch {
+                delay((i+1) * 200L)
+                println("Coroutine $i is done")
+            }
+        }
+    }
+}
+
+fun main() = runBlocking<Unit>() {
+    val activity = Activity()
+    activity.doSomething()
+    println("Launched coroutines")
+    delay(500L)
+    println("Destroying activity!")
+    activity.destroy() // 여기를 주석처리하면 10번 실행이 모두 되는 것을 확인할 수 있다.
+    delay(5000L)
+}
+```
+```
+Launched coroutines
+Coroutine 0 is done
+Coroutine 1 is done
+Destroying activity!
+```
