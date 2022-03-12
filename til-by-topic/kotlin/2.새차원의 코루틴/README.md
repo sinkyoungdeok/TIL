@@ -186,19 +186,165 @@ fun main() = runBlocking {
 
 # 3. Cancellation and Timeouts
 
-<details><summary> 자세히 보기 </summary>
+  
+### 코루틴 취소
+- 코루틴을 정교하게 취소해주는 것은 중요하다.
+- 왜냐하면, 메모리라는 리소스를 차지하기 때문이다.
+- 코루틴 취소하는 방법은 간단하지만, 코루틴 자체가 취소에 대해서 협조적인 상태가 되어야 하는게 중요하다.
 
-- Job
-  - cancel()
-- Cancellation is cooperative
-  - way 1: to periodically invoke a suspending
-  - way 2: explicitly check the cancellation status (isActive)
-- Timeout
-  - withTimeout
-  - withTimeoutOrNull
+```kotlin
+fun main() = runBlocking {
+    var job = launch {
+        repeat(1000) { i ->
+            println("job: I'm sleeping $i ...")
+            delay(500L) 
+        }
+    }
+    delay(1300L) // 1.3초 뒤에 job을 취소
+    println("main: I'm tired of waiting!")
+    job.cancel()
+    job.join()
+    println("main: Now I can quit.")
+}
+```
 
-</details>
+### 코루틴 취소는 협조적이다.
+- 코루틴이 취소가 되려면 조건이 필요하다. 즉, 협력이 필요하다. 
+- suspend function은 취소가 가능하다.
+- suspend function을 호출하면 취소됐는지 확인할 수 있다. 
+- yield() 함수를 통해서 정상 취소가 가능하다. (취소가 되면 내부적으로 예외를 던져서 종료시킴)
+```kotlin
+fun main() = runBlocking {
+    val startTime = System.currentTimeMillis()
+    val job = launch(Dispatchers.Default) { // 이 예제는 코루틴 취소에 대해서 협조적이지 않다. (suspend function이 안불렸기 때문)
+        var nextPrintTime = startTime
+        var i = 0
+        while (i < 5) {
+            if (System.currentTimeMillis() >= nextPrintTime) {
+                // delay(1L) // 이 주석을 지우면 suspend function이 호출되므로 정상적으로 cancel이 된다. 
+                // yield() // 위의 delay를 호출하지 않고, yield()를 통해서 취소를 확인 할 수 있다 ( 이 방법이 더 좋다)
+                println("job: I'm sleeping ${i++} ...")
+                nextPrintTime += 500L
+            }
+        }
+    }
+    delay(1300L) // 1.3초 뒤 코루틴 취소를 하려고하지만, 잘 안되는 것을 확인할 수 있다. 
+    println("main: I'm tired of waiting!")
+    job.cancelAndJoin() 
+    println("main: Now I can quit.")
+}
 
+
+```
+
+
+### 복잡한 코루틴 코드를 취소 가능 하도록 만들기
+1) 주기적으로 suspend fucntion을 호출한다 (ex: yield)
+2) 명시적으로 취소에 대한 상태를 체크한다 (isActive) - 여기에서 사용한 방법 
+```kotlin
+fun main() = runBlocking {
+    val startTime = System.currentTimeMillis()
+    val job = launch(Dispatchers.Default) {
+        // 이 방법은 exception을 던지지 않는다.
+        var nextPrintTime = startTime
+        var i = 0
+        println("isActive $isActive ...")
+        while (isActive) {
+            if (System.currentTimeMillis() >= nextPrintTime) {
+                println("job: I'm sleeping ${i++} ...")
+                nextPrintTime += 500L
+            }
+        }
+        println("isActive $isActive ...")
+    }
+    delay(1300L)
+    println("main: I'm tired of waiting!")
+    job.cancelAndJoin()
+    println("main: Now I can quit.")
+}
+```
+
+### 코루틴을 종료 할 때 리소스 해제 방법 
+- 코루틴에서 네트워크를 사용하거나 DB를 쓸 때, 도중에 코루틴이 취소되면 리소스를 닫아주고 종료해야 한다.
+
+```kotlin
+fun main() = runBlocking {
+    val job = launch {
+        try {
+            repeat(1000) { i ->
+                println("job: I'm sleeping $i ...")
+                delay(500L)
+            }
+        } finally {
+            // 여기에서 리소스를 종료 해준다. 
+            println("job: I'm running finally")
+        }
+    }
+    delay(1300L)
+    println("main: I'm tired of waiting!")
+    job.cancelAndJoin()
+    println("main: Now I can quit.")
+}
+```
+
+### 취소가 불가능한 영역을 실행
+- 드문 케이스이다.
+- 캔슬을 실행해서 이미 코루틴이 캔슬된 상태에서 다시 코루틴을 실행하는 상황 
+- withContext(NonCancellable)을 활용한다.
+```kotlin
+fun main() = runBlocking {
+    val job = launch {
+        try {
+            repeat(1000) { i ->
+                println("job: I'm sleeping $i ...")
+                delay(500L)
+            }
+        } finally {
+            withContext(NonCancellable) { // finally부분에서 다시 코루틴을 사용하기 위함
+                println("job: I'm running finally")
+                delay(1000L)
+                println("job: And I've just delayed for 1 sec because I'm non-cancellable")
+            }
+        }
+    }
+    delay(1300L)
+    println("main: I'm tired of waiting!")
+    job.cancelAndJoin()
+    println("main: Now I can quit.")
+}
+```
+
+### Timeout
+- 코루틴을 다른곳에서 취소하는 것이 아닌, 코루틴을 실행할 때 이 시간이 지난후에 종료하게끔 하는 것이다.
+- 시간이 지나면 Exception을 던지는데, main에서 던지기 때문에 에러가 발생한다.
+```kotlin
+fun main() = runBlocking {
+    withTimeout(1300L) {
+        repeat(1000) { i ->
+            println("I'm sleeping $i ...")
+            delay(500L)
+        }
+    }
+}
+```
+
+### withTimeoutOrNull
+- 예외를 던지는 것 대신에 null을 리턴해준다.
+```kotlin
+fun main() = runBlocking {
+    val result = withTimeoutOrNull(1300L) {
+        repeat(1000) { i ->
+            println("I'm sleeping $i ...")
+            delay(500L)
+        }
+        "Done" // will get cancelled before it produces this result
+    }
+    println("Result is $result")
+}
+```
+
+
+---
 
 # 4. Composing Suspending Functions
 
