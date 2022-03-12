@@ -621,22 +621,13 @@ First child was cancelled
 Computation failed with ArithmeticException
 ```
 
+---
 
 # 5. Coroutines under the hood
 
-<details><summary> 자세히 보기 </summary>
-
-- There is no magic
-  - CPS == Callbacks
-  - CPS Transformation
-- Decompile
-  - Labels
-  - Callback
-- CPS simulation
-  - debugging
-
-</details>
-
+### 코루틴은 마법이 아니다.
+- 내부적으로 코틀린 컴파일러가 콜백형태로 만들어서 콜백을 해준다. 즉, 일반적인 코드이다.
+- 컴파일해보면, Continuation Pass Style == CPS 스타일로 변경되는 것을 확인할 수 있다.
 
 # 6. Coroutine Context and Dispatchers
 
