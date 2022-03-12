@@ -3,24 +3,25 @@
 - url: https://www.inflearn.com/course/%EC%83%88%EC%B0%A8%EC%9B%90-%EC%BD%94%ED%8B%80%EB%A6%B0-%EC%BD%94%EB%A3%A8%ED%8B%B4/dashboard
 - 강사님: 새차원
 
+---
+
+
 # 1. why coroutines
 
-<details><summary> 자세히 보기 </summary>
 
-### Coroutine
+## Coroutine 용어
 - 코루틴(coroutine)은 루틴의 일종
 - 협동 루틴이라 할 수 있다
 - 코루틴의 "Co"는 with 또는 together를 뜻한다.
 
+## Coroutine 특징 
 - 코루틴은 이전에 자신의 실행이 마지막으로 **중단**되었던 지점 다음의 장소에서 실행을 **재개**한다
-![image](https://user-images.githubusercontent.com/28394879/146778353-0cb4f22d-8216-473a-a43b-e00807d7434f.png)
-
 - 코루틴은 협력작업, 예외, 이벤트 루프, 반복자, 무한 목록 및 파이프와 같은 친숙한 프로그램 구성 요소를 구현하는데 적합하다
+- 코루틴은 비동기처리에 대한 코드를 간단히 작성할 수 있음
+- 코루틴은 메인스레드가 블록킹되는 것에 대해서 도움을 준다.
+- 코루틴은 비동기 콜백처리하는 코드를 순차적으로 짤 수 있게 해준다. 
 
-
-
-</details>
-
+---
 
 # 2. basics
 
