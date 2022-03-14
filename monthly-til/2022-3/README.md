@@ -179,3 +179,13 @@
   - 전체 복습
 
 </details>
+
+<details> <summary> 2022년 3월 13일 </summary>
+
+## 회사 업무
+
+## 개인 공부
+- [팀 프로젝트] CherryPick
+  - API 설계 회의 (백엔드 + 프론트엔드)
+
+</details>
