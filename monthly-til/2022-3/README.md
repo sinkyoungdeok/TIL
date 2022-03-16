@@ -199,3 +199,13 @@
   - Chapter3) 3. 모델 주도 설계 복습 (0% -> 20%)
 
 </details>
+
+<details> <summary> 2022년 3월 15일 </summary>
+
+## 회사 업무
+
+## 개인 공부
+- [PS] python
+  - 구현문제 5문제 풀이
+
+</details>
