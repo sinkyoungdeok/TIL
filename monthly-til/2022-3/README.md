@@ -186,7 +186,7 @@
 
 ## 개인 공부
 - [팀 프로젝트] CherryPick
-  - API 설계 회의 (백엔드 + 프론트엔드)
+  - API 설계 회의 - 화면에서 필요한 데이터 협의, json 데이터 형식 협의 (백엔드 + 프론트엔드)
 
 </details>
 
@@ -241,5 +241,15 @@
   - ITSMCHG-6713 오더 할증 내역 조회
 
 ## 개인 공부
+
+</details>
+
+<details> <summary> 2022년 3월 19일 </summary>
+
+## 회사 업무
+
+## 개인 공부
+- [팀 프로젝트] CherryPick
+  - API 설계 회의 - uri, method 회의 (백엔드 + 프론트엔드)
 
 </details>
