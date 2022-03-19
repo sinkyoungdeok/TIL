@@ -220,3 +220,26 @@
 ## 개인 공부
 
 </details>
+
+<details> <summary> 2022년 3월 17일 </summary>
+
+## 회사 업무
+- 태우님 createOrder ~ deliverOrder 온보딩 help
+- 라스트마일 한방 회의
+
+## 개인 공부
+
+</details>
+
+<details> <summary> 2022년 3월 18일 </summary>
+
+## 회사 업무
+- 코드리뷰
+  - ITSMCHG-5875 cancelOrder OptimisticLock에러 발생시 응답 변경
+  - ITSMCHG-6832 기사 강제 퇴근 API
+  - ITSMCHG-5877 선불 오더를 기사의 미납금액 및 M캐시 잔액에 상관없이 기사가 직접 잡을 수 있게 한다.
+  - ITSMCHG-6713 오더 할증 내역 조회
+
+## 개인 공부
+
+</details>
