@@ -253,3 +253,13 @@
   - API 설계 회의 - uri, method 회의 (백엔드 + 프론트엔드)
 
 </details>
+
+<details> <summary> 2022년 3월 20일 </summary>
+
+## 회사 업무
+
+## 개인 공부
+- [PS] python 
+  - DFS&BFS 1문제 풀이
+
+</details>
