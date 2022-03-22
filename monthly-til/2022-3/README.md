@@ -263,3 +263,17 @@
   - DFS&BFS 1문제 풀이
 
 </details>
+
+<details> <summary> 2022년 3월 21일 </summary>
+
+## 회사 업무
+- 다지점 관제 - 요구사항 검토
+- 코드리뷰
+  - ITSMCHG-6805 고용보험 일차감 실패건 모아서 재시도
+  - [ITSMCHG-6750] createorder refactoring
+  - [ITSMCHG-6674] 상점 최대 배송거리 조회 기능 추가
+  - ITSMCHG-5599 보험 개인 정보 파기 크론
+
+## 개인 공부
+
+</details>
