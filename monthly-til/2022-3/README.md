@@ -291,3 +291,17 @@
 
 
 </details>
+
+<details> <summary> 2022년 3월 23일 </summary>
+
+## 회사 업무
+- 다지점 관제
+  - 다지점관제 담당자 / 일정산정 미팅
+  - 간단히 erd작성
+- 라스트마일 개발 토크 참석
+
+## 개인 공부
+- [개인플젝] order-and-gift-project
+  - (Partner) Order 서비스 - partnerName 대신 User도메인의 name활용
+
+</details>
