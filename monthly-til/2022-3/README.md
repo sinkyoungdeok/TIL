@@ -305,3 +305,16 @@
   - (Partner) Order 서비스 - partnerName 대신 User도메인의 name활용
 
 </details>
+
+<details> <summary> 2022년 3월 24일 </summary>
+
+## 회사 업무
+- 다지점 관제
+  - erd 검토 및 위키 정리
+  - 유스케이스 정리
+
+## 개인 공부
+- [PS] python
+  - DFS&BFS 1문제 풀이
+
+</details>
