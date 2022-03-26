@@ -333,3 +333,14 @@
   - 프론트&백엔드 회의 - JWT 토큰 & 소셜 로그인 통신 방식 협의 (Refresh Token 활용) 
 
 </details>
+
+<details> <summary> 2022년 3월 26일 </summary>
+
+## 회사 업무
+
+## 개인 공부
+- [개인플젝] order-and-gift-project
+  - (Item) Order 서비스 -> Auth 활용
+  - (Order) Order 서비스 -> Auth 활용
+
+</details>
