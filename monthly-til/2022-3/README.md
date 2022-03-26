@@ -318,3 +318,18 @@
   - DFS&BFS 1문제 풀이
 
 </details>
+
+<details> <summary> 2022년 3월 25일 </summary>
+
+## 회사 업무
+- 다지점 관제
+  - 윈도우에 VPN 설치 & 부릉 POS 설치
+  - 유스케이스, erd 재검토
+- DDD스터디 - 용어사전 작성
+
+## 개인 공부
+- [팀 프로젝트] CherryPick
+  - 디자인 회의
+  - 프론트&백엔드 회의 - JWT 토큰 & 소셜 로그인 통신 방식 협의 (Refresh Token 활용) 
+
+</details>
