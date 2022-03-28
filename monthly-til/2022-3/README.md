@@ -344,3 +344,17 @@
   - (Order) Order 서비스 -> Auth 활용
 
 </details>
+
+<details> <summary> 2022년 3월 27일 </summary>
+
+## 회사 업무
+
+## 개인 공부
+- [개인플젝] order-and-gift-project
+  - Order & Gift 서비스
+    - (Auth) 403 error 핸들링
+    - (Auth) 기본 jwt토큰 대신 리프래시 토큰 방식으로 변경한다
+    - (Auth) 리프래시 토큰으로 액세스토큰을 재발급하는 API를 만든다
+    - (Common) ErrorCode로 에러 처리하는 것으로 변경한다. 
+
+</details>
