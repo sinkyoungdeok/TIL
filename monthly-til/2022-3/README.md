@@ -358,3 +358,19 @@
     - (Common) ErrorCode로 에러 처리하는 것으로 변경한다. 
 
 </details>
+
+<details> <summary> 2022년 3월 28일 </summary>
+
+## 회사 업무
+- 다지점관제
+  - 요구사항 싱크 회의
+  - 대상 API List 조사
+- 위클리
+
+## 개인 공부
+- [개인플젝] order-and-gift-project
+  - Order & Gift 서비스
+    - 리프래시 토큰을 redis에 저장해서 처리한다.
+    - 로그아웃 API
+
+</details>
