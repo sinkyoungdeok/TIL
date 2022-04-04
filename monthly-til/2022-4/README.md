@@ -28,3 +28,13 @@
   - Chapter4) 깊은 통찰을 향한 리팩터링 (10% -> 50%)
   
 </details>
+
+<details> <summary>2022년 4월 3일</summary>
+
+## 회사 업무
+
+## 개인 공부
+- [스터디] 알고리즘
+  - 이분탐색 3문제 python 풀이
+  
+</details>
