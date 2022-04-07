@@ -53,3 +53,16 @@
   
 </details>
 
+<details> <summary>2022년 4월 5일</summary>
+
+## 회사 업무
+- 다지점 관제
+  - 매핑기능 개발
+- devportal 설명회
+
+## 개인 공부
+- [스터디] 알고리즘
+  - 이분탐색 1문제 python 풀이
+  
+</details>
+
