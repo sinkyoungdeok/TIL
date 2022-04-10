@@ -103,6 +103,16 @@
 ## 회사 업무
 
 ## 개인 공부
-- 우아한형제들 기술 블로그 - 배민광고리스팅 개발기 (0% -> 50%) 
+- 우아한형제들 기술 블로그 - 배민광고리스팅 개발기 with Kotlin&Webflux (0% -> 50%) 
+  
+</details>
+
+<details> <summary>2022년 4월 9일</summary>
+
+## 회사 업무
+
+## 개인 공부
+- HTTP 0.9 ~ 3.0 공부
+  - 링크: https://www.youtube.com/watch?v=xcrjamphIp4
   
 </details>
