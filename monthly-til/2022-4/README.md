@@ -116,3 +116,82 @@
   - 링크: https://www.youtube.com/watch?v=xcrjamphIp4
   
 </details>
+
+<details> <summary>2022년 4월 10일</summary>
+
+## 회사 업무
+
+## 개인 공부
+- spring redis cacheable 공부 (https://mangkyu.tistory.com/179)
+  
+</details>
+
+<details> <summary>2022년 4월 11일</summary>
+
+## 회사 업무
+- 코드리뷰 3건
+- 다지점 관제
+  - 지점장/오퍼레이터/기사 수정 화면 관련 수정 조사
+  - 다지점 관제 매핑 - PR피드백 반영
+- 풀필먼트-라스트마일 연동
+  - qa2 카프카 토픽 추가
+  - 카프카 데이터 보유기간 논의 (with 준영님, 영준님)
+- 위클리 미팅
+
+## 개인 공부
+  
+</details>
+
+<details> <summary>2022년 4월 12일</summary>
+
+## 회사 업무
+- 코드리뷰 1건
+- 다지점 관제
+  - 다지점 관제 매핑 - PR피드백 반영 
+  - API 스펙 작성
+- 풀필먼트-라스트마일 연동
+  - qa 일정 변경 확인 
+- 1:1 미팅
+
+## 개인 공부
+  
+</details>
+
+<details> <summary>2022년 4월 13일</summary>
+
+## 회사 업무
+- 다지점관제 매핑 기능 개발
+  - 다지점 관제 매핑 조회 - 매니저 API 추가
+  - 신규 API 스펙 위키에 정리 및 공유
+  - 리팩토링 및 PR 작성
+
+## 개인 공부
+  
+</details>
+
+<details> <summary>2022년 4월 14일</summary>
+
+## 회사 업무
+- 다지점관제 매핑 기능 개발
+  - PR피드백 반영
+  - 테스트 코드 작성
+  - 매핑 조회에 redis 캐시 사용 개발 및 새 PR 작성
+- 코드리뷰 1건
+- All Hands 미팅 
+
+## 개인 공부
+  
+</details>
+
+<details> <summary>2022년 4월 15일</summary>
+
+## 회사 업무
+- 다지점관제 매핑 기능 개발
+  - 매핑 조회에 redis 캐시 사용 개발
+  - 다지점관제 권한 체크 고려
+- 다지점 관제 조회 기능 
+  - PR 리뷰
+
+## 개인 공부
+  
+</details>
