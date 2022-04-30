@@ -195,3 +195,94 @@
 ## 개인 공부
   
 </details>
+
+<details> <summary>2022년 4월 16일</summary>
+
+## 회사 업무
+
+## 개인 공부
+- cors 공부 및 정리
+  
+</details>
+
+<details> <summary>2022년 4월 17일</summary>
+
+## 회사 업무
+
+## 개인 공부
+- 세션과 토큰 공부 및 정리
+  
+</details>
+
+<details> <summary>2022년 4월 18일</summary>
+
+## 회사 업무
+- 다지점 관제
+  - [ITSMCHG-6875] MCP를 위해서 response 모델의 이름 변경, getter추가 
+  - [ITSMCHG-6950] 지점장/오퍼레이터/기사 수정 화면 관련 개발
+  - [ITSMCHG-7085] 매니저 매핑 조회에 다지점 권한여부를 판단하도록 추가한다.
+- 위클리 미팅
+
+## 개인 공부
+
+  
+</details>
+
+<details> <summary>2022년 4월 19일</summary>
+
+## 회사 업무
+- 다지점 관제
+  - [ITSMCHG-7102] 매핑 업데이트 기능에 수정자를 헤더의 request-by값을 이용하는 것으로 변경한다. - 개발 및 PR작성
+  - 개발내용 싱크 회의
+- 풀필먼트-라스트마일 연동
+  - qa2 배포
+  - 광훈님 문의 답변
+- 11:00 - 13:00 MySQL 강의 참석
+- 코드리뷰 1건
+
+## 개인 공부
+
+  
+</details>
+
+<details> <summary>2022년 4월 20일</summary>
+
+## 회사 업무
+- 다지점관제
+  - [ITSMCHG-7102] 매핑 업데이트 기능에 수정자를 헤더의 request-by값을 이용하는 것으로 변경한다. - PR피드백 반영
+  - postman collection 업데이트
+  - DBA - DDL/DML 작업 요청
+- 오후 반차
+
+## 개인 공부
+
+  
+</details>
+
+<details> <summary>2022년 4월 21일</summary>
+
+## 회사 업무
+- 다지점 관제
+  - [ITSMCHG-7102] 매핑 업데이트 기능에 수정자를 헤더의 request-by값을 이용하는 것으로 변경한다. - dev1 배포 및 DB마이그레이션
+  - updateAgent에 다지점관제 권한 체크 로직을 추가한다. - 개발 및 PR 작성
+  - 테스트 지원
+- 코드리뷰
+  - [ITSMCHG-7113] 조회 API - 오더 개수 조회
+
+## 개인 공부
+
+  
+</details>
+
+<details> <summary>2022년 4월 22일</summary>
+
+## 회사 업무
+- 다지점 관제
+  - 코드리뷰 1건
+  - [ITSMCHG-7122] updateAgent에 다지점관제 권한 체크 로직을 추가한다. - PR피드백 반영
+  - [ITSMCHG-7064] 다지점 관제 매핑 조회에 캐시 적용 - PR피드백 반영
+
+## 개인 공부
+
+  
+</details>
