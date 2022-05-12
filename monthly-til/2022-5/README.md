@@ -60,3 +60,32 @@
   
 </details>
 
+<details> <summary>2022년 5월 6일</summary>
+
+## 회사 업무
+
+## 개인 공부
+- [DDD] 도메인 주도 설계란 무엇인가?
+  - Chapter5) 모델 무결성 보존 (0% -> 30%)
+  
+</details>
+
+<details> <summary>2022년 5월 7일</summary>
+
+## 회사 업무
+
+## 개인 공부
+- [팀 프로젝트] CherryPick
+  - 코드리뷰 - 유저 추가 정보 기입 API 
+  
+</details>
+
+<details> <summary>2022년 5월 8일</summary>
+
+## 회사 업무
+
+## 개인 공부
+- [개인플젝] 음식점 
+  - PR리뷰
+  
+</details>
