@@ -12,18 +12,6 @@
 - [Kotlin](./til-by-topic/kotlin)
 - [order-and-gift-project](https://github.com/sinkyoungdeok/order-and-gift-project)
 
-
-# 월별 TIL
-- [2021년 9월](./monthly-til/2021-09)
-- [2021년 10월](./monthly-til/2021-10) 
-- [2021년 11월](./monthly-til/2021-11)
-- [2021년 12월](./monthly-til/2021-12)
-- [2022년 1월](./monthly-til/2022-1)
-- [2022년 2월](./monthly-til/2022-2)
-- [2022년 3월](./monthly-til/2022-3)
-- [2022년 4월](monthly-til/2022-4)
-- [2022년 5월](monthly-til/2022-5)
-
 # 년도별 들은 강의&책
 
 <details><summary>2021년도</summary>
