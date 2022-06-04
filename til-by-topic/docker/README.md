@@ -4,7 +4,8 @@
 [2. Kubernetes와 Docker로 한 번에 끝내는 컨테이너 기반 MSA](./Kubernetes와-Docker로-한-번에-끝내는-컨테이너-기반-MSA/README.md)
 
 ## 목록 
-- [1. 설치 명령어](#1.설치-명령어)
+- [1. 설치 명령어](#1-설치-명령어)
+- [2. 기본 개념](#2-기본-개념)
 
 ## 1. 설치 명령어 
 
@@ -14,20 +15,39 @@
 brew install --cask docker
 ```
 
-### Kubectl 설치 명령어 (Mac OS)
 
-```
-brew install kubectl 
-```
+## 2. 기본 개념 
 
-### Kustomize 설치 명령어 (Mac OS)
+### 이미지 (Image)
+- 컨테이너를 생성할 때 필요한 요소
+- 컨테이너의 목적에 맞는 바이너리와 의존성이 설치되어 있다.
+- 여러개의 계층으로 된 바이너리 파일로 존재한다.
 
-```
-brew install kustomize
-```
+### 컨테이너 (Container)
+- 호스트와 다른 컨테이너로부터 격리된 시스템 자원과 네트워크를 사용하는 프로세스
+- 이미지를 읽기 전용으로 사용한다.
+- 변경사항은 컨테이너 계층에 저장한다.
+-  컨테이너에서 아무리 변경을 해도 이미지에는 영향이 없다. 
+- 이미지:컨테이너 == 1:N
 
-### Minikube 설치 명령어 (Mac OS)
+### 이미지와 컨테이너의 관계
+- DockerFile에서 build를 하면 Image가 된다.
+- Image를 Run을 하면 Container가 된다.
+- 이미지 <--> 컨테이너 는 프로그램 <--> 프로세스와 같다.
+- 이미지 <--> 컨테이너 는 클래스 <--> 인스턴스와 같다. 
 
-```
-brew install minikube
-```
+### 도커 이미지 이름 구성 
+- 저장소 이름/이미지 이름:이미지 태그 
+- 예) sinkyoungdeok/nginx:1.21
+- 도커 저장소 이름은 생략하면 기본 저장소로 인식한다 (기본저장소 = 도커 허브)
+- 도커 이미지 태그를 생략하면 최신 리비전을 가리키는 latest로 인식한다.
+
+
+### 도커 이미지 저장소
+- 도커 이미지를 관리하고 공유하기 위한 서버 어플리케이션 
+- Public(공개형) 저장소: QUAY, Dockerhub
+- Private(비공개형) 저장소: AWS ECR, Docker Registry
+
+### 도커 구성 요소 
+- Docker Registry에서 이미지들을 Pull또는 Run 명령어를 통해 DOCKER_HOST 공간에 저장한다.
+- DOCKER_HOST 공간에 저장된 이미지들을 실행함으로써 Docker daemon이 컨테이너를 관리할 수 있게 된다. 
