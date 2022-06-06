@@ -57,6 +57,12 @@ brew install --cask docker
 ### 도커 컨테이너 라이프사이클 
 ![image](https://user-images.githubusercontent.com/28394879/172013121-d12ff88c-58bb-4222-9e45-452067f0f440.png)
 
+### 엔트리 포인트 
+- 도커 컨테이너가 실행할 때 고정적으로 실행되는 스크립트 혹은 명령어 
+- 생략할 수 있으며, 생략될 경우 커맨드에 지정된 명령어로 수행
+
+### 커맨드
+- 도커 컨테이너가 실행할 때 수행할 명령어 혹은 엔트리포인트에 지정된 명령어에 대한 인자 값 
 
 ## 3. 기본 명령어 
 
@@ -163,4 +169,10 @@ docker run --rm ...
 ### 중지된 모든 컨테이너 삭제 
 ```
 docker container prune
+```
+
+### 엔트리포인트와 커맨드 
+```
+docker run --entrypoint sh ubuntu:focal
+docker run --entrypoint echo ubuntu:focal hello world
 ```
