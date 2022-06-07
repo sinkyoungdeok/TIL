@@ -64,6 +64,12 @@ brew install --cask docker
 ### 커맨드
 - 도커 컨테이너가 실행할 때 수행할 명령어 혹은 엔트리포인트에 지정된 명령어에 대한 인자 값 
 
+### 도커 네트워크 구조 
+![image](https://user-images.githubusercontent.com/28394879/172395969-10afa311-c63a-454f-b671-c0b3df0faa87.png)
+- docker0: 도커 엔진에 의해 기본 생성되는 브릿지 네트워크 (veth와 eth 간 다리 역할)
+- veth: 컨테이너당 하나씩 대응되는 가상 eth이다. 
+
+
 ## 3. 기본 명령어 
 
 ### 컨테이너 생성 
@@ -175,4 +181,42 @@ docker container prune
 ```
 docker run --entrypoint sh ubuntu:focal
 docker run --entrypoint echo ubuntu:focal hello world
+```
+
+### 환경 변수 
+
+- -e: 환경변수 직접 입력
+- --env-file: 환경변수 파일 입력
+```
+docker run -it -e MY_HOST=kyoungdeok.sin ubuntu:facal env
+docker run -it --env-file ./sample.env ubuntu:facal env
+```
+
+
+### 실행중인 컨테이너에 명령어를 실행 
+```
+docker exec [container] [command]
+docker exec -it my-nginx bash
+docker exec my-nginx env 
+```
+
+
+### 컨테이너 포트 노출 
+```
+docker run -p [HOST IP:PORT] : [CONTAINER PORT] [container]
+
+# nginx 컨테이너의 80번 포트를 호스트 모든 IP의 80번 포트와 연결하여 실행
+docker run -d -p 80:80 nginx
+
+# nginx 컨테이너의 80번 포트를 호스트 127.0.0.1 IP의 80번 포트와 연결하여 실행
+docker run -d -p 127.0.0.1:80:80 nginx
+
+# nginx 컨테이너의 80번 포트를 호스트의 사용 가능한 포트와 연결하여 실행 
+docker run -d -p 80 nginx 
+```
+
+### expose
+- 문서화 용도의 옵션이다. 
+```
+docker run -d --expose 80 nginx
 ```
