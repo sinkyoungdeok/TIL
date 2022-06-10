@@ -7,6 +7,9 @@
 - [1. 설치 명령어](#1-설치-명령어)
 - [2. 기본 개념](#2-기본-개념)
 - [3. 기본 명령어](#3-기본-명령어)
+- [4. 포트 관련 명령어](#4-포트-관련-명령어)
+- [5. 네트워크 관련 명령어](#5-네트워크-관련-명령어)
+- [6. 볼륨 관련 명령어](#6-볼륨-관련-명령어)
 
 ## 1. 설치 명령어 
 
@@ -211,6 +214,7 @@ docker exec -it my-nginx bash
 docker exec my-nginx env 
 ```
 
+## 4. 포트 관련 명령어
 
 ### 컨테이너 포트 노출 
 ```
@@ -232,6 +236,8 @@ docker run -d -p 80 nginx
 docker run -d --expose 80 nginx
 ```
 
+## 5. 네트워크 관련 명령어 
+
 ### network none 
 ```
 docker run -it --net none ubuntu:focal
@@ -243,7 +249,68 @@ docker run -d --net host grafana/grafana
 ```
 
 ### bridge network 생성 
+
+- `--net-alias` 옵션으로 도메인을 설정할 수 있다. 
 ```
 docker network create --driver=bridge sinkyoungdeok
 ```
-- `--net-alias` 옵션으로 도메인을 설정할 수 있다. 
+
+## 6. 볼륨 관련 명령어 
+
+### 호스트 볼륨 
+- 호스트의 디렉토리를 컨테이너의 특정 경로에 마운트 한다.
+```
+# 호스트의 /opt/html 디렉토리를 Nginx의 웹 루트 디렉토리로 마운트
+docker run -d \
+--name nginx \
+-v /opt/html:/usr/share/nginx/html \
+nginx
+
+docker run -d \
+--name nginx \
+-v $(pwd)/html:/usr/share/nginx/html \
+nginx
+```
+
+
+### 볼륨 컨테이너 
+- 특정 컨테이너의 볼륨 마운트를 공유 할 수 있다. 
+```
+docker run -d \
+--name my-volume \
+-it \
+-v /opt/html:/usr/share/nginx/
+html \
+ubuntu:focal
+
+# my-volume 컨테이너의 볼륨을 공유 
+docker run -d \
+--name nginx \
+--volumes-from my-volume \
+nginx 
+```
+
+### 도커 볼륨 
+- 도커가 제공하는 볼륨 관리 기능을 활용해서 데이터를 보존한다.
+- 기존적으로 /var/lib/docker/volumes/${volume-name}/_data 에 데이터가 저장 된다.
+```
+# web-volume 도커 볼륨 생성
+docker volume create --name db
+
+# 도커의 web-volume 볼륨을 Nginx의 웹 루트 디렉토리로 마운트 
+docker run -d \
+--name skd-mysql \
+-v db:/var/lib/mysql \
+-p 3306:3306 \
+mysql:5.7
+```
+
+### 읽기전용 볼륨 연결 
+- 볼륨 연결 설정에 :ro 옵션을 통해 읽기 전용 마운트 옵션을 설정할 수 있다. 
+```
+# 도커의 web-volume 볼륨을 Nginx의 웹 루트 디렉토리로 읽기 전용 마운트
+docker run -d \
+--name nginx \
+-v web-volume:/usr/share/nginx/html:ro \
+nginx 
+```
