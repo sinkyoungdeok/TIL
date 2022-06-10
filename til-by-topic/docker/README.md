@@ -69,6 +69,17 @@ brew install --cask docker
 - docker0: 도커 엔진에 의해 기본 생성되는 브릿지 네트워크 (veth와 eth 간 다리 역할)
 - veth: 컨테이너당 하나씩 대응되는 가상 eth이다. 
 
+### 도커 네트워크 드라이버 
+![image](https://user-images.githubusercontent.com/28394879/173072332-472ff060-a189-49f9-ae5c-5d5695140c5c.png)
+- none: 네트워크 설정이 필요 없을 경우 혹은 커스텀 네트워크를 사용할 때 사용 -> ubuntu를 띄운다고 가정했을 때 apt update했을 시 실패한다 (네트워크 설정이 없기 떄문) 
+- host: 도커가 제공해주는 가상 네트워크를 사용하는 것이 아닌, 직접 host네트워크에 붙어서 사용 -> 직접 host에 붙기 때문에 port binding이 필요 없다. 
+
+
+
+
+
+
+
 
 ## 3. 기본 명령어 
 
@@ -220,3 +231,19 @@ docker run -d -p 80 nginx
 ```
 docker run -d --expose 80 nginx
 ```
+
+### network none 
+```
+docker run -it --net none ubuntu:focal
+```
+
+### network host
+```
+docker run -d --net host grafana/grafana
+```
+
+### bridge network 생성 
+```
+docker network create --driver=bridge sinkyoungdeok
+```
+- `--net-alias` 옵션으로 도메인을 설정할 수 있다. 
