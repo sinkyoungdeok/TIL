@@ -10,6 +10,7 @@
 - [4. 포트 관련 명령어](#4-포트-관련-명령어)
 - [5. 네트워크 관련 명령어](#5-네트워크-관련-명령어)
 - [6. 볼륨 관련 명령어](#6-볼륨-관련-명령어)
+- [7. 로그 관련 명령어](#7-로그-관련-명령어)
 
 ## 1. 설치 명령어 
 
@@ -76,6 +77,11 @@ brew install --cask docker
 ![image](https://user-images.githubusercontent.com/28394879/173072332-472ff060-a189-49f9-ae5c-5d5695140c5c.png)
 - none: 네트워크 설정이 필요 없을 경우 혹은 커스텀 네트워크를 사용할 때 사용 -> ubuntu를 띄운다고 가정했을 때 apt update했을 시 실패한다 (네트워크 설정이 없기 떄문) 
 - host: 도커가 제공해주는 가상 네트워크를 사용하는 것이 아닌, 직접 host네트워크에 붙어서 사용 -> 직접 host에 붙기 때문에 port binding이 필요 없다. 
+
+
+### 도커 로그 드라이버 
+![image](https://user-images.githubusercontent.com/28394879/173167899-54ead741-9b2b-4270-82c0-53d601c5eb7e.png)
+- 기본: json-file (in-line json타입의 file로 저장됨)
 
 
 
@@ -314,3 +320,46 @@ docker run -d \
 -v web-volume:/usr/share/nginx/html:ro \
 nginx 
 ```
+
+
+
+
+
+## 7. 로그 관련 명령어 
+
+
+### 로그 확인하기 
+```
+# 전체 로그 확인
+docker logs [container]
+
+# 마지막 로그 10줄 확인
+docker logs --tail 10 [container]
+
+# 실시간 로그 스트림 확인
+docker logs -f [container]
+
+# 로그마다 타임스탬프 표시
+docker logs -f -t [container]
+```
+
+
+### 호스트 운영체제의 로그 저장 경로
+```
+# log driver 를 json-file로 했을 때만 유효하다.
+cat /var/lib/docker/containers/${CONTAINER_ID}/${CONTAINER_ID}-json.log 
+```
+
+### 로그 용량 제한 
+- 컨테이너 단위로 로그 용량 제한을 할 수 있지만, 도커 엔진에서 기본 설정을 진행할수도 있다. (운영환경에서 필수 설정)
+```
+# 한 로그 파일 당 최대 크기를 3MB로 제한하고, 최대 로그 파일을 3개로 로테이팅
+docker run \
+-d \
+--log-driver=json-file \
+--log-opt max-size=3m \
+--log-opt max-file=5 \
+nginx
+```
+
+
