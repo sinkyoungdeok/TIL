@@ -11,6 +11,7 @@
 - [5. 네트워크 관련 명령어](#5-네트워크-관련-명령어)
 - [6. 볼륨 관련 명령어](#6-볼륨-관련-명령어)
 - [7. 로그 관련 명령어](#7-로그-관련-명령어)
+- [8. 이미지 빌드 명령어](#8-이미지-빌드-명령어)
 
 ## 1. 설치 명령어 
 
@@ -83,7 +84,10 @@ brew install --cask docker
 ![image](https://user-images.githubusercontent.com/28394879/173167899-54ead741-9b2b-4270-82c0-53d601c5eb7e.png)
 - 기본: json-file (in-line json타입의 file로 저장됨)
 
-
+### 도커 이미지 구조
+![image](https://user-images.githubusercontent.com/28394879/173233112-8074c39a-a301-4c06-8d14-13b1270b3d5b.png)
+- 위 그림은 ubuntu image에 nginx 변경사항이 추가되고, 그 위에 web app 변경 사항이 반영된 이미지에 대한 그림이다.
+- 도커 이미지는 변경사항이 있을 때 마다 하나의 layer씩 추가되는 형식으로 되어 있다.
 
 
 
@@ -363,3 +367,47 @@ nginx
 ```
 
 
+
+
+
+## 8. 이미지 빌드 명령어
+
+### Dockerfile 없이 이미지 생성 
+```
+# 기존 컨테이너에서 변경사항을 기반으로 새 이미지를 생성하는 방법이다. 
+# docker commit [OPTIONS] CONTAINER [REPOSITORY[:TAG]]
+# ubuntu 컨테이너의 현재 상태를 my_ubuntu:v1 이미지로 생성
+docker commit -a sinkyoungdeok -m "First Commit" ubuntu my_ubuntu:v1
+```
+
+
+### DockerFile 이용하여 이미지 생성 
+```
+# Dockerfile 
+FROM node:12-alpine
+RUN apk add --no-cache python3 g++ make
+WORKDIR /app
+COPY . .
+RUN yaun install --production
+CMD ["node", "src/index.js"]
+
+# docker build [OPTIONS] PATH
+# ./ 디렉토리를 빌드 컨텍스트로 my_app:v1 이미지 빌드 (Dockerfile 이용)
+docker build -t my_app:v1 ./
+
+# ./ 디렉토리를 빌드 컨텍스트로 my_app:v1 이미지 빌드 (example/MyDockerfile 이용)
+docker build -t my_app:v1 -f example/MyDockerfile ./
+```
+
+### Dockerignore
+- .gitignore와 동일한 문법
+- 특정 디렉토리 혹은 파일 목록을 빌드 컨텍스트에서 제외하기 위한 목적이다.
+```
+# comment
+*/temp*
+*/*/temp*
+temp?
+
+*.md
+!README.md
+```
