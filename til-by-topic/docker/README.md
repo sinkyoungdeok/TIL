@@ -12,6 +12,7 @@
 - [6. 볼륨 관련 명령어](#6-볼륨-관련-명령어)
 - [7. 로그 관련 명령어](#7-로그-관련-명령어)
 - [8. 이미지 빌드 명령어](#8-이미지-빌드-명령어)
+- [9. 도커파일 문법](#9-도커파일-문법)
 
 ## 1. 설치 명령어 
 
@@ -410,4 +411,91 @@ temp?
 
 *.md
 !README.md
+```
+
+
+
+## 9. 도커파일 문법
+
+### From
+- 베이스 이미지 사용 
+```
+FROM node:16
+```
+
+### Label
+- 이미지의 메타데이터
+```
+LABEL description="Simple server with Node.js"
+```
+
+### ENV
+- 컨테이너의 환경변수 
+```
+FROM busybox
+ENV FOO=/bar
+WORKDIR ${FOO}
+ADD . $FOO
+```
+
+### ARG
+- 도커이미지 상에서 인자값 사용 
+```
+FROM busybox
+ARG user1
+ARG buildno=1
+```
+
+### WORKDIR
+- working directory를 설정한다.
+- 우분투에서 cd를 통해서 디렉토리 이동하는것과 유사하다.
+```
+# 이미지 상의 경로를 /app으로 이동해라.
+WORKDIR /app
+```
+
+### COPY
+- COPY SRC(호스트 OS) DEST(이미지상에서 경로)
+```
+# 호스트OS의 package*.json을 이미지 경로인 ./에 복사해라. 
+COPY package*.json ./
+```
+
+### RUN
+- 도커이미지 상에서 해당 명령어를 실행할 때 사용 
+```
+# npm install을 실행해라 
+RUN npm install 
+```
+
+### EXPOSE
+- **(예 8080) 포트를 사용한다고 문서화 할 때 사용
+```
+EXPOSE 8080
+``` 
+
+### CMD
+- 컨테이너를 실행할 때 어떤 명령어를 수행할 것인지를 나타낼 때 사용 
+```
+CMD ["node", "server.js" ]
+CMD "node server.js"
+```
+
+### ENTRYPOINT
+- CMD에 앞서서 시작 프로그램을 지정할 때 사용 
+```
+ENTRYPOINT ["EXECUTABLE", "param1", "param2"]
+ENTRYPOINT command param1 param2
+``` 
+
+```
+FROM ubuntu
+ENTRYPOINT ["top", "-b"]
+CMD ["-c"]
+```
+
+### USER
+- 컨테이너가 사용하게 될 기본 사용자 및 그룹
+```
+USER <user>[:<group>]
 ```
