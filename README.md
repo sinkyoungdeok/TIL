@@ -4,7 +4,7 @@
 - [docker](./til-by-topic/docker/README.md)
 - [ps](https://github.com/sinkyoungdeok/ps)
 - [kubernetes](https://github.com/sinkyoungdeok/kubernetes)
-- [aws](https://github.com/sinkyoungdeok/aws)
+- [aws](./til-by-topic/aws)
 - [msa](https://github.com/sinkyoungdeok/msa)
 - [mysql](https://github.com/sinkyoungdeok/mysql)
 - [ELK](https://github.com/sinkyoungdeok/ELK)
