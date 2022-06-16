@@ -14,6 +14,7 @@
 - [8. 이미지 빌드 명령어](#8-이미지-빌드-명령어)
 - [9. 도커파일 문법](#9-도커파일-문법)
 - [10. 이미지 압축파일 저장 명령어](#10-이미지-압축파일-저장-명령어)
+- [11. 도커 허브 명령어](#11-도커-허브-명령어)
 
 ## 1. 설치 명령어 
 
@@ -517,4 +518,19 @@ docker save -o ubuntu_focal.tar ubuntu:focal
 # docker load -i [INPUT-FILE]
 # ubuntu_focal.tar 압축 파일에서 ubuntu:focal 이미지 불러오기 
 docker load -i ubuntu_focal.tar
+```
+
+
+## 11. 도커 허브 명령어
+
+### 허브 로그인 
+```
+docker login -u sinkyoungdeok
+```
+
+### 도커 허브 repository에 push 
+```
+# 이전에 도커 허브에서 repository를 만들어야됨.
+docker tag nginx:latest sinkyoungdeok/my-nginx:v1.0.0
+docker push sinkyoungdeok/my-nginx:v1.0.0
 ```
