@@ -13,6 +13,7 @@
 - [7. 로그 관련 명령어](#7-로그-관련-명령어)
 - [8. 이미지 빌드 명령어](#8-이미지-빌드-명령어)
 - [9. 도커파일 문법](#9-도커파일-문법)
+- [10. 이미지 압축파일 저장 명령어](#10-이미지-압축파일-저장-명령어)
 
 ## 1. 설치 명령어 
 
@@ -498,4 +499,22 @@ CMD ["-c"]
 - 컨테이너가 사용하게 될 기본 사용자 및 그룹
 ```
 USER <user>[:<group>]
+```
+
+
+
+## 10. 이미지 압축파일 저장 명령어
+
+### 이미지 tar 압축파일로 저장
+```
+# docker save -o [OUTPUT-FILE] IMAGE
+# ubuntu:focal 이미지를 ubuntu_focal.tar 압축 파일로 저장
+docker save -o ubuntu_focal.tar ubuntu:focal
+```
+
+### 이미지 압축에서 불러오기 
+```
+# docker load -i [INPUT-FILE]
+# ubuntu_focal.tar 압축 파일에서 ubuntu:focal 이미지 불러오기 
+docker load -i ubuntu_focal.tar
 ```
