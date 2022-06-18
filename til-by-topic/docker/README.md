@@ -16,6 +16,7 @@
 - [10. 이미지 압축파일 저장 명령어](#10-이미지-압축파일-저장-명령어)
 - [11. 도커 허브 명령어](#11-도커-허브-명령어)
 - [12. AWS ECR 저장소 명령어](#12-AWS-ECR-저장소-명령어)
+- [13. 이미지 경량화 전략](#13-이미지-경량화-전략)
 
 ## 1. 설치 명령어 
 
@@ -550,3 +551,44 @@ docker tag nginx:latest 797373241119.dkr.ecr.ap-northeast-2.amazonaws.com/my-ngi
 
 docker push 797373241119.dkr.ecr.ap-northeast-2.amazonaws.com/my-nginx:v1.0.0
 ```
+
+
+
+
+## 13. 이미지 경량화 전략
+
+### 꼭 필요한 패키지 및 파일만 추가
+
+### 컨테이너 레이어 수 줄이기
+- RUN 명령어의 개수를 줄인다. ( && 를 활용하자 )
+
+### 경량 베이스 이미지 선택
+- 경량 베이스 이미지 종류
+  - debian slim 
+  - alpine
+  - stretch
+
+### 멀티 스테이지 빌드 사용 
+- 빌드 의존성은 빌드 스테이지에서 진행
+- 빌드결과물만 릴리즈 스테이지에 복사해서 진행
+
+```
+FROM node:16-alpine AS base
+LABEL maintainer="Kyoungdeok Sin <tkagmd1@naver.com>"
+LABEL description="Simple server with Node.js"
+
+WORKDIR /app
+
+COPY package*.json ./
+
+FROM base AS build # base이미지가 변경되지 않는 이상 이부분은 동일한 레이어로 동작
+RUN npm install
+
+FROM base AS release
+COPY --from=build /app/node_modules ./node_modules
+COPY . .
+
+EXPOSE 8080
+CMD [ "node", "server.js" ]
+``` 
+
