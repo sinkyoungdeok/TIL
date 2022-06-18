@@ -20,6 +20,7 @@
 - [14. 도커 데몬 디버깅](#14-도커-데몬-디버깅)
 - [15. 도커 컴포즈 명령어](#15-도커-컴포즈-명령어)
 - [16. 도커 컴포즈 활용 예시](#16-도커-컴포즈-활용-예시)
+- [17. jib을 이용한 docker 이미지 빌드 푸시](#17-jib을-이용한-docker-이미지-빌드-푸시)
 
 ## 1. 설치 명령어 
 
@@ -858,3 +859,92 @@ volumes:
     mysql-data: {}
     grafana-data: {}
 ```
+
+
+## 17. jib을 이용한 docker 이미지 빌드 푸시
+
+### 빌드란 무엇인가?
+- 소스 코드 파일을 컴퓨터나 휴대폰에서 실행할 수 있는 독립 소프트웨어 아티팩트로 변환하는 과정 혹은 결과물
+- 빌드에서 가장 중요한 단계중 하나는 소스 코드 파일이 실행 코드로 변환되는 컴파일 과정이다.
+- 빌드하는 과정은 다른 프로그램을 제어하는 프로그램인 빌드 도구에 의해 관리된다.
+
+### 빌드 방식 
+- 전체 빌드: 매 빌드 때마다 전체 코드를 포함해 빌드 
+- 증분 빌드: 변경된 코드 대상만 분리해 빌드 -> 도커도 이 방식을 채택
+
+### Gradle이란?
+- Groovy를 이용한 빌드 자동화 시스템 
+- Groovy와 유사한 도메인 언어를 채용
+- Java, C/C++, 파이썬 등과 같은 여러가지 언어를 지원한다. 
+
+### Gradle 프로젝트의 구조 
+![image](https://user-images.githubusercontent.com/28394879/174432847-32dc332c-3f53-417c-8fe3-125542f97a90.png)
+- app/build.gradle: 프로젝트 내 소스코드의 라이브러리 의존성, 플러그인, 라이브러리 저장소 등을 설정할 수 있는 빌드 스크립트 파일 
+- gradle/wrapper/.*: gradlew라는 매퍼 파일을 실행하기 위해 필요한 파일들 
+- gradlew: 리눅스 또는 맥OS 용 gradle 실행 쉘 스크립트 파일 
+- gradlew.bat: 윈도우용 실행 배치 스크립트 파일 
+- settings.gradle: 프로젝트의 구성 정보 파일 
+
+### Jib이란
+- Docker없이 도커 빌드 및 생성된 이미지를 푸시하는 기능을 제공한다. 
+- Docker데몬 없이, Docker권장사항에 대한 깊은 숙달 없이 Java 애플리케이션에 최적화된 Docker및 OCI 이미지를 빌드한다.
+- Maven및 Gradle용 플러그인과 자바 라이브러리로 사용할 수 있다. 
+- 장점
+  - 빠른 도커 이미지 빌드 및 배포가 가능하다.
+  - 애플리케이션을 여러 레이어로 분리하여 클래스 종속성을 분리해 변경된 레이어만 배포 가능하다
+  - 도커 CLI가 없어도, gradle내에서 도커 이미지를 빌드하고 원하는 이미지 레포지토리로 푸시하는 명령을 구성할 수 있다.
+  - 빌드 시 Dockerfile없이 가능하다. 
+
+
+### Jib과 기존 Dockerfile 기반 빌드 비교 
+![image](https://user-images.githubusercontent.com/28394879/174433151-254f15df-dab6-4734-8f75-8927c491a1ba.png)
+- Docker 빌드 
+  - 애플리케이션을 컨테이너화 할 때에는 gradle을 이용한 애플리케이션 빌드를 통해 패키지를 만드는 과정을 포함해야 한다.
+  - 빌드가 성공했다면 빌드의 결과 패키지 파일을 Dockerfile을 통해서 Base 이미지에 넣어주어야 한다.
+  - 이러한 gradle빌드와 도커파일 수행과정이 분리되어 있기 떄문에 파이프라인화해서 연결작업을 진행해주어야 한다.
+- Jib 빌드 
+  - gradle에서 프로젝트를 빌드함과 동시에 컨테이너 이미지를 만들어서 원하는 도커 이미지 레포지토리에 푸시까지 된다.
+  - Docker 빌드를 위한 파이프라인 과정이 하나로 통합이 되서 진행된다.
+
+
+### Jib 설정
+![image](https://user-images.githubusercontent.com/28394879/174433980-cf39d4be-4a97-4285-85cc-f124c8ed02ab.png)
+- from: Jib 라이브러리가 애플리케이션을 컨테이너 이미지로 만들때 사용하는 Base이미지를 설정
+- to: image는 생성될 컨테이너 이미지가 저장될 리포지터리를 의미하고, tag는 이미지의 설정될 태그를 의미한다.
+- container: 컨테이너 이미지가 컨테이너화 되서 실행 될 때 필요한 애플리케이션 설정들을 지정한다. 
+
+--- 
+
+### Gradle 설치 
+```
+brew install gradle
+```
+
+### Gradle Project 생성 및 빌드 
+Gradle 프로젝트 구성 명령어 
+```
+gradle init --dsl=groovy --type=java-application \
+    --test-framework=junit \
+    --package=com.text --project-name=test-docker-spring-boot 
+```
+
+Gradle 빌드 명령어 
+```
+gradle build --info 
+```
+
+### Docker 빌드 및 Push 
+Jib을 이용한 Docker 빌드 및 Push 명령어 
+```
+./gradlew jib
+```
+
+Docker Pull 및 Run 명령어 
+```
+docker pull sinkyoungdeok/jib-docker
+
+docker run -d -p 8080:8080 sinkyoungdeok/jib-docker
+```
+
+### 실습 파일 
+[실습파일 보러 가기](./Kubernetes와-Docker로-한-번에-끝내는-컨테이너-기반-MSA/1.docker&jib/)
