@@ -15,6 +15,7 @@
 - [9. 도커파일 문법](#9-도커파일-문법)
 - [10. 이미지 압축파일 저장 명령어](#10-이미지-압축파일-저장-명령어)
 - [11. 도커 허브 명령어](#11-도커-허브-명령어)
+- [12. AWS ECR 저장소 명령어](#12-AWS-ECR-저장소-명령어)
 
 ## 1. 설치 명령어 
 
@@ -533,4 +534,19 @@ docker login -u sinkyoungdeok
 # 이전에 도커 허브에서 repository를 만들어야됨.
 docker tag nginx:latest sinkyoungdeok/my-nginx:v1.0.0
 docker push sinkyoungdeok/my-nginx:v1.0.0
+```
+
+
+## 12. AWS ECR 저장소 명령어
+
+### AWS ECR push
+```
+# 이전에 AWS ECR에서 repository를 만들어야됨
+export AWS_PROFILE=sinkyoungdeok
+aws sts get-caller-identity
+aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin 797373241119.dkr.ecr.ap-northeast-2.amazonaws.com
+
+docker tag nginx:latest 797373241119.dkr.ecr.ap-northeast-2.amazonaws.com/my-nginx:v1.0.0
+
+docker push 797373241119.dkr.ecr.ap-northeast-2.amazonaws.com/my-nginx:v1.0.0
 ```
