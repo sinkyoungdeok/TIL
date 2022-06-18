@@ -21,6 +21,7 @@
 - [15. 도커 컴포즈 명령어](#15-도커-컴포즈-명령어)
 - [16. 도커 컴포즈 활용 예시](#16-도커-컴포즈-활용-예시)
 - [17. jib을 이용한 docker 이미지 빌드 푸시](#17-jib을-이용한-docker-이미지-빌드-푸시)
+- [18. jenkins 소개와 설치](#18-jenkins-소개와-설치)
 
 ## 1. 설치 명령어 
 
@@ -948,3 +949,71 @@ docker run -d -p 8080:8080 sinkyoungdeok/jib-docker
 
 ### 실습 파일 
 [실습파일 보러 가기](./Kubernetes와-Docker로-한-번에-끝내는-컨테이너-기반-MSA/1.docker&jib/)
+
+
+
+## 18. jenkins 소개와 설치
+
+### jenkins 소개 
+- 지속적 통합(Continuous Integration = CI) 서비스를 제공하는 툴 
+- 다수의 개발자들이 하나의 프로그램을 개발할 때 버전 충돌을 방지하기 위해 git등의 저장소에 업로드함으로써 지속적 통합이 가능하도록 해준다.
+
+### jenkins 특징 
+1. 빌드 자동화
+2. 자동화 테스트
+3. 코드 품질 검사 
+4. 빌드 파이프라인 구성
+ 
+
+### jenkins 플러그인 소개
+- credential plugin: aws token, git access token, secret key 등의 정보를 저장할 때 사용
+- pipeline plugin: jenkins의 핵심기능인 파이프라인을 관리할 수 있도록 해주는 플러그인 
+- docker plugin: jenkins에서 도커를 사용하기 위한 플러그인 
+
+### jenkins 설치 명령어 
+Jenkins 컨테이너 실행 명령어 
+```
+# intel mac 
+docker run --name jenkins -d -p 18080:8080 -v ~/jenkins:/var/jenkins_home -u root jenkins/jenkins:latest
+
+# m1 mac 
+docker run --name jenkins -d -p 18080:8080 -v ~/jenkins:/var/jenkins_home -u root --platform linux/amd64 --restart=always -e TZ="Asiz/Seoul" jenkins4eval/jenkins
+```
+
+Admin Password 확인 명령어 
+```
+docker exec -it jenkins bash -c "cat /var/jenkins_home/secrets/initialAdminPassword"
+```
+
+### jenkins 플러그인 설치 
+- Job DSL, Simple Build DSL for Pipeline
+- Docker Pipeline, Pipeline: Declarative Agent API, Pipeline Utility Steps, Build Pipeline, SSH Pipeline Steps, Pipeline: AWS Steps, Pipeline: Github
+- Git Parameter, Github Integration, Gituhb Authentication
+- Docker, Docker Commons, Docker API, docker-build-step, CloudBees Docker Build and Publish, CloudBees Docker Custom Build Environment
+- Amazon Web Services SDK :: All, CloudBees AWS Credentials, Amazon ECR, AWS Global Configuration, SSH, SSH Agent
+
+### SSH Key 생성 및 Github 적용 
+SSH Key 생성 명령어 
+```
+ssh-keygen -b 2048 -t rsa
+```
+
+SSH Key 설정 경로 
+```
+github > profile > settings > account settings > SSH and GPG keys > new SSH key > Title: ssh-key / Key: cat ~/.ssh/id_rsa.pub 쳐서 나온 내용 > Add SSH key
+``` 
+
+### Jenkins SSH key 추가 
+```
+Jenkins 관리 > Manage Credentials > Jenkins > Global credentials > Add Credentials > cat ~/.ssh/id_rsa 결과값을 넣기
+
+# Global credentials가 클릭 안될시 해당 링크로 이동: http://localhost:18080/credentials/store/system/domain/_/
+```
+![image](https://user-images.githubusercontent.com/28394879/174446039-0352e9a9-db8d-4974-ba8b-9deef8c01fb2.png)
+
+
+### AWS key 추가 
+![image](https://user-images.githubusercontent.com/28394879/174446119-468a4f92-753e-40df-83ae-180b48d4d45a.png)
+
+### deploy 서버의 pem키를 jenkins의 deploy ssh key로 추가
+![image](https://user-images.githubusercontent.com/28394879/174446243-c7ceece5-5b26-4c10-8a0a-54c266f9251a.png)
