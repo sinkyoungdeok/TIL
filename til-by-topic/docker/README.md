@@ -18,6 +18,7 @@
 - [12. AWS ECR 저장소 명령어](#12-AWS-ECR-저장소-명령어)
 - [13. 이미지 경량화 전략](#13-이미지-경량화-전략)
 - [14. 도커 데몬 디버깅](#14-도커-데몬-디버깅)
+- [15. 도커 컴포즈 명령어](#15-도커-컴포즈-명령어)
 
 ## 1. 설치 명령어 
 
@@ -94,6 +95,26 @@ brew install --cask docker
 ![image](https://user-images.githubusercontent.com/28394879/173233112-8074c39a-a301-4c06-8d14-13b1270b3d5b.png)
 - 위 그림은 ubuntu image에 nginx 변경사항이 추가되고, 그 위에 web app 변경 사항이 반영된 이미지에 대한 그림이다.
 - 도커 이미지는 변경사항이 있을 때 마다 하나의 layer씩 추가되는 형식으로 되어 있다.
+
+### 도커 컴포즈 개념 
+- 단일 서버에서 여러 컨테이너를 프로젝트 단위로 묶어서 관리
+- docker-compose.yml 파일을 통해 명시적 관리 
+- 프로젝트 단위로 도커 네트워크와 볼륨 관리
+- 프로젝트 내 서비스 간 의존성 정의 가능
+- 프로젝트 내 서비스 디스커버리 자동화
+- 손 쉬운 컨테이너 수평 확장
+
+### 도커 컴포즈 - 프로젝트
+- 도커 컴포즈에서 다루는 워크스페이스 단위
+- 함께 관리하는 서비스 컨테이너의 묶음
+- 프로젝트 단위로 기본 도커 네트워크가 생성 됨
+
+### 도커 컴포즈 - 서비스
+- 도커 컴포즈에서 컨테이너를 관리하기 위한 단위
+- scale을 통해 서비스 컨테이너의 수 확장 가능
+
+### 도커 컴포즈 - 컨테이너
+- 서비스를 통해 컨테이너 관리 
 
 
 
@@ -615,4 +636,130 @@ docker system prune
 ### 컨테이너별 cpu 메모리 네트워크io사용률 등 보기 
 ```
 docker stats
+```
+
+
+
+
+## 15. 도커 컴포즈 명령어
+
+### version 
+- 2021년 11월 기준 버전 3.9가 최신
+- 가능한 최신 버전 사용 권장
+- 도커 엔진 및 도커 컴포즈 버전에 따른 호환성 매트릭스 참조해야 함. 
+- version3부터 Docker Swarm과 호환
+  - Swarm 서비스를 docker-compose.yml로 정의 가능 
+
+### 도커 스왐 (Docker Swarm)
+- 여러 서버를 기반으로 스왐 클러스터를 형성하여 컨테이너를 관리하는 컨테이너 오케스트레이션 시스템
+- 쿠버네티스와 동일 목적으로 만들어졌지만 인기를 끌지 못했다. 
+
+### services
+- 프로젝트 내에 구성되는 여러 서비스들을 관리 
+
+### networks
+- 프로젝트마다 독립된 네트워크로 구성됨
+- 프로젝트내에 기본적으로 default 네트워크(브릿지)로 설정됨 
+
+### volumes
+- 프로젝트마다 독립된 볼륨으로 구성됨 
+
+### 프로젝트 목록 확인
+```
+# 실행중인 프로젝트 목록 확인
+docker-compose ls
+
+# 전체 프로젝트 목록 확인
+docker-compose ls -a
+```
+
+### 도커 컴포즈 파일 예시 
+```
+version: "3.9"
+services:
+    web:
+        build: . # 현재 디렉토리를 컴파일해서 빌드
+        ports:
+        - "5000"
+    redis:
+        image: "redis:alpine"
+```
+
+### 도커 컴포즈 실행 
+```
+docker-compose up
+```
+
+<details><summary> 명령어 옵션 </summary>
+
+- -p: 프로젝트명 변경
+- -d: 백그라운드 실행
+
+</details>
+
+</br></br>
+
+### 프로젝트 내 컨테이너 및 네트워크 종료 및 제거
+```
+docker-compose down 
+```
+
+### 프로젝트 내 컨테이너, 네트워크 및 볼륨 종료 및 제거 
+```
+docker-compose down -v 
+```
+
+### docker-compose 서비스 확장
+- docker-compose 파일내에 포트바인딩을 호스트포트를 지정하게되면, 확장이 불가능하다. (예: ports: - "5000:5000")
+- docker-compose 파일내에 컨테이너 네임을 지정하게되면, 확장이 불가능하다. (예: container_name: "web")
+```
+# web 서비스를 3개로 확장
+docker-compose up --scale web=3
+```
+
+### 프로젝트 내 서비스 로그 확인
+```
+docker-compose logs
+```
+
+### 프로젝트 내 컨테이너 이벤트 확인
+```
+docker-compose events
+```
+
+### 프로젝트 내 이미지 목록
+```
+docker-compose images
+```
+
+### 프로젝트 내 컨테이너 목록
+```
+docker-compose ps
+```
+
+### 프로젝트 내 실행중인 프로세스 목록
+```
+docker-compose top
+```
+
+### 도커 컴포즈 파일 내 옵션들
+```
+services:
+    db:
+        image: mysql:5.7 # 사용할 이미지 선택 
+        volumes: # 볼륨 설정
+        - db:/var/lib/mysql
+        restart: always # 재시작 전략 설정
+        environment: # 배열을 통한 환경변수 전달 
+        - MYSQL_ROOT_PASSWORD=wordpress
+        networks: # 네트워크 설정 
+        - wordpress
+    wordpress:
+        depends_on: # 컨테이너 실행 되는 순서 지정
+        - db # db서비스가 실행된 후에 wordpress가 실행되도록 설정
+        ports: # 포트 바인딩 설정
+        - "8000:80"
+        environment: # 오브젝트 형식을 통한 환경변수 전달
+            WORDPRESS_DB_HOST: db:3306
+            WORDPRESS_DB_USER: wordpress
 ```
