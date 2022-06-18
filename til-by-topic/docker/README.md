@@ -19,6 +19,7 @@
 - [13. 이미지 경량화 전략](#13-이미지-경량화-전략)
 - [14. 도커 데몬 디버깅](#14-도커-데몬-디버깅)
 - [15. 도커 컴포즈 명령어](#15-도커-컴포즈-명령어)
+- [16. 도커 컴포즈 활용 예시](#16-도커-컴포즈-활용-예시)
 
 ## 1. 설치 명령어 
 
@@ -116,7 +117,14 @@ brew install --cask docker
 ### 도커 컴포즈 - 컨테이너
 - 서비스를 통해 컨테이너 관리 
 
-
+### 도커 컴포즈 - 주요 사용 목적
+- 로컬 개발 환경 구성
+  - 특정 프로젝트의 로컬 개발 환경 구성 목적으로 사용
+  - 프로젝트의 의존성(Redis,Mysql 등)을 쉽게 띄울 수 있음
+- 자동화된 테스트 환경 구성
+  - CI/CD 파이프라인 중 쉽게 격리된 테스트 환경을 구성하여 테스트 수행 가능
+- 단일 호스트 내 컨테이너를 선언적 관리
+  - 단일 서버에서 컨테이너를 관리할 때 YAML 파일을 통해 선언적으로 관리 가능 
 
 
 
@@ -762,4 +770,91 @@ services:
         environment: # 오브젝트 형식을 통한 환경변수 전달
             WORDPRESS_DB_HOST: db:3306
             WORDPRESS_DB_USER: wordpress
+```
+
+
+
+
+
+## 16. 도커 컴포즈 활용 예시
+
+### 1. Grafana 구성하기
+요구사항
+- Grafana의 3000번 포트는 호스트의 3000번 포트와 바인딩
+- Grafana의 설정 파일인 grafana.ini는 호스트에서 주입 가능하도록 구성하고 읽기전용 설정
+- Grafana의 로컬 데이터 저장 경로를 확인하여 도커 볼륨 마운트
+- Grafana의 플러그인 추가 설치를 위한 환경변수 설정
+- 로그 드라이버 옵션을 통해 로그 로테이팅 
+
+```
+version: '3.9'
+
+services:
+    grafana:
+        image: grafana/grafana:8.2.2
+        restart: unless-stopped
+        environment:
+            GF_INSTALL_PLUGINS: grafana-clock-panel
+        ports:
+        - 3000:3000
+        volumes:
+        - ./files/grafana.ini:/etc/grafana/grafana.ini:ro
+        - grafana-data:/var/lib/grafana
+        logging:
+            driver: "json-file"
+            options:
+                max-size: "8m"
+                max-file: "10"
+volumes:
+    grafana-data: {}
+```
+
+### 2. Grafana + Mysql 구성하기
+요구사항
+- 1단계 요구사항 포함
+- grafana.ini를 통해 database 설정을 sqlite에서 MySQL로 변경
+- MySQL 컨테이너를 docker-compose에 db 서비스로 추가
+- grafana 서비스가 db 서비스를 database로 연결하도록 구성
+- MySQL의 로컬 데이터 저장 경로 확인하여 도커 볼륨 마운트 
+
+```
+version: '3.9'
+
+services:
+    db:
+      image: mysql:5.7
+      restart: unless-stopped
+      environment:
+          MYSQL_ROOT_PASSWORD: grafana
+          MYSQL_DATABASE: grafana
+          MYSQL_USER: grafana
+          MYSQL_PASSWORD: grafana
+      volumes:
+      - mysql-data:/var/lib/mysql
+      logging:
+          driver: "json-file"
+          options: 
+              max-size: "8m"
+              max-file: "10"
+    grafana:
+        depends_on:
+        - db
+        image: grafana/grafana:8.2.2
+        restart: unless-stopped
+        environment:
+            GF_INSTALL_PLUGINS: grafana-clock-panel
+        ports:
+        - 3000:3000
+        volumes:
+        - ./files/grafana.ini:/etc/grafana/grafana.ini:ro
+        - grafana-data:/var/lib/grafana
+        logging:
+            driver: "json-file"
+            options:
+                max-size: "8m"
+                max-file: "10"
+                
+volumes:
+    mysql-data: {}
+    grafana-data: {}
 ```
