@@ -19,7 +19,7 @@
 - [17. jib을 이용한 docker 이미지 빌드 푸시](#17-jib을-이용한-docker-이미지-빌드-푸시)
 - [18. jenkins 소개와 설치](#18-jenkins-소개와-설치)
 - [19. jenkins를 활용한 docker 빌드](#19-jenkins를-활용한-docker-빌드)
-- [20. nexus 활용](#20-nexus-활용)
+- [20. nexus를 활용한 docker 빌드](#20-nexus를-활용한-docker-빌드)
 
 ## 1. 설치 명령어 
 
@@ -1114,7 +1114,7 @@ https://github.com/sinkyoungdeok/jenkins-test
 
 
 
-## 20. nexus 활용
+## 20. nexus를 활용한 docker 빌드
 
 ### nexus 소개 
 - 사내망에 필요한 라이브러리를 다운로드 받을 수 있도록 하는 저장소 
@@ -1150,3 +1150,93 @@ https://github.com/sinkyoungdeok/jenkins-test
 
 ### Nexus Repository 구성 방식 
 ![image](https://user-images.githubusercontent.com/28394879/174606038-0c378472-c429-44e5-a966-4b18b2b9f127.png)
+
+
+### Nexus 설치 명령어 
+```
+# intel mac
+docker run --name nexus -d -p 8081:8081 -v ~/nexus-data:/nexus-data -u root sonatype/nexus3
+
+# m1 mac에선 실패.
+```
+
+### Nexus Admin Password 확인 명령어
+```
+docker exec -it nexus bash -c "cat /nexus-data/admin.password"
+```
+
+
+### Blob Store를 S3에 연동 
+```
+nexus -> Repository -> Blob Stores -> Create Blob Store
+
+Type: S3
+Name: test-docker-nexus-repository
+Region: ap-northeast-2
+Bucket: test-docker-nexus-repository-kd
+Prefix: test
+Expiration Days: 3
+Authentication: Access Key, Secret Key 설정 
+
+Save
+```
+
+- S3 접근해보면 생겨있음.
+
+
+### Proxy 타입의 Repository 생성 
+```
+nexus -> Repository -> Repositories -> Create repository -> maven2 (proxy) 
+
+Name: test-docker-nexus-repository1
+Version policy: Mixed
+Layout policy: Permissive
+Remote storage: https://repo1.maven.org/maven2/
+Auto blocking enabled: 체크표시 제거
+Blob store: test-docker-nexus-repository
+Strict Content Type Validation: 체크표시 제거 
+
+Create repository
+```
+
+### Nexus Artifact를 활용한 Docker 빌드
+- gradle 변경 
+```
+// 기존 gradle 
+repositories {
+    mavenCentral()
+}
+
+// 변경된 build.gradle
+repositories {
+    maven {
+        url "https://<Nexus VM 퍼블릭 주소>:8081/repository/<Nexus에 생성한 Proxy Repository명>"
+    }
+}
+```
+
+- gradle, ecr, docker, 컨테이너 명령어 
+```
+# gradle 
+gradle clean build --info
+
+# aws ecr login 
+aws ecr get-login-password --region <리전명> | docker login --username AWS --password-stdin <AWS ECR Repository URL>
+
+# docker build with jib
+gradle jib --console=plain
+
+# docker 
+docker run -d -p 8080:8080 -t <AWS ECR Repository URL>:태그명
+``` 
+
+- 실행시간
+  - mavenCentral() : 3분 30초 
+  - maven with nexus : 3분 42초 
+  - maven with nexus (nexus에 이미 artifact가 저장되고 난 후에 요청 했을 때) : 1분 51초
+- 결론 
+  - 일반적으로 nexus에 의존성들이 한번 저장되고나서, repository로 다운로드가 되기 때문에 nexus repository의 첫시도는 오래걸릴 수 있다.
+  - 하지만, nexus repository에 한번 저장되고나면 그뒤 요청들은 mavenCentral에 접근할 필요가 없으므로 훨씬 더 빠르다. 
+
+### 실습 파일 
+[실습파일 보러 가기](./Kubernetes와-Docker로-한-번에-끝내는-컨테이너-기반-MSA/2.nexus&docker)
