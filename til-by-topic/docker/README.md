@@ -1,8 +1,4 @@
 
-## 강의별 정리
-[1. 초보를 위한 도커 안내서](./초보를-위한-도커-안내서/README.md)  
-[2. Kubernetes와 Docker로 한 번에 끝내는 컨테이너 기반 MSA](./Kubernetes와-Docker로-한-번에-끝내는-컨테이너-기반-MSA/README.md)
-
 ## 목록 
 - [1. 설치 명령어](#1-설치-명령어)
 - [2. 기본 개념](#2-기본-개념)
@@ -23,6 +19,7 @@
 - [17. jib을 이용한 docker 이미지 빌드 푸시](#17-jib을-이용한-docker-이미지-빌드-푸시)
 - [18. jenkins 소개와 설치](#18-jenkins-소개와-설치)
 - [19. jenkins를 활용한 docker 빌드](#19-jenkins를-활용한-docker-빌드)
+- [20. nexus 활용](#20-nexus-활용)
 
 ## 1. 설치 명령어 
 
@@ -1110,3 +1107,46 @@ aws configure
 
 ### jenkins 진행 repository
 https://github.com/sinkyoungdeok/jenkins-test
+
+
+
+
+
+
+
+## 20. nexus 활용
+
+### nexus 소개 
+- 사내망에 필요한 라이브러리를 다운로드 받을 수 있도록 하는 저장소 
+- 별도의 리포지터리(nexus) 를 구축하는 이유 
+  - 보안 이슈 
+  - 라이브러리 버전 관리 용이 
+  - 공유 및 협업 강화 
+
+### nexus 장점 
+- main 저장소의 캐시 역할
+  - build시 artifact 다운로드를 빨리 할 수 있음
+- 자체 artifact 배포를 위한 private repository를 만들 수 있다
+  - 외부에 공개하고 싶지 않은 custom artifact를 private repository에 올린다.
+- 보안 
+  - 외부와 연결이 불가능 한 경우 중앙 레포에 연결이 안되서 빌드가 안되는 문제가 발생하는데, 넥서스 repository만 외부와 연결하게 설정하면 빌드가 가능해진다.
+
+### Nexus 와 Jenkins CI 연동 
+![image](https://user-images.githubusercontent.com/28394879/174604090-57fdb04c-3b9c-4e98-81b8-107b30fd6fa2.png)
+
+### Nexus Repository 
+- Snapshots: 빌드 등 수시로 릴리즈 되는 아티팩트 리포지터리
+- Releases: 정식 릴리즈를 통해서 배포되는 아티팩트 리포지터리
+- 3rd Party: 특정 밴더사에서 제공하는 아티팩트 리포지터리
+- Proxy Repository: Local Cache 용 
+- Virtual Repository: 여러 리포지터리를 그룹화하여 하나의 리포지터리로 참조 가능 
+
+### Nexus Repository Type
+- Proxy: 외부망에 있는 리포지터리와 연동해 버전관리
+- Hosted: 내부망 내 개발용으로 연동하는 리포지터리
+- Virtual: 서로 다른 타입의 리포지터리를 연결
+- Group: 위에 명시된 3개 타입을 그룹화
+
+
+### Nexus Repository 구성 방식 
+![image](https://user-images.githubusercontent.com/28394879/174606038-0c378472-c429-44e5-a966-4b18b2b9f127.png)
