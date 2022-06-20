@@ -22,6 +22,7 @@
 - [16. 도커 컴포즈 활용 예시](#16-도커-컴포즈-활용-예시)
 - [17. jib을 이용한 docker 이미지 빌드 푸시](#17-jib을-이용한-docker-이미지-빌드-푸시)
 - [18. jenkins 소개와 설치](#18-jenkins-소개와-설치)
+- [19. jenkins를 활용한 docker 빌드](#19-jenkins를-활용한-docker-빌드)
 
 ## 1. 설치 명령어 
 
@@ -1017,3 +1018,95 @@ Jenkins 관리 > Manage Credentials > Jenkins > Global credentials > Add Credent
 
 ### deploy 서버의 pem키를 jenkins의 deploy ssh key로 추가
 ![image](https://user-images.githubusercontent.com/28394879/174446243-c7ceece5-5b26-4c10-8a0a-54c266f9251a.png)
+
+
+
+
+
+
+
+
+
+
+## 19. jenkins를 활용한 docker 빌드
+
+### jenkins CI/CD job 수행 및 Docker 빌드/배포 과정 
+![image](https://user-images.githubusercontent.com/28394879/174514187-4bf59bd2-fe4e-4c7b-a031-5b457afc88b0.png)
+
+
+### 파이프라인 구성 
+```
+젠킨스 대시보드 -> 새로운 Item -> Pipeline -> Github project 설정, Pipeline 설정 -> 저장
+```
+![image](https://user-images.githubusercontent.com/28394879/174531990-4fdd1dab-a811-4f66-bc03-d3fe9f59637e.png)
+
+
+### Jenkinsfile 설명 
+- Jenkinsfile: https://github.com/sinkyoungdeok/jenkins-test/blob/main/1-jenkins-docker/Jenkinsfile
+```
+def mainDir="1-jenkins-docker"
+def ecrLoginHelper="docker-credential-ecr-login"
+def region="ap-northeast-2"
+def ecrUrl="651192415160.dkr.ecr.ap-northeast-2.amazonaws.com"
+def repository="test"
+def deployHost="172.31.51.28"
+
+pipeline {
+    agent any 
+
+    stages {
+        stage('Pull Codes from Github'){
+            steps{
+                checkout scm
+            }
+        }
+        stage('Build Codes by Gradle') {
+            steps {
+                sh """
+                cd ${mainDir}
+                ./gradlew clean build
+                """
+            }
+        }
+        stage('Build Docker Image by Jib & Push to AWS ECR Repository') {
+            steps {
+                withAWS(region:"${region}", credentials:"aws-key") {
+                    ecrLogin()
+                    sh """
+                        curl -O https://amazon-ecr-credential-helper-releases.s3.us-east-2.amazonaws.com/0.4.0/linux-amd64/${ecrLoginHelper}
+                        chmod +x ${ecrLoginHelper}
+                        mv ${ecrLoginHelper} /usr/local/bin/
+                        cd ${mainDir}
+                        ./gradlew jib -Djib.to.image=${ecrUrl}/${repository}:${currentBuild.number} -Djib.console='plain'
+                    """
+                }
+            }
+        }
+        stage('Deploy to AWS EC2 VM'){
+            steps{
+                sshagent(credentials : ["deploy-key"]) {
+                    sh "ssh -o StrictHostKeyChecking=no ec2-user@${deployHost} \ # ssh 연결
+                     'aws ecr get-login-password --region ${region} | docker login --username AWS --password-stdin ${ecrUrl}/${repository}; \ # ecr 연동
+                      sleep 3; \
+                      docker run -d -p 80:8080 -t ${ecrUrl}/${repository}:${currentBuild.number};'" # 이미지 pull 및 컨테이너 실행
+                }
+            }
+        }
+    }
+}
+```
+
+### 배포할 서버에 aws 인증 
+```
+# 아래 인증을 안하고 배포 시 no basic auth credentials 에러 발생
+aws configure 
+```
+
+
+### 배포 
+```
+젠킨스 대시보드 -> 생성한 파이프라인 클릭 -> 지금 빌드
+```
+
+### jenkins 진행 repository
+https://github.com/sinkyoungdeok/jenkins-test
