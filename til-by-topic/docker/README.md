@@ -1301,3 +1301,180 @@ docker run -d -p 8080:8080 -t <AWS ECR Repository URL>:태그명
 5. 전달된 품질 분석 결과는 소나큐브 DB에 저장되어 관리 되고
 6. 소나큐브 웹 서버를 통해 개발자는 이슈를 확인하고 새로 개발되는 코드에 대한 품질 향상 활동 및 이슈처리 등을 지속적으로 수행할 수 있다.
 7. 품질 활동 결과는 다른 시스템과 api등으로 연동하여 리포팅 할 수 있다. 
+
+
+### SonarQube 설치 명령어
+```
+# intel mac 
+docker run --name sonarqube -d -p 9000:9000 sonarqube:latest
+
+# m1 mac은 실패
+```
+
+### SonarQube 유저 생성 
+```
+sonarqube 대시보드 -> Administration -> Security -> Users -> Create User 
+
+# 어드민 권한 부여 
+sonarqube 대시보드 -> Administration -> Security -> Global Permission
+```
+
+### Jacoco란 
+- Java Code Coverage
+  - 자바 소스파일의 코드 커버리지 제공
+  - 테스트케이스에 의한 테스트수 측정
+- Instruction Coverage
+  - 코드 실행량 측정 커버리지
+- Branch Coverage
+  - if나 switch 문의 분기 확인
+  - 실행된 것과 실행되지 않은 부분 측정
+- Cyclomatic complexity
+  - function 테스트시 최소 경로 정보 
+  - 모든 코드를 커버하기 위한 테스트 수 
+
+### SonarQube & Jacoco 관련 명령어 
+```
+# 빌드 
+./gradlew clean build --info
+
+# Jacoco 코드 커버리지 측정 및 리포트 작성 명령어
+./gradlew jacocoTestCoverageVerification --info
+./gradlew jacocoTestReport --info
+cat /build/reports/jacoco/test/html/index.html
+
+# SonarQube 코드 품질 스캔 결과 연동 명령어 
+./gradlew sonarqube --info
+
+# Docker 이미지 빌드 및 push 
+./gradlew jib --console=plain
+```
+
+### Gradle에서 SonarQube 및 Jacoco 플러그인 설정 
+```
+// build.gradle
+
+buildscript {
+  ext {
+      springBootVersion = '1.5.4.RELEASE'
+      jacocoVersion = '0.8.7'
+  }
+  repositories {
+      mavenCentral()
+      maven {
+          url "https://plugins.gradle.org/m2/"
+      }
+  }
+  dependencies {
+      classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+      classpath "org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.7.1"
+  }
+}
+
+plugins {
+	id 'org.springframework.boot' version '2.5.2'
+	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+	id 'java'
+    id 'com.google.cloud.tools.jib' version '3.1.4'
+}
+
+apply plugin: 'org.sonarqube'
+apply plugin: 'jacoco'
+group = 'com.example'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '11'
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
+
+test {
+	useJUnitPlatform()
+}
+jacoco{
+  toolVersion = "${jacocoVersion}"
+}
+
+jacocoTestReport {
+ reports{
+  html.enabled=true
+  xml.enabled=true
+  csv.enabled=true
+ }
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
+sonarqube {
+  properties {
+      property "sonar.projectName","SpringBoot Code Coverage Demo"
+      property "sonar.exclusions", "**/generated-*/**/*"
+      property "sonar.projectKey", "org.sonarqubeJacocoCodeCoverage"
+      property "sonar.reportPath" , "${project.buildDir}/jacoco/test.exec"
+      property "sonar.host.url", "http://<SonarQube Private IP>:9000"
+      property "sonar.sources", "src/main/java"
+      property "sonar.tests", "src/test/java"
+      property "sonar.login", "<SonarQube ID>"
+      property "sonar.password", "<SonarQube PW>"
+  }
+}
+
+tasks['sonarqube'].dependsOn test
+
+jib {
+    from {
+        image = 'adoptopenjdk/openjdk11:alpine-jre'
+    }
+    to {
+        image = '<AWS ECR URL>/<Image Repository Name>'
+        tags = ['<Image Tag Name>']
+    }
+    container {
+        entrypoint = ['java', '-Dspring.profiles.active=test', '-jar', 'spring-boot-gradle-demo-0.0.1-SNAPSHOT.jar']
+        // mainClass = 'com.test.StartApplication'
+        jvmFlags = ['-Xms512m', '-Xmx512m', '-Xdebug', '-XshowSettings:vm', '-XX:+UnlockExperimentalVMOptions', '-XX:+UseContainerSupport']
+        ports = ['8080']
+
+        environment = [SPRING_OUTPUT_ANSI_ENABLED: "ALWAYS"]
+        labels = [version:project.version, name:project.name, group:project.group]
+
+        creationTime = 'USE_CURRENT_TIMESTAMP'
+        format = 'Docker'
+    }
+    extraDirectories {
+        paths {
+            path {
+                from = file('build/libs')
+            }
+        }
+    }
+}
+```
+
+### Jacoco 코드 커버리지 측정 및 리포트 결과
+![image](https://user-images.githubusercontent.com/28394879/174920294-f4fc3587-88e5-48e3-bd2e-dd5850e9d397.png)
+- 어떤식으로 충족이 안됐는지는 확인할 수 있다.
+- 하지만, 어떤것을 기준으로 이러한 값이 나왔는지 확인이 불가하므로 소나큐브가 필요하다.
+
+
+
+
+### SonarQube에서 정적코드 품질분석 결과확인 
+```
+./gradlew sonarqube --info
+
+SonarQube 대시보드 -> Projects -> SpringBoot Code Coverage Demo -> Code Smells 
+```
+
+![image](https://user-images.githubusercontent.com/28394879/174921174-afe88f48-b059-40ad-a3ab-b0bf08e81ac3.png)
+
+
+
+### 실습 파일 
+[실습파일 보러 가기](./Kubernetes와-Docker로-한-번에-끝내는-컨테이너-기반-MSA/3-sonarqube-docker)
