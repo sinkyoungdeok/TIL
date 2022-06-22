@@ -1548,5 +1548,47 @@ wget https://github.com/arminc/clair-scanner/releases/download/v12/clair-scanner
 chmod +x clair-scanner_linux_amd64; sudo mv clair-scanner_linux_amd64 /usr/local/bin/clair-scanner
 ```
 
+### Clair 관련 명령어
+```
+# Clair 실행 서버 Private IP 확인 멸영어 
+export IP=$(ip r | tail -n1 | awk '{print $9}');echo ${IP}
 
-### Clair 보안 설정 및 Docker 빌드 스캔 
+# Gradle 및 AWS-CLI Docker 이미지 스캔 및 결과 확인 명령어 
+clair-scanner --ip ${IP} --clair=http://localhost:6060 --log="clair.log" --report="gradle_report.txt" <Gradle 이미지명>
+clair-scanner --ip ${IP} --clair=http://localhost:6060 --log="clair.log" --report="aws-cli_report.txt" <AWS-CLI 이미지명>
+
+# Spring Boot 웹 애플리케이션 Docker 이미지 빌드 보안 스캔 명령어 
+clair-scanner --ip ${IP} --clair=http://localhost:6060 --log="clair.log" --report="spring-boot-web_report.txt" <예제 Docker 이미지명>
+```
+
+### Clair-scanner 기본 보안 설정을 위한 옵션 
+- -w: 화이트리스트 파일의 경로 
+- -t: 심각도에 해당하는 내용을 출력 (심각도 = Defcon1, Critical, High, Medium, Low, Negligible, Unknown)
+- -c: Clair URL
+- --ip: private ip address
+- -l: 출력 로그파일 
+- --all: 전체에 보안취약점에 대해서 출력
+- -r: 스캔 결과값에 대해서 output파일 설정 
+
+
+### Jenkins에서 많이 사용하는 Docker 이미지 스캔 및 결과 확인
+```
+# gradle 
+docker pull gradle:jdk11
+# aws-cli
+docker pull bitnami/aws-cli:latest
+
+# gradle scan
+clair-scanner --ip ${IP} --clair=http://localhost:6060 --log="clair.log" --report="gradle_report.txt" gradle:jdk11
+# aws-cli scan
+clair-scanner --ip ${IP} --clair=http://localhost:6060 --log="clair.log" --report="aws-cli_report.txt" bitnami/aws-cli:latest
+```
+
+### Gradle-Jib 예제 Docker 이미지 빌드 스캔 및 결과 확인
+```
+aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin 797373241119.dkr.ecr.ap-northeast-2.amazonaws.com
+
+docker pull 797373241119.dkr.ecr.ap-northeast-2.amazonaws.com/test:1.0
+
+clair-scanner --ip ${IP} --clair=http://localhost:6060 --log="clair.log" --report="spring-boot-web_report.txt" 
+```
