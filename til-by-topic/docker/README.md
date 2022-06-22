@@ -21,6 +21,7 @@
 - [19. jenkins를 활용한 docker 빌드](#19-jenkins를-활용한-docker-빌드)
 - [20. nexus를 활용한 docker 빌드](#20-nexus를-활용한-docker-빌드)
 - [21. sonarqube를 활용한 docker 빌드](#21-sonaqube를-활용한-docker-빌드)
+- [22. docker 컨테이너 보안을 위한 clair 활용](#22-docker-컨테이너-보안을-위한-clair-활용)
 
 ## 1. 설치 명령어 
 
@@ -1474,7 +1475,63 @@ SonarQube 대시보드 -> Projects -> SpringBoot Code Coverage Demo -> Code Smel
 
 ![image](https://user-images.githubusercontent.com/28394879/174921174-afe88f48-b059-40ad-a3ab-b0bf08e81ac3.png)
 
+![image](https://user-images.githubusercontent.com/28394879/174921363-899c4b96-35fc-4d82-9c57-ae758cce623e.png)
+
 
 
 ### 실습 파일 
 [실습파일 보러 가기](./Kubernetes와-Docker로-한-번에-끝내는-컨테이너-기반-MSA/3-sonarqube-docker)
+
+
+
+
+
+
+## 22. docker 컨테이너 보안을 위한 clair 활용
+
+### Docker 컨테이너 보안 
+![image](https://user-images.githubusercontent.com/28394879/174927936-b1461b70-b9c1-4737-a229-666df2be6dcb.png)
+
+안전한 컨테이너 보안을 위해 취할 수 있는 단계   
+1. 정적 코드 분석 (ex: sonarqube)
+2. 종속성 확인 (라이브러리 등 확인)
+3. 컨테이너 이미지의 보안 취약점 스캔 (ex: Clair)
+
+### Clair 소개 
+- 애플리케이션 컨테이너의 취약점에 대한 정적 분석을 위한 오픈소스 프로젝트
+- 클라이언트는 Clair API를 사용하여 컨테이너 이미지를 색인화한 다음 알려진 취약점과 대조할 수 있다.
+- Clair의 목표는 컨테이너 기반 인프라의 보안을 투명하게 볼 수 있도록 하는 것이다.
+
+### Clair 아키텍처
+![image](https://user-images.githubusercontent.com/28394879/174928467-7265baaa-7b36-466e-8f6e-b441adc69ec2.png)
+- Clair는 컨텐츠를 검사하고 취약점을 보고하기 위한 엔진으로 ClairCore 라이브러리를 사용한다.
+- 높은 수준의 ClairCore 라이브러리에서 제공하는 기능에 대한 Clair 서비스 레포를 전송할 수 있다.
+- 레이어 인덱싱과 같은 대부분의 개발은 ClairCore를 통해서 적용이 된다 
+- ClairCore 내에는 REST API를 통해 취약성 데이터베이스를 업데이트를 담당하는 업데이터와 데이터 소스 목록을 처리하는 구문을 구현할 수 있다.
+- ClairCore 내에는 취약점 데이터베이스 저장 및 업데이트된 도커 이미지 레이어 분석 결과를 출력하는 구문을 구현할 수 있다. 
+
+### Clair 작동 방식 
+![image](https://user-images.githubusercontent.com/28394879/174929163-dc1cb0a0-f853-4494-8e13-3b23cb087897.png)
+- Clair는 크게 3부분으로 나뉜다.
+  1. indexer: 매니페스트를 클레어에 전달한다. clair가 indexing을 수신받으면, 클레어는 컨테이너 이미지에 레이어 정보를 가져오고, 해당 컨텐츠를 스캔하여 index report 라는 중간 데이터를 반환한다. (매니페스트: 컨테이너 이미지에 대한 클레어 명세 내용)
+  2. matcher: index report를 가져오고, report가 나타내는 매니페스트에 영향을 미치는 관련 취약점을 연결한다. 클레어는 지속적으로 새로운 보안 데이터를 수집하고 있으며, 매칭 서버에 대한 요청을 통해 항상 인덱스 레포트의 최신 취약점을 분석하고 제공한다.
+  3. notifier: 클레어는 notifier를 통해 알람 서비스를 구현한다. 새로운 취약점이 발견되면 알람서비스는 이러한 취약점이 인덱싱된 매니페스트에 영향을 미치는지 확인한다. 관리자는 이러한 알람을 통해 구성에 따라 조치를 취할 수 있다. 
+
+### Clair를 통한 컨테이너 이미지 분석 방식 
+![image](https://user-images.githubusercontent.com/28394879/174930470-01d316d4-054b-4290-94b8-1d4769d4223f.png)
+- 클레어는 총 4가지 도커 이미지의 보안 취약점을 분석한다.
+  1. 특정 이미지 리포지터리에 컨테이너 이미지가 있어야지 접근해서 분석할 수 있다. (pull)
+  2. registry에 있는 컨테이너 이미지를 사용해서 해당 레이어에 HTTP URL을 통해 layer의 tar파일을 가져와 분석한다. 
+  3. 분석한 이미지 레이어외에 다른 레이어를 분석하기 위해 다른 API 엔드포인트를 통해서 tar파일을 얻는다.
+  4. 클레어에게 하나로 통합된 스캔 가능한 레이어로 구성된 도커 이미지를 통합적으로 분석할 수 있도록 진행한다.
+
+### Clairctl를 통한 보안 취약점 스캔 
+![image](https://user-images.githubusercontent.com/28394879/174931546-f388b242-8325-4f8a-b469-2653a12ed98f.png)
+
+### Clair & Jenkins CI 연동
+![image](https://user-images.githubusercontent.com/28394879/174931635-6d12a198-104c-425b-9a58-0acedbe0b503.png)
+- 빨간 박스에서 Clair를 진행한다. 
+
+### Clair 설치 
+
+### Clair 보안 설정 및 Docker 빌드 스캔 
