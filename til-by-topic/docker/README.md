@@ -1533,5 +1533,20 @@ SonarQube 대시보드 -> Projects -> SpringBoot Code Coverage Demo -> Code Smel
 - 빨간 박스에서 Clair를 진행한다. 
 
 ### Clair 설치 
+Clair DB & Clair 서버 컨테이너 실행 
+```
+# intel mac
+docker run -p 5432:5432 -d --name db arminc/clair-db:latest
+docker run -p 6060:6060 --link db:postgres -d --name clair arminc/clair-local-scan:latest
+
+# m1 mac 실패
+```
+
+Clair-scanner 설치 
+```
+wget https://github.com/arminc/clair-scanner/releases/download/v12/clair-scanner_linux_amd64
+chmod +x clair-scanner_linux_amd64; sudo mv clair-scanner_linux_amd64 /usr/local/bin/clair-scanner
+```
+
 
 ### Clair 보안 설정 및 Docker 빌드 스캔 
