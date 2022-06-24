@@ -1648,9 +1648,5 @@ aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS
 gradle jib --conosole=plain
 ```
 
-
-### Docker 컨테이너 빌드 및 푸시 (Nexus vs AWS ECR)
-
-
 ### 실습 파일 
 [실습파일 보러 가기](./Kubernetes와-Docker로-한-번에-끝내는-컨테이너-기반-MSA/4-nexus-ecr-docker)
