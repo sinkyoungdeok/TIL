@@ -23,6 +23,7 @@
 - [21. sonarqube를 활용한 docker 빌드](#21-sonaqube를-활용한-docker-빌드)
 - [22. docker 컨테이너 보안을 위한 clair 활용](#22-docker-컨테이너-보안을-위한-clair-활용)
 - [23. docker 컨테이너 빌드 및 푸시 방법 nexus vs aws ecr](#23-docker-컨테이너-빌드-및-푸시-방법-nexus-vs-aws-ecr)
+- [24. docker 트러블 슈팅](#24-docker-트러블-슈팅)
 
 ## 1. 설치 명령어 
 
@@ -1655,3 +1656,87 @@ gradle jib --conosole=plain
 
 ### 실습 파일 
 [실습파일 보러 가기](./Kubernetes와-Docker로-한-번에-끝내는-컨테이너-기반-MSA/4-nexus-ecr-docker)
+
+
+
+## 24. docker 트러블 슈팅
+
+### Docker Network 트래픽 Dump 
+- tcpdump 명령어 사용
+- docker컨테이너가 사용하고 있는 특정 네트워크 인터페이스를 확인(리눅스)
+- 해당 인터페이스에서 발생하는 트래픽 정보(패킷)등을 tcpdump로 수집
+- 수집한 트래픽은 파일로 dump
+```
+sudo tcpdump -i docker0 -w tcpdump.pcap
+```
+
+### Docker Network 트래픽 Debugging 
+- tcpdump로 수집된 트래픽의 dump 파일을 로컬로 가져옴
+- wireshark에 dump파일 import
+- wireshark를 통한 디버깅 시작 
+
+
+### Private 환경에서 Nexus 활용
+![image](https://user-images.githubusercontent.com/28394879/175469786-b3ffb234-a82c-4db5-9152-926ea592ff95.png)
+
+![image](https://user-images.githubusercontent.com/28394879/175482325-961f5d72-a315-4608-b6c5-3acb09ce34e3.png)
+
+
+### Private 환경에서 Squid Proxy 활용 
+![image](https://user-images.githubusercontent.com/28394879/175469960-a0920d54-138c-46ad-bccd-aab4f7321e55.png)
+
+
+### Docker 데몬 상태 확인 및 이슈 로깅 명령어 
+```
+# Docker 데몬 상태 확인 명령어
+systemctl status docker
+journalctl -r -u docker
+
+# Docker 정보 확인 명령어 
+docker info
+
+# 특정 Docker 컨테이너 상세 정보 확인 명령어 
+docker inspect <실행중인 컨테이너 ID>
+
+# 특정 Docker 컨테이너 이슈 로깅 명령어 
+docker logs <실행중인 컨테이너 ID>
+```
+
+### CRI-O 데몬 상태 확인 및 이슈 로깅 명령어 
+```
+# CRI-O 데몬 상태 확인 명령어 
+systemctl status crio
+journalctl -r -u crio
+
+# CRI-O 정보 확인 명령어 (k8s에서만 사용가능)
+crictl info
+
+# 특정 CRI-O 컨테이너 상세 정보 확인 명령어 (k8s에서만 사용가능)
+crictl inspect <실행중인 컨테이너 ID>
+
+# 특정 CRI-O 컨테이너 이슈 로깅 명령어 (k8s에서만 사용가능)
+crictl logs <실행중인 컨테이너 ID>
+```
+
+
+### tcpdump 명령어 
+```
+# tcpdump 수집 명령어
+tcpdump -i <컨테이너 네트워크 인터페이스명> -w <Dump 파일명>
+
+# tcpdump 파일 로컬로 가져오는 방법
+scp -i <서버 접속 SSH Key> <계정명>@<서버 IP 혹은 DNS 주소>:<Dump 파일이 있는 서버의 경로> <Dump 파일을 저장할 로컬환경의 경로>
+```
+
+### wireshark에 tcpdump 파일 import 및 디버깅 수행 
+```
+# wireshark import
+파일 -> import > scp로 가져온 dump 파일 선택 > 열기
+
+# wireshark 디버깅, -filter 창에서 다음의 키워드로 검색
+http
+ctp.dstport == 80
+tcp.port == 80 and ip.addr == <특정 목적지 IP>
+http.request.method == "GET"
+http.response.code = 200
+```
