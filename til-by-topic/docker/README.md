@@ -22,6 +22,7 @@
 - [20. nexus를 활용한 docker 빌드](#20-nexus를-활용한-docker-빌드)
 - [21. sonarqube를 활용한 docker 빌드](#21-sonaqube를-활용한-docker-빌드)
 - [22. docker 컨테이너 보안을 위한 clair 활용](#22-docker-컨테이너-보안을-위한-clair-활용)
+- [23. docker 컨테이너 빌드 및 푸시 방법 nexus vs aws ecr](#23-docker-컨테이너-빌드-및-푸시-방법-nexus-vs-aws-ecr)
 
 ## 1. 설치 명령어 
 
@@ -1592,3 +1593,19 @@ docker pull 797373241119.dkr.ecr.ap-northeast-2.amazonaws.com/test:1.0
 
 clair-scanner --ip ${IP} --clair=http://localhost:6060 --log="clair.log" --report="spring-boot-web_report.txt" 
 ```
+
+
+## 23. docker 컨테이너 빌드 및 푸시 방법 nexus vs aws ecr
+
+
+### Docker 컨테이너 빌드 후 Nexus에 이미지 Push 및 Clair 보안 스캔 수행 
+![스크린샷 2022-06-24 오전 11 49 30](https://user-images.githubusercontent.com/28394879/175452426-0b2ee420-4977-4bfe-82ad-2d4821eceb33.png)
+
+
+### Docker 컨테이너 빌드 후 AWS ECR에 이미지 Push 및 ECR 보안 스캔 수행 
+![스크린샷 2022-06-24 오전 11 55 42](https://user-images.githubusercontent.com/28394879/175453075-551b1f64-7c53-4ff5-98d3-ac2f1ced6aaa.png)
+
+### Nexus Registry 및 AWS ECR 연결 설정 
+
+
+### Docker 컨테이너 빌드 및 푸시 (Nexus vs AWS ECR)
