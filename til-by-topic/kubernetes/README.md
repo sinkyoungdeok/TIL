@@ -10,6 +10,7 @@
 - [1. 설치 명령어](#1-설치-명령어)
 - [2. 기본 개념](#2-기본-개념)
 - [3. 기본 명령어](#3-기본-명령어)
+- [4. 로컬 개발 환경 세팅](#4-로컬-개발-환경-세팅)
 
 
 ## 1. 설치 명령어 
@@ -165,4 +166,20 @@ brew install minikube
 
 ```
 minikube start --driver docker 
+```
+
+
+
+## 4. 로컬 개발 환경 세팅
+
+### local 환경 클러스터 구성 (m1 mac)
+```
+brew install google-cloud-sdk
+gcloud init
+gcloud container clusters get-credentials <프로젝트 명> --zone us-central1-c --project <..>
+```
+
+### 쿠버네티스 오브젝트 yaml 작성 시 도움 되는 플러그인 
+```
+vscode 패키지 -> Kubernetes 설치 
 ```
