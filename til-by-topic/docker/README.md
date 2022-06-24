@@ -1605,7 +1605,52 @@ clair-scanner --ip ${IP} --clair=http://localhost:6060 --log="clair.log" --repor
 ### Docker 컨테이너 빌드 후 AWS ECR에 이미지 Push 및 ECR 보안 스캔 수행 
 ![스크린샷 2022-06-24 오전 11 55 42](https://user-images.githubusercontent.com/28394879/175453075-551b1f64-7c53-4ff5-98d3-ac2f1ced6aaa.png)
 
-### Nexus Registry 및 AWS ECR 연결 설정 
+### Nexus Docker Registry 설치 및 설정 
+- Nexus Registry용 Blob Store 생성
+- Nexus Registry용 Repository 생성 
+
+### Nexus Docker 빌드 및 Push&Pull 수행
+- Nexus Registry URL 설정 
+  - 로컬 Docker 데몬
+  - Gradle > Jib
+- Docker 빌드 및 Nexus Registry로 Push 수행
+- Nexus Registry에서 로컬로 Docker Pull 수행 
+
+### Nexus Docker 명령어 
+```
+# 로컬 Docker 데몬 내 Nexus Registry 설정 명령어 
+vi ~/.docker/daemon.json
+
+# Nexus Registry 로그인 명령어 
+docker login -u <Registry 계정명> <Nexus Registry 주소>:5000
+
+# Docker 빌드 후 Nexus Registry로 Push 하기 위한 Gradle - Jib 명령어 
+gradle jib -DsendCredentialsOverHttp=true --console=plain
+
+# Nexus Registry에서 로컬로 Pull 하기 위한 명령어 
+docker pull <Nexus Registry 주소>:5000/<Repository명>:<Tag명>
+```
+
+### AWS ECR Repository 보안 취약점 스캔 연결 설정 
+- AWS ECR Repository 보안 취약점 스캔 연결 설정
+- ECR Repository 대상 Docker 빌드 및 Push 테스트
+- 보안 취약점 스캔 수행 및 결과 확인 
+
+### AWS ECR 명령어 
+```
+# Nexus Registry 로그아웃 명령어 
+docker logout
+
+# AWS ECR Repository 로그인 명령어 
+aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin <AWS ECR Repository URL>
+
+# Docker 빌드 및 AWS ECR로 Push 명령어 
+gradle jib --conosole=plain
+```
 
 
 ### Docker 컨테이너 빌드 및 푸시 (Nexus vs AWS ECR)
+
+
+### 실습 파일 
+[실습파일 보러 가기](./Kubernetes와-Docker로-한-번에-끝내는-컨테이너-기반-MSA/4-nexus-ecr-docker)
