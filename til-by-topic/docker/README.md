@@ -239,6 +239,11 @@ docker run --rm ...
 docker container prune
 ```
 
+### 이미지 모두 삭제 
+```
+docker rmi $(docker images | grep -v TAG | awk '{print $3}')
+```
+
 ### 엔트리포인트와 커맨드 
 ```
 docker run --entrypoint sh ubuntu:focal
