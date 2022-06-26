@@ -315,7 +315,7 @@ kubectl scal deployment orderapp --replicas=3
 
 
 ### Pod와 컨테이너 설계시 고려 할 점 
-- Pod:Container = 1:1 or 1:N 결정
+- Pod:Container = 1:1 or 1:N 결정 => pod은 생성과 종료가 빈번하게 일어나서, 서로 다른 컨테이너를 하나의 pod로 구성하기보다는 1:1로 구성하는게 좋다.
 1. 컨테이너들의 라이프사이클이 같은가?
    - Pod 라이프 사이클 = 컨테이너들의 라이프 사이클
    - 컨테이너 A가 종료 되었을 때 컨테이너 B 실행이 의미가 있는가
@@ -323,3 +323,115 @@ kubectl scal deployment orderapp --replicas=3
    - 웹 서버 vs 데이터베이스와 같이 "트래픽이 많은 vs 그렇지 않은" 과 같이 요구사항이 다르면 좋지 않다.
 3. 인프라 활용도가 더 높아지는 방향으로  
    - 쿠버네티스가 노드 리소스 등 여러 상태를 고려하여 Pod를 스케쥴링  
+
+
+### pod가 노드에 배포되는 과정
+Master Node: API Server, Replication Controller, Scheduler
+Worker Node: kubelet, docker
+1. API Server: 사용자로부터 pod 배포 요청을 수락한다
+2. Replication Controller: Api Server로 부터 요청 받은 수 만큼 Pod Replica를 생성 한다 (pod desired state == current state)
+3. Scheduler: Api Server로 부터 전달 받은 요청으로 Pod를 배포할 적절한 노드를 선택한다 (nodeselector)
+4. Kublet: Api Server로 부터 전달 받은 요청으로 docker에게 이미지 다운로드를 명령하고 Pod 실행을 준비한다. Pod 상태를 업데이트 한다
+5. Docker: kublet로 부터 전달 받은 요청으로 이미지를 다운로드하고 컨테이너를 실행한다. 
+
+### Pod 오브젝트 표현 방법
+```
+apiVersion: V1 # Kubernetes API 버전
+kind: Pod # 오브젝트 타입
+metadata: # 오브젝트를 유일하게 식별하기 위한 정보 
+  name: kube-basic # 오브젝트 이름
+  labels: # 오브젝트 집합을 구할 때 사용할 이름표 
+    app: kube-basic
+    project: test-project
+spec: # 사용자가 원하는 오브젝트의 바람직한 상태
+  nodeSelector: # Pod를 배포할 노드
+  containers: # Pod 안에서 실행할 컨테이너 목록
+  volumes: # 컨테이너가 사용할 수 있는 볼륨 목록 
+```
+
+### Pod 오브젝트 표현 방법 - nodeSelector
+```
+spec:
+  nodeSelector: # Pod 배포를 위한 노드 선택
+    gpu: "true" # 노드 집합을 구하기 위한 식별자 (key: value) 
+
+# 위 구문의 해석: gpu 가 true인 노드에만 배포를 하라.
+```
+
+### Pod 오브젝트 표현 방법 - containers
+```
+spec:
+  containers:
+  - name: kube-basic  # 컨테이너 이름 
+  image: kube-basic: 1.0 # 도커 이미지 주소 
+  imagePullPolicy: "Always" # 도커 이미지 다운로드 정책 (Always/IfNotPresent/Never)
+  ports:
+  - containerPort: 80 # 통신에 사용할 컨테이너 포트  
+```
+
+### Pod 오브젝트 표현 방법 - containers 환경 변수 env
+```
+spec:
+  containers:
+  - name:kube-basic
+  image: kube-basic:1.0
+    env: # 컨테이너에 설정할 환경변수 목록 
+    - name: PROFILE # 환경 변수 이름 
+    value: production # 환경 변수 값 
+    - name: LOG_DIRECTORY
+    value: /logs
+    - name: MESSAGE
+    value: This application is running on $(PROFILE) # 다른 환경변수 참조
+```
+
+### Pod 오브젝트 표현 방법 - containers valumeMounts
+```
+spec:
+  containers:
+  - name: kube-basic
+  image: kube-basic:1.0 
+    volumeMounts: # 컨테이너에서 사용할 Pod 볼륨 목록 
+    - name: html # Pod 볼륨 이름 
+    mountPath: /var/html # 마운트할 컨테이너 경로
+  - name: web-server
+    image: nginx
+    volumeMounts: 
+    - name: html
+      mountPath: /usr/share/nginx/html  # 같은 Pod 볼륨을 다른 경로로 마운트
+      readOnly: true
+```
+
+
+### Pod 오브젝트 표현 방법 - spec volumes 
+```
+spec:
+  containers:
+  volumes: # 컨테이너가 사용할 수 있는 볼륨 목록 
+    name: host-volume # 볼륨 이름 
+    hostPath: # 볼륨 타입 , 노드에 있는 파일이나 디렉토리를 마운트하고자 할 때 
+      path: /data/mysql
+```
+- Pod 볼륨 라이프사이클 = Pod 라이프사이클
+- Container에서 볼륨 마운트 방법: volumeMounts 속성
+- 목적에 맞는 볼륨 선택 (hostPath, gitRepo, ConfigMap, Secret, ...)
+
+
+### Pod의 한계점 
+1. Pod이 나도 모르는 사이에 종료된다면? 
+  - 자가 치유 능력(Self-Healing)이 없다. Pod이나 노드 이상으로 종료되면 끝
+  - "사용자가 선언한 수만큼 Pod을 유지" 해주는 Replicaset 오브젝트 도입 필요
+2. Pod IP는 외부에서 접근할 수 없다. 그리고 생성할 때 마다 IP가 변경된다.
+  - 클러스터 "외부에서 접근"할 수 있는 "고정적인 단일 엔드포인트"가 필요
+  - Pod의 집합을 클러스터 외부로 노출하기 위한 Service 오브젝트 도입 필요 
+
+### Pod 핵심 정리 
+Pod 생성과 배포 
+- Pod는 여러 개의 컨테이너를 포함할 수 있고 하나의 노드에 배포 될 수 있다.
+- Pod를 YAML 파일로 정의 해두면 필요 할 때 원하는 수 만큼 노드에 배포할 수 있다.
+- Pod와 컨테이너를 1:1로 기본 설계하고 특별한 사유가 있을 때 1:N 구조를 고민하자.
+
+Pod IP
+- 쿠버네티스는 Pod를 생성할 때 클러스터 내부에서만 접근할 수 있는 IP를 할당한다.
+- Pod IP는 컨테이너와 공유되기 때문에 컨테이너간 포트 충돌을 주의해야 한다.
+- 하나의 Pod에 속한 컨테이너들은 localhost로 통신할 수 있다.
+- 다른 Pod(컨테이너)와 통신은 Pod IP를 이용한다.
