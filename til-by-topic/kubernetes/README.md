@@ -435,3 +435,59 @@ Pod IP
 - Pod IP는 컨테이너와 공유되기 때문에 컨테이너간 포트 충돌을 주의해야 한다.
 - 하나의 Pod에 속한 컨테이너들은 localhost로 통신할 수 있다.
 - 다른 Pod(컨테이너)와 통신은 Pod IP를 이용한다.
+
+### Pod 컨테이너 환경변수 예제 
+
+![image](https://user-images.githubusercontent.com/28394879/175968049-1d11c434-36bb-4752-842e-ef68562f0859.png)
+
+
+Pod 이름, 컨테이너 이름과 이미지, 포트 설정 예시 
+```
+apiVersion: v1
+kind: Pod
+metadata:
+  name: hello-app
+spec:
+  containers:
+  - name: hello-app
+    image: devchloe/hello-app:1.0
+    ports:
+    - containerPort: 3000
+  - env:
+```
+
+컨테이너 환경변수 키와 값 설정 예시
+```
+spec:
+  containers:
+  - env: hello-app
+    - name: STUDENT_NAME # 환경변수 키 선언
+      value: 신경덕 # 환경변수 값 선언 
+    - name: GREETING
+      value: 하이 $(STUDENT_NAME)님 
+```
+
+Pod 오브젝트 값을 환경변수 값으로 설정 
+```
+spec:
+  containers:
+  - env: hello-app
+    - name: NODE_NAME
+      valueFrom: # k8s 오브젝트로부터 환경변수 값을 얻는다.
+        fieldRef: # Pod spec, status의 field를 환경변수 값으로 참조 
+          fieldPath: spec.nodeName # 참조할 field의 경로 선택 
+    - name: NODE_IP
+      valueFrom:
+        fieldRef:
+          fieldPath: status.hostIP
+```
+
+kubectl 명령어 예시=
+```
+kubectl apply -f <yaml 파일 경로> # Pod 생성
+kubectl get pod -o wide # Pod 실행 및 IP 확인
+kubectl delete pod --all # or kubectl delete pod <pod-name> -> Pod 종료 
+kubectl exec <pod-name> [-c <container-name>] --ifconfig eth0 # 컨테이너 IP 확인
+kubectl exec <pod-name> -- env # 컨에이너 환경변수 확인
+kubectl port-forward <pod-name> <host-port>:<container-port> # 포트 포워딩 
+```
