@@ -441,7 +441,8 @@ Pod IP
 ![image](https://user-images.githubusercontent.com/28394879/175968049-1d11c434-36bb-4752-842e-ef68562f0859.png)
 
 
-Pod 이름, 컨테이너 이름과 이미지, 포트 설정 예시 
+
+### Pod 이름, 컨테이너 이름과 이미지, 포트 설정 예시 
 ```
 apiVersion: v1
 kind: Pod
@@ -456,7 +457,7 @@ spec:
   - env:
 ```
 
-컨테이너 환경변수 키와 값 설정 예시
+### 컨테이너 환경변수 키와 값 설정 예시
 ```
 spec:
   containers:
@@ -467,7 +468,7 @@ spec:
       value: 하이 $(STUDENT_NAME)님 
 ```
 
-Pod 오브젝트 값을 환경변수 값으로 설정 
+### Pod 오브젝트 값을 환경변수 값으로 설정 
 ```
 spec:
   containers:
@@ -482,12 +483,85 @@ spec:
           fieldPath: status.hostIP
 ```
 
-kubectl 명령어 예시=
+
+### 요구사항 - yaml 예시 
 ```
-kubectl apply -f <yaml 파일 경로> # Pod 생성
-kubectl get pod -o wide # Pod 실행 및 IP 확인
-kubectl delete pod --all # or kubectl delete pod <pod-name> -> Pod 종료 
-kubectl exec <pod-name> [-c <container-name>] --ifconfig eth0 # 컨테이너 IP 확인
-kubectl exec <pod-name> -- env # 컨에이너 환경변수 확인
-kubectl port-forward <pod-name> <host-port>:<container-port> # 포트 포워딩 
+# 요구사항!
+# Pod API 버전: v1
+# Pod 이름: hello-app
+# Pod 네임스페이스: default
+# 컨테이너 이름/포트: hello-app(80)
+# 도커 이미지: yoonjeong/hello-app:1.0
+# 환경변수:
+# -- POD_NAME(metadata.name), POD_IP(status.podIP)
+# -- NAMESPACE_NAME(metadata.namespace)
+# -- NODE_NAME(spec.nodeName), NODE_IP(status.hostIP)
+# -- STUDENT_NAME(본인이름), GREETING(STUDENT_NAME을 참조한 인삿말)
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: hello-app
+spec:
+  containers:
+  - name: hello-app
+    image: nginx
+    ports:
+    - containerPort: 80
+    env:
+    - name: POD_NAME
+      valueFrom:
+        fieldRef:
+          fieldPath: metadata.name
+    - name: POD_IP
+      valueFrom:
+        fieldRef:
+          fieldPath: status.podIP
+    - name: NAMESPACE_NAME
+      valueFrom:
+        fieldRef:
+          fieldPath: metadata.namespace
+    - name: NODE_NAME
+      valueFrom:
+        fieldRef:
+          fieldPath: spec.nodeName
+    - name: NODE_IP
+      valueFrom:
+        fieldRef:
+          fieldPath: status.hostIP
+    - name: STUDENT_NAME
+      value: 신경덕
+    - name: GREETING
+      value: 쿠버네티스 입문 강의에 오신 것을 환영합니다. $(STUDENT_NAME)님!
+    resources:
+      limits:
+        memory: "128Mi"
+        cpu: "100m"
+```
+
+스크립트
+```
+# 배포 
+kubectl apply -f til-by-topic/kubernetes/3.Kubernetes와-Docker로-한-번에-끝내는-컨테이너-기반-MSA/ch2/hello-app.yaml
+
+# Pod 실행 및 IP 확인
+kubectl get pod -o wide 
+
+# 컨테이너 환경변수 확인
+kubectl exec hello-app -- env 
+
+# 컨테이너 IP 확인
+kubectl exec hello-app -- ifconfig eth0 
+
+# 컨테이너 host 확인 
+kubectl exec hello-app -- cat /etc/hosts
+
+# 컨테이너 리스닝 포트 확인 
+kubectl exec hello-app -- netstat -an
+
+# 포트 포워딩 
+kubectl port-forward hello-app 5000:80
+
+# or kubectl delete pod <pod-name> -> Pod 종료 
+kubectl delete pod --all 
 ```
