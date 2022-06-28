@@ -436,13 +436,13 @@ Pod IP
 - 하나의 Pod에 속한 컨테이너들은 localhost로 통신할 수 있다.
 - 다른 Pod(컨테이너)와 통신은 Pod IP를 이용한다.
 
-### Pod 컨테이너 환경변수 예제 
+### Pod 배포 및 확인 실습 방법
 
 ![image](https://user-images.githubusercontent.com/28394879/175968049-1d11c434-36bb-4752-842e-ef68562f0859.png)
 
 
 
-### Pod 이름, 컨테이너 이름과 이미지, 포트 설정 예시 
+### Pod 이름, 컨테이너 이름과 이미지, 포트 설정 
 ```
 apiVersion: v1
 kind: Pod
@@ -457,7 +457,7 @@ spec:
   - env:
 ```
 
-### 컨테이너 환경변수 키와 값 설정 예시
+### 컨테이너 환경변수 키와 값 설정 
 ```
 spec:
   containers:
@@ -484,7 +484,7 @@ spec:
 ```
 
 
-### 요구사항 - yaml 예시 
+### Pod이름, 컨테이너 이름과 이미지, 포트, 환경변수 등 설정
 ```
 # 요구사항!
 # Pod API 버전: v1
@@ -505,7 +505,7 @@ metadata:
 spec:
   containers:
   - name: hello-app
-    image: nginx
+    image: nginx:latest
     ports:
     - containerPort: 80
     env:
@@ -539,7 +539,7 @@ spec:
         cpu: "100m"
 ```
 
-스크립트
+배포, 확인, 삭제 명령어  
 ```
 # 배포 
 kubectl apply -f til-by-topic/kubernetes/3.Kubernetes와-Docker로-한-번에-끝내는-컨테이너-기반-MSA/ch2/hello-app.yaml
