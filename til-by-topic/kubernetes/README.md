@@ -565,3 +565,47 @@ kubectl port-forward hello-app 5000:80
 # or kubectl delete pod <pod-name> -> Pod 종료 
 kubectl delete pod --all 
 ```
+
+
+### 컨테이너 간 localhost 통신, 다른 Pod의 Pod IP 통신 예제 
+
+![image](https://user-images.githubusercontent.com/28394879/176452247-a166bec9-8718-46d9-a26c-ff6870f733fa.png)
+
+```
+# blue, green 배포 
+kubectl apply -f til-by-topic/kubernetes/3.Kubernetes와-Docker로-한-번에-끝내는-컨테이너-기반-MSA/ch3/blue-green-app.yaml
+
+# red 배포 
+kubectl apply -f til-by-topic/kubernetes/3.Kubernetes와-Docker로-한-번에-끝내는-컨테이너-기반-MSA/ch3/red-app.yaml 
+
+# blue log 확인 
+kubectl logs blue-green-app -c blue-app
+
+# 환경변수(POD_IP, NAMESPACE, NODE_NAME) 조회 
+kubectl exec blue-green-app -c blue-app -- printenv POD_IP NAMESPACE NODE_NAME
+
+# blue-app 컨테이너 -> green-app 컨테이너 /tree, /hello 요청 실행 
+kubectl exec blue-green-app -c blue-app -- curl -vs localhost:8081/tree
+kubectl exec blue-green-app -c blue-app -- curl -vs localhost:8081/hello
+
+# green-app 컨테이너 -> blue-app 컨테이너 /sky, /hello 요청 실행 
+kubectl exec blue-green-app -c green-app -- curl -vs localhost:8080/sky
+kubectl exec blue-green-app -c green-app -- curl -vs localhost:8080/hello
+
+# red-app ip 조회 
+kubectl get pod/red-app -o jsonpath="{.status.podIP}"
+
+# red_pod_ip 환경변수 설정 
+export RED_POD_IP=$(kubectl get pod/red-app -o jsonpath="{.status.podIP}")
+
+# blue-app 컨테이너 -> red-app 컨테이너 /rose, /hello 요청 실행 
+kubectl exec blue-green-app -c blue-app -- curl -vs $RED_POD_IP:8080/rose
+
+# 포트포워딩 
+kubectl port-forward blue-green-app 8080:8080
+kubectl port-forward blue-green-app 8081:8081
+kubectl port-forward red-app 8082:8080
+
+# pod 종료 
+kubectl delete pod --all 
+```
