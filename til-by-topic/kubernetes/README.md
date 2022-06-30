@@ -609,3 +609,88 @@ kubectl port-forward red-app 8082:8080
 # pod 종료 
 kubectl delete pod --all 
 ```
+
+
+### Label과 Selector 란 
+- Label: 쿠버네티스 오브젝트를 식별하기 위한 key/value 쌍의 메타정보
+  - 쿠버네티스를 논리적인 그룹으로 나누기 위해 붙이는 이름표 
+- Selector: Label을 이용해 쿠버네티스 리소스를 필터링하고 원하는 리소스 집합을 구하기 위한 label query
+  - Label를 이용해 쿠버네티스 리소스를 선택하는 방법 
+
+
+### Label과 Selector가 필요한 상황
+![image](https://user-images.githubusercontent.com/28394879/176677076-3f67dc4c-769c-46d6-8555-a6a55ff692c6.png)
+- 예) 클러스터에서 서로 다른 팀의 수백개 Pod이 동시에 실행되고 있는 상황에서 주문 트래픽을 주문 Pod으로, 배달 트래픽을 배달 Pod으로 라우팅 해야 할 때   
+- 예) 배달 트래픽이 증가되는 상황에서 클러스터에서 실행 중인 배달 관련 Pod들을 수평 확장 해야 할 때 
+- 우리가 어떤 리소스를 선택해서 명령을 실행하고자 할 때
+
+### Label 예시 
+```
+apiVersion: v1
+kind: Pod
+metadata:
+  name: my-pod
+  labels:
+    app: backend
+    version: v1
+    env: prod
+```
+
+### Label 조회 명령어 
+```
+kubectl get pod my-pod --show-labels
+```
+
+### Label 추가 명령어 
+```
+kubectl label pod my-pod app=backend
+```
+
+### Label 변경 명령어
+```
+kubectl label pod my-pod version=v1 # 생성 
+kubectl label pod my-pod version=v2 --overwrite # 변경 
+```
+
+### Label 선택 조회 명령어 
+```
+kubectl get pod/my-pod --label-columns app,env
+kubectl get pod/my-pod -L app,env
+```
+
+### Label 삭제 명령어 
+```
+kubectl label pod/my-pod app-
+```
+
+### selector 문법
+```
+kubectl get <오브젝트 타입> --selector <label query 1, ..., label query N>
+kubectl get <오브젝트 타입> -l <label query 1, ..., label query N>
+label query: key=value
+```
+
+
+### label query 연산자 =, !=
+- `=` : 같다 
+- `!=` : 같지 않다  
+```
+kubectl get pod --selector env=prod
+kubectl get pod --selector env!=prod
+kubectl get pod --selector app=backend,env=prod
+kubectl get pod --selector app!=backend,env=prod
+```
+
+### label query 연산자 in, notin
+- `in`: 속해 있다, 키가 존재한다
+- `notin`: 속해 있지 않다, 키가 존재하지 않는다. 
+```
+kubectl get pod --selector 'env in (dev,stage,prod)' # env에 dev,stage,prod 셋 중 하나라도 포함되면 출력  
+kubectl get pod --selector 'env notin (dev,stage,prod)' # env에 dev,stage,prod 셋다 아닌것을 출력 
+```
+
+### label query 연산자 키값 조회 
+```
+kubectl get pod --selector env # env 키값을 가지고 있는 것을 모두 출력 
+kubectl get pod --selector !env # env 키값을 가지고 있지 않는 것을 모두 출력 
+```
