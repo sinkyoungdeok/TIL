@@ -694,3 +694,21 @@ kubectl get pod --selector 'env notin (dev,stage,prod)' # env에 dev,stage,prod 
 kubectl get pod --selector env # env 키값을 가지고 있는 것을 모두 출력 
 kubectl get pod --selector !env # env 키값을 가지고 있지 않는 것을 모두 출력 
 ```
+
+
+### label query (selector) 예시
+```
+# -- group=nature 레이블을 가진 모든 파드 조회
+kubectl get pod --selector group=nature -L group,concept,element,position,version
+# -- concept가 flower이거나 earth인 모든 파드 조회 
+kubectl get pod --selector 'concept in (flower,earth)' -L group,concept,element,position,version
+# -- concept 레이블이 없는 모든 파드 조회 (! 이용)
+kubectl get pod --selector '!concept' -L group,concept,element,position,version
+# -- concept 레이블이 없는 모든 파드 조회 (notin 이용)
+kubectl get pod --selector 'concept notin (earth, flower)' -L group,concept,element,position,version
+# -- 물을 주어야 하는 group=nature 레이블을 가진 모드 파드 조회 (position=bottom)
+kubectl get pod --selector group=nature,position=bottom -L group,concept,element,position,version
+# -- 손이 닿지 않는 group=nature 레이블을 가진 파드의 IP 조회 (position=top)
+kubectl get pod --selector group=nature,position=top -L group,concept,element,position,version
+kubectl get pod --selector group=nature,position!=bottom -L group,concept,element,position,version
+```
