@@ -712,3 +712,54 @@ kubectl get pod --selector group=nature,position=bottom -L group,concept,element
 kubectl get pod --selector group=nature,position=top -L group,concept,element,position,version
 kubectl get pod --selector group=nature,position!=bottom -L group,concept,element,position,version
 ```
+
+
+### nodeSelector를 활용하여 배포하기
+![image](https://user-images.githubusercontent.com/28394879/176914009-009b605b-b404-4473-8ab1-ef6ac117d52d.png)
+
+```
+kubectl get nodes --show-labels # 노드 조회 -> 기본으로 설정된 node 3개가 나옴. 
+kubectl get nodes # 레이블 없이 조회 
+
+# 첫번째 세번째 노드에 레이블 추가 
+kubectl label node gke-my-cluster-default-pool-3b91989a-56s9 gke-my-cluster-default-pool-3b91989a-xv16 soil=moist 
+
+# 두번째 노드에 레이블 추가 
+kubectl label node gke-my-cluster-default-pool-3b91989a-bx9c soil=dry
+
+# 반영된 label 조회
+kubectl get node -L soil 
+
+
+# Pod 생성 (kubectl run <pod-name> --labels="" --image= --port= --overrides='{"key": {"key": {"key": "value"}}}')
+# apiVersion: v1
+# kind: Pod
+# metadata:
+#   name: tree-app-1
+#   labels:
+#     element: tree
+# spec:
+#   nodeSelector:
+#     soil: moist
+#   containers:
+#   - name: tree-app
+#     image: yoonjeong/green-app:1.0
+#     ports:
+#     - containerPort: 8081
+
+# pod 5개 배포 
+for i in {1..5}; 
+do kubectl run tree-app-$i \
+--labels="element=tree" \
+--image=yoonjeong/green-app:1.0 \
+--port=8081 \
+--overrides='{ "spec": { "nodeSelector": {"soil": "moist"} } }';
+done
+
+
+# 배포된 pod 확인 -> moist에만 배포됐는지 확인.
+kubectl get pod -o wide
+
+# 생성한 pod 제거 
+kubectl delete pod -l element=tree
+```
