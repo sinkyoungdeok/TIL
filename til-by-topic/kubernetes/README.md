@@ -12,6 +12,7 @@
 - [3. 기본 명령어](#3-기본-명령어)
 - [4. 로컬 개발 환경 세팅](#4-로컬-개발-환경-세팅)
 - [5. pod 살펴보기](#5-pod-살펴보기)
+- [6. replica set](#6-replica-set)
 
 
 ## 1. 설치 명령어 
@@ -763,3 +764,58 @@ kubectl get pod -o wide
 # 생성한 pod 제거 
 kubectl delete pod -l element=tree
 ```
+
+
+## 6. replica set
+
+### replica set 이란
+- replicaSet은 Pod 복제본을 생성하고 관리한다.
+- N개의 Pod을 생성하기 위해 생성 명령을 N번 실행할 필요 없다.
+- replicaSet 오브젝트를 정의하고 원하는 Pod의 개수를 replicas 속성으로 선언한다.
+- 클러스터 관리자 대신 Pod 수가 부족하거나 넘치지 않게 Pod 수를 조정 
+
+### replica set의 필요성 
+- pod에 문제가 생겼을 때, pod는 즉시 종료되고 클라이언트 요청을 처리할 수 없다. (No Self-Healing)
+- pod에 문제가 생겼을 때, 클러스터 관리자가 24/7 동안 Pod 상태를 감시하고 정상 복구해야 한다
+- N개의 Pod을 실행하고 상태 이상에 대비할 필요가 있는데, 이것을 replica set이 해준다.
+
+### replica set 특징
+- 소프트웨어가 내결함성을 가진다. (fault tolerance)
+- 소프트웨어나 하드웨어 실패가 발생하더라도 소프트웨어가 정상적인 기능을 수행할 수 있게 해준다.
+- 사람의 개입없이 내결함성을 가진 소프트웨어를 구성하게 해준다.
+
+
+### replica set 역할
+- Pod/노드 상태에 따라 Pod의 수를 조정할 수 있도록 ReplicaSet에게 역할을 위임한다.
+- ReplicaSet을 이용해서 Pod 복제 및 복구 작업 자동화
+- 클러스터 관리자는 ReplicaSet을 만들어 필요한 Pod의 개수를 k8s에게 선언
+- 쿠버네티스가 ReplicaSet 요청서에 선언된 replicas를 읽고 그 수만큼 Pod 실행을 보장 
+
+### replica set 오브젝트 표현 방법
+```
+apiVersion: apps/v1 # k8s api 버전
+kind: ReplicaSet # 오브젝트 타입
+metadata: # 오브젝트 식별 정보 
+  name: blue-app-rs # 오브젝트 이름
+  labels: # 오브젝트 집합을 구할 때 사용할 이름표
+    app: blue-app
+spec: # 사용자가 원하는 Pod의 바람직한 상태
+  selector: # ReplicaSet이 관리해야하는 Pod를 선택하기 위한 label query
+    matchLabels:
+      app: blue-app # Pod label query 작성
+  replicas: # 실행하고자 하는 Pod의 복제본 개수 선언 
+  template: # Pod 실행 정보 - Pod Template과 동일 (metadata, spec, ...)
+    metadata:
+      labels:
+        app: blue-app # Replica Set selector에 정의한 label을 포함해야 한다 
+    spec:
+      containers:
+        - name: blue-app
+          image: blue-app:1.0
+```
+
+### replica set으로 pod 레플리케이션
+- replicaSet을 이용해서 Pod 복제본(replicas)을 생성하고 관리한다
+  - 여러 노드에 걸쳐 배포된 Pod Up/Down 상태를 감시하고 replicas 수만큼 실행을 보장한다
+- replicaSet의 spec.selector.matchLabels는 Pod Template 부분의 spec.template.metadata.labels와 같아야 한다.
+- spec.replicas를 설정하지 않으면 기본값은 1이다.
