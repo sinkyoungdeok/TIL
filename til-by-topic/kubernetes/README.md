@@ -884,3 +884,8 @@ kubectl get pod -w
 kubectl get pod blue-replicaset-9k7zh -o jsonpath="{.metadata.ownerReferences[0].name}" 
 # 결과 -> blue-replicaset
 ```
+
+### 배포한 ReplicaSet의 Pod Template을 변경 
+- 변경해도 기존 Pod에는 영향이 없다.
+- ReplicaSet에 선언한 replicas 값이 변경 되었을 경우에만 Pod을 새로 생성하거나 제거한다.
+- 3개를 배포한 상황에서, Pod Template을 변경하고 Replicas를 4개로 변경하면, 기존 Pod들은 그대로 있고 새로운 Pod에만 변경된 Template가 적용되어 배포된다.
