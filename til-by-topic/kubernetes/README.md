@@ -856,3 +856,31 @@ kubectl apply -f blue-app.yaml # pod 생성
 kubectl apply -f replicaset.yaml # 레플리카셋 생성, blue-app의 label과 동일해야됨.
 kubectl describe rs blue-replicaset # 2개가 생성된것을 확인할 수 있음 -> 1개 pod는 이미 생성해서.
 ```
+
+### replicaset의 Pod 생성/복구 자동화 기능
+- pod 삭제 혹은 종료시 
+  - pod 개수가 선언된 replicas와 일치하지 않으면 새로운 pod를 생성하여 replicas를 맞춤
+- 노드 실패 시 
+  - up상태의 pod의 개수가 변경되었음을 인지하고 새로운 pod를 건강한 노드에 생성하여 replicas를 맞춘다.
+
+### pod는 납두고, replicaset만 삭제 하기 
+```
+kubectl delete rs blue-replicaset --cascade=orphan
+```
+
+### gracefully하게 replicaSet&pod 삭제 하기
+```
+kubectl scale rs/blue-replicaset --replicas 0
+kubectl delete rs/blue-replicaset
+```
+
+### pod watch 모드로 모니터링 방법
+```
+kubectl get pod -w
+```
+
+### pod의 owner 확인 명령어 
+```
+kubectl get pod blue-replicaset-9k7zh -o jsonpath="{.metadata.ownerReferences[0].name}" 
+# 결과 -> blue-replicaset
+```
