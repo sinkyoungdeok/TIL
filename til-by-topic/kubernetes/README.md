@@ -819,3 +819,40 @@ spec: # 사용자가 원하는 Pod의 바람직한 상태
   - 여러 노드에 걸쳐 배포된 Pod Up/Down 상태를 감시하고 replicas 수만큼 실행을 보장한다
 - replicaSet의 spec.selector.matchLabels는 Pod Template 부분의 spec.template.metadata.labels와 같아야 한다.
 - spec.replicas를 설정하지 않으면 기본값은 1이다.
+
+### 간단한 replica set 예시 
+```
+spec:
+  selector:
+    matchLabels:
+      app: blue-app
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: blue-app
+    spec:
+      containers:
+      - name: blue-app
+        image: 'yoonjeong/blue-app:1.0'
+        ports:
+        - containerPort: 8080
+```
+
+```
+kubectl apply -f til-by-topic/kubernetes/3.Kubernetes와-Docker로-한-번에-끝내는-컨테이너-기반-MSA/ch4/replicaset.yaml # replicaSet 생성
+kubectl get rs blue-replicaset -o wide # replicaset과 배포 이미지 확인
+kubectl get pod -o wide # pod 목록과 배포된 노드 확인
+kubectl describe rs blue-replicaset # replicaset의 pod 생성 기록 확인
+kubectl get events --sort-by=.metadata.creationTimestamp # replicaSet의 pod 생성 이후 과정 확인
+kubectl port-forward rs/blue-replicaset 8080:8080 # replicaSet 파드로 트래픽 전달 
+curl localhost:8080/sky
+kubectl delete rs/blue-replicaset # 레플리카셋 삭제 
+```
+
+### 기존에 생성한 Pod를 ReplicaSet으로 관리
+```
+kubectl apply -f blue-app.yaml # pod 생성 
+kubectl apply -f replicaset.yaml # 레플리카셋 생성, blue-app의 label과 동일해야됨.
+kubectl describe rs blue-replicaset # 2개가 생성된것을 확인할 수 있음 -> 1개 pod는 이미 생성해서.
+```
