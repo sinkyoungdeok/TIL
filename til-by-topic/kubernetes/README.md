@@ -13,6 +13,7 @@
 - [4. 로컬 개발 환경 세팅](#4-로컬-개발-환경-세팅)
 - [5. pod 살펴보기](#5-pod-살펴보기)
 - [6. replica set](#6-replica-set)
+- [7. deployment](#7-deployment)
 
 
 ## 1. 설치 명령어 
@@ -914,4 +915,111 @@ kubectl scle rs/<replicaset-name> --replicas <number of replicas>
 ### ReplicaSet 이미지 변경 
 ```
 kubectl set image rs/<replicaset-name> <container>=<image>
+```
+
+## 7. deployment
+
+### 지금까지의 ReplicaSet으로 Pod를 배포하는 이유
+- replicaSet의 Pod 복제 기능을 이용해 여러 개의 Pod를 한 번에 실행할 수 있다.
+- 선언한 replicas 수만큼 Pod 실행을 보장한다
+- ReplicaSet이 운영자 대신 Pod 상태를 24/7 감시한다
+- Pod 실행 중에도 replicas 조정이 자유롭다
+
+### Deployment의 필요성 
+- 롤백을 할 때 새로운 ReplicaSet을 만들어서 Pod 재배포 or Pod Template 변경 후 적용후 필요없는 ReplicaSet과 Pod를 제거하는 과정을 거쳐야 한다.
+- 롤백 혹은 새로운 버전을 배포할 때마다 위와 같은 과정을 반복을 해야하는 번거로움이 있다. 
+- 배포할 때 바뀌는 부분은 보통 Pod Template 이미지이다.
+
+### Deployment 오브젝트란 
+- Pod 배포 자동화를 위한 오브젝트 (ReplicaSet + 배포전략)
+- 새로운 Pod을 롤아웃/롤백할 때 ReplicaSet 생성을 대신해준다. (Pod 복제)
+- 다양한 배포 전략을 제공하고 이전 파드에서 새로운 파드로의 전환 속도를 제어할 수 있다.
+- 이제부터는 Pod를 배포할 때 ReplicaSet이 아닌 Deployment를 사용한다.
+
+### Deployment 오브젝트 표현 방법 
+```
+apiVersion: apps/v1 # Kubernetes API 버전
+kind: Deployment # 오브젝트 타입
+metadata: # 오브젝트를 유일하게 식별하기 위한 정보
+  name: my-app # 오브젝트 이름 
+spec: # 사용자가 원하는 Pod의 바람직한 상태
+  selector: # ReplicaSet을 통해 관리할 Pod를 선택하기 위한 label query
+    matchLabels:
+      app: my-app
+  replicas: 3 # 실행하고자 하는 Pod 복제본 개수 선언
+  template: # Pod 실행 정보 - Pod Template과 동일 (metadata, spec, ...)
+    metadata:
+      labels:
+        app: my-app # selector에 정의한 label을 포함해야 한다
+    spec:
+      containers:
+      - name: my-app
+        image: my-app:1.0
+```
+
+### Deployment의 Pod Template 1.0 -> 2.0 변경 요청 
+1. 기존에 Deployment로 1.0이 "ReplicaSetA"안에 3개의 pod가 배포된 상황
+2. 1.0->2.0 업데이트 요청 
+3. Deployment가 "ReplicaSetB"안에 3개의 2.0버전의 pod와 함께 배포
+4. "ReplicaSetA"의 scale을 0으로 조정  
+5. "ReplicaSetA" 제거 
+
+
+### Deployment 롤아웃 전략1 - Recreate 배포 
+- 이전 Pod를 모두 종료하고 새로운 Pod를 replicas만큼 생성 
+- pod가 아무것도 존재하지 않는 구간이 생길 수 밖에 없다.
+- 서비스 down time이 있을 수 밖에 없는 방법 
+- 개발 단계에서는 유용하지만, 서비스 운영 단계에서는 유영하지 않는 방법 
+<img width="498" alt="image" src="https://user-images.githubusercontent.com/28394879/177026856-d23df5cf-3a41-4465-904a-87aa2da295c2.png">
+
+### Deployment 롤아웃 전략2 - RollingUpdate 배포 
+- 모든 이전 Pod가 종료될 때 까지, 새로운 Pod 생성과 이전 Pod 종료가 동시에 일어나는 방식
+- pod가 존재하지 않는 구간이 없으므로 service down time 이 발생하지 않는다.
+- 서로 다른 버전이 존재하기 때문에, 기존 버전의 응답과 새로운 버전의 응답이 혼합될 수 있다. 
+<img width="423" alt="image" src="https://user-images.githubusercontent.com/28394879/177026915-dc9b5d62-1f09-45d5-96fb-b21ddbb1f1a1.png">
+
+### Recreate vs Rollingupdate
+- Recreate
+  - 새로운 버전을 배포하기 전에 이전 버전이 즉시 종료
+  - 컨테이너가 정상적으로 시작되기 전까지 서비스를 못함
+  - replicas 수만큼의 컴퓨팅 리소스 필요
+  - 개발 단계에서 유용
+- RollingUpdate
+  - 새로운 버전을 배포하면서 이전 버전을 종료
+  - 서비스 다운 타임 최소화
+  - 동시에 실행되는 Pod의 개수가 replicas를 넘게 되므로 컴퓨팅 리소스 더 많이 필요
+
+### RollingUpdate 속도 제어 옵션 - maxUnavailable
+- 롤링 업데이트를 수행하는 동안 유지하고자 하는 최소 Pod의 비율(수)를 지정할 수 있다.
+- 최소 Pod 유지 비율 = 100 - maxUnavailable 값 
+- 예) replicas: 10, maxUnavailable: 30%
+  - 이전 버전의 Pod를 replicas 수의 최대 30%까지 즉시 Scale Down 할 수 있다.
+  - replicas를 10으로 선언 했을 때, 이전 버전의 Pod를 3개까지 즉시 종료할 수 있다.
+  - 새로운 버전의 Pod 생성과 이전 버전의 Pod 종료를 진행하면서 replicas 수의 70% 이상의 Pod를 항상 Running 상태로 유지해야 한다.
+
+### RollingUpdate 속도 제어 옵션 - maxSurge
+- 롤링 업데이트를 수행하는 동안 허용할 수 있는 최대 Pod의 비율(수)를 지정 할 수 있다.
+- 최대 Pod 허용 비율 = maxSurge 값
+- 예) replicas: 10, maxSurge 30%
+  - 새로운 버전의 Pod를 replicas 수의 최대 30%까지 즉시 Scale Up 할 수 있다.
+  - 새로운 버전의 Pod를 3개가지 즉시 생성할 수 있다.
+  - 새로운 버전의 Pod 생성과 이전 버전의 Pod 종료를 진행하면서 총 Pod의 수가 replicas수의 130%를 넘지 않도록 유지해야 한다.
+
+### Deployment 롤백 전략 - Revision 
+- Deployment는 롤아웃 히스토리를 Revision # 으로 관리한다.
+- Revision 특정 번호에 대해서 배포되었던 Pod Template 정보를 조회 할 수 있다.
+```
+Pod Template:
+  Labels: app=my-app
+          version=v1
+          pod-template-hash=65464c57f5 # 버전마다 pod Template의 해시 값이 같으면 같은 pod Template으로 배포했다는 것을 알 수 있다.
+  Annotations: kubernetes.io/change-cause: v1 배포
+  Containers:
+    my-app:
+      image: nginx: 1.16.1
+      Port: 80/TCP
+```
+- Revision #를 이용한 손쉬운 롤백 
+```
+kubectl rollout undo deployment <deployment-name> --to-revision=1 # 현재버전이 3인 상황.
 ```
