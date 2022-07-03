@@ -889,3 +889,29 @@ kubectl get pod blue-replicaset-9k7zh -o jsonpath="{.metadata.ownerReferences[0]
 - 변경해도 기존 Pod에는 영향이 없다.
 - ReplicaSet에 선언한 replicas 값이 변경 되었을 경우에만 Pod을 새로 생성하거나 제거한다.
 - 3개를 배포한 상황에서, Pod Template을 변경하고 Replicas를 4개로 변경하면, 기존 Pod들은 그대로 있고 새로운 Pod에만 변경된 Template가 적용되어 배포된다.
+
+
+### replicas 수 변경 명령어 
+```
+kubectl scle rs/<replicaset-name> --replicas <number of replicas>
+```
+
+
+### replicaset 롤백
+- pod template 이미지 변경을 통해 롤백을 할 수 있다.
+- 실행 중인 Pod 장애 시 ReplicaSet을 새로 생성하지 않고 이전 버전의 Pod를 배포할 수 있다.
+- Label을 통한 롤백 
+  - 기존에 replicaSet으로 image: my-app2.0 으로 3개를 배포한 상황이다.
+  - 그 3개가 모두 오류가 발생해서 my-app1.0으로 롤백해야 한다.
+  - 1) replicaSet의 Pod Template 이미지를 1.0으로 변경한다.
+  - 2) 기존에 2.0으로 배포된 Pod의 레이블을 변경한다 -> ReplicaSet selector로부터 제외 
+  - 위 1,2번 과정을 거치면 replicaSet이 관리하는 pod가 없어졌다는것을 알고 새롭게 my-app1.0으로 3개를 배포 하게 된다.
+- replicas 수 조정을 통한 롤백
+  - 1) kubectl scale rs myapp-replicaset --replicas 0
+  - 2) replicaSet의 Pod Template 변경 (이미지를 my-app2.0 -> my-app1.0으로 변경)
+  - 3) kubectl scale rs myapp-replicaset --replicas 3 
+
+### ReplicaSet 이미지 변경 
+```
+kubectl set image rs/<replicaset-name> <container>=<image>
+```
