@@ -1023,3 +1023,129 @@ Pod Template:
 ```
 kubectl rollout undo deployment <deployment-name> --to-revision=1 # 현재버전이 3인 상황.
 ```
+
+### Deployment의 replicas 변경 
+- 새로운 replicaSet을 생성하지 않는다.
+- 이미 생성한 replicaSet이 새로운 Pod를 'desired - current' replicas만큼 추가 생성한다.
+
+### Deployment 이벤트 확인 명령어 
+```
+kubectl describe deployment <deployment-name>
+```
+
+### Deployment를 통해 생성한 Pod 상태 변화 확인 
+```
+kubectl get deployment -w 
+```
+
+### Deployment 배포 진행중/완료 상태 확인 
+```
+kubectl rollout status deployment <deployment-name>
+```
+
+### Deployment의 Pod replicas 변경 
+```
+kubectl scale deployment <deployment-name> --replicas=<number-of-pod>
+```
+
+### ReplicaSet 이벤트 확인 
+```
+kubectl descripbe rs <replicaset-name>
+```
+
+### ReplicaSet이 생성한 Pod 상태 변화 확인 
+```
+kubectl get rs -w
+```
+
+### label selector로 리소스 삭제 
+```
+kubectl delete all -l <label-key>=<label-value>
+```
+
+### Deployment 배포 및 replicas 변경 예시 
+```
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-app
+spec:
+  replicas: 2
+  selector: 
+    matchLabels:
+      app: my-app
+  template:
+    metadata:
+      labels:
+        app: my-app
+    spec:
+      containers:
+      - name: my-app
+        image: yoonjeong/my-app:1.0
+        ports:
+        - containerPort: 8080 
+        resources:
+          limits:
+            memory: "64Mi"
+            cpu: "50m"
+```
+
+```
+kubectl apply -f til-by-topic/kubernetes/3.Kubernetes와-Docker로-한-번에-끝내는-컨테이너-기반-MSA/ch5/deployment.yaml # 배포
+kubectl describe deployment my-app # deployment 이벤트 확인 
+kubectl rollout status deployment/my-app # 배포가 완료되었는지 확인 
+kubectl scale deployment my-app --replicas=5 # pod replicas 변경 
+kubectl describe deployment my-app # deployment 이벤트 확인 
+kubectl port-forward deployment/my-app 8080:8080 # 포트포워딩
+kubectl delete all -l app=my-app # pod, replicaSet 삭제 -> deployment가 남아서 새롭게 배포됨 
+kubectl delete deployment my-app # deployment 까지 같이 제거 (pod, replicaSet 모두 제거 ) 
+```
+
+### Deployment의 Pod Template 이미지 변경 & 레이블 변경 과정  
+1. Deployment가 새로운 ReplicaSet을 생성한다
+2. 이전 ReplicaSet은 자신이 관리하는 Pod를 모두 제거 한다. 
+3. 새로운 ReplicaSet은 새로운 Pod를 replicas 수 만큼 생성한다.
+
+
+### Deployment Pod Template 예시
+```
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-app
+  labels:
+    app: my-app
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: my-app
+  template:
+    metadata:
+      labels:
+        app: my-app
+        project: fastcampus
+        env: production
+    spec:
+      containers:
+      - name: my-app
+        image: yoonjeong/my-app:1.0
+        ports:
+        - containerPort: 8080
+        resources:
+          limits:
+            memory: "64Mi"
+            cpu: "50m"
+```
+
+```
+kubectl apply -f til-by-topic/kubernetes/3.Kubernetes와-Docker로-한-번에-끝내는-컨테이너-기반-MSA/ch6/deployment.yaml # 배포
+kubectl describe deployment my-app # deployment 이벤트 확인 
+kubectl rollout status deployment/my-app # 배포가 완료되었는지 확인 
+kubectl set image deployment my-app my-app=yoonjeong/my-app:2.0 # 이미지 변경 / 혹은 label변경 혹은 추가 후 재 배포  
+kubectl describe rs/<old-replicaset-name> # old ReplicaSet의 Pod 이벤트 
+kubectl describe rs/<new-replicaset-name> # new ReplicaSet의 Pod 이벤트 
+kubectl port-forward deployment/my-app 8080:8080 # 포트 포워딩 
+curl localhost:8080 # 요청  -> 2.0버전으로 잘 호출되는것을확인 
+kubectl delete all -l app=my-app # 모든 리소스 삭제 
+```
