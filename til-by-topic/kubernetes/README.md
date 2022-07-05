@@ -1149,3 +1149,44 @@ kubectl port-forward deployment/my-app 8080:8080 # 포트 포워딩
 curl localhost:8080 # 요청  -> 2.0버전으로 잘 호출되는것을확인 
 kubectl delete all -l app=my-app # 모든 리소스 삭제 
 ```
+
+### Deployment Recreate 전략 예시
+```
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-app
+  labels:
+    app: my-app
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: my-app
+  strategy:
+    type: Recreate # Recreate 전략 
+  template:
+    metadata:
+      labels:
+        app: my-app
+    spec:
+      containers:
+      - name: my-app
+        image: yoonjeong/my-app:1.0
+        ports:
+        - containerPort: 8080
+        resources:
+          limits:
+            memory: "64Mi"
+            cpu: "50m"
+```
+
+```
+kubectl get rs -w  # ReplicaSet이 생성한 Pod 상태 변화 확인 
+kubectl apply -f til-by-topic/kubernetes/3.Kubernetes와-Docker로-한-번에-끝내는-컨테이너-기반-MSA/ch7/recreate.yaml # 배포 
+
+# recrea.yaml 파일에서 image: yoonjeong/my-app:2.0 으로 변경 
+
+kubectl apply -f til-by-topic/kubernetes/3.Kubernetes와-Docker로-한-번에-끝내는-컨테이너-기반-MSA/ch7/recreate.yaml # 재배포 
+kubectl delete all -l app=my-app
+```
