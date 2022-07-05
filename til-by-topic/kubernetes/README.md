@@ -1005,6 +1005,25 @@ spec: # 사용자가 원하는 Pod의 바람직한 상태
   - 새로운 버전의 Pod를 3개가지 즉시 생성할 수 있다.
   - 새로운 버전의 Pod 생성과 이전 버전의 Pod 종료를 진행하면서 총 Pod의 수가 replicas수의 130%를 넘지 않도록 유지해야 한다.
 
+### maxUnavailable, maxSurge 예시 
+- 예) replicas: 3, maxUnavailable: 1, maxSurge: 0
+  - 한 시점에 있을 수 있는 최소 Pod: 2
+  - 한 시점에 있을 수 있는 최대 Pod: 3
+- 예) replicas: 3, maxUnavailable: 1, maxSurge: 1
+  - 한 시점에 있을 수 있는 최소 Pod: 2
+  - 한 시점에 있을 수 있는 최대 Pod: 4
+- 예) replicas: 3, maxUnavailable: 1, maxSurge: 2
+  - 한 시점에 있을 수 있는 최소 Pod: 2 (replicas - maxUnavailable)
+  - 한 시점에 있을 수 있는 최대 Pod: 5 (replicas + maxSurge)
+
+### maxUnavailable, maxSurge 가 필요한 이유 
+- 기존에 실행 중인 Pod를 일시에 제거하면 새로운 Pod가 생성되기까지 서비스 중단이 발생할 수 있다.
+- 모든 Old Pod을 New Pod로 전환하는데 시간을 최소화 할 수 있다.
+- 새로운 Pod를 replicas 수만큼 미리 배포한다면 리소스가 부족할 수 있다. (약 2배 리소스 확보 필요)
+- 그래서 maxUnavailable을 이용해서 최소 서비스 운영에 영향을 주지 않을 만큼 유지해야 하는 Pod를 선언 해야 한다.
+- maxSurge로 어떤 시점에 동시에 존재할 수 있는 최대 Pod 수를 선언하여 배포 속도를 조절함과 동시에 리소스를 제어할 수 있다.
+- 유지해야할 Pod 수의 상한선과 하한선을 쿠버네티스에게 알리기 위한 옵션이다.
+
 ### Deployment 롤백 전략 - Revision 
 - Deployment는 롤아웃 히스토리를 Revision # 으로 관리한다.
 - Revision 특정 번호에 대해서 배포되었던 Pod Template 정보를 조회 할 수 있다.
@@ -1188,5 +1207,49 @@ kubectl apply -f til-by-topic/kubernetes/3.Kubernetes와-Docker로-한-번에-�
 # recrea.yaml 파일에서 image: yoonjeong/my-app:2.0 으로 변경 
 
 kubectl apply -f til-by-topic/kubernetes/3.Kubernetes와-Docker로-한-번에-끝내는-컨테이너-기반-MSA/ch7/recreate.yaml # 재배포 
+kubectl delete all -l app=my-app
+```
+
+### Deployment RollingUpdate 전략 예시
+```
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-app
+  labels:
+    app: my-app
+spec:
+  replicas: 5 
+  selector:
+    matchLabels:
+      app: my-app
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 2
+      maxSurge: 1 
+  template:
+    metadata:
+      labels:
+        app: my-app
+    spec:
+      containers:
+      - name: my-app 
+        image: yoonjeong/my-app:1.0
+        ports:
+        - containerPort: 8080
+        resources:
+          limits:
+            memory: "64Mi"
+            cpu: "50m"
+```
+
+```
+kubectl get rs -w  # ReplicaSet이 생성한 Pod 상태 변화 확인 
+kubectl apply -f til-by-topic/kubernetes/3.Kubernetes와-Docker로-한-번에-끝내는-컨테이너-기반-MSA/ch8/rollingupdate.yaml # 배포 
+
+# rollingupdate.yaml 파일에서 image: yoonjeong/my-app:2.0 으로 변경 
+
+kubectl apply -f til-by-topic/kubernetes/3.Kubernetes와-Docker로-한-번에-끝내는-컨테이너-기반-MSA/ch8/rollingupdate.yaml # 변경사항 반영
 kubectl delete all -l app=my-app
 ```
