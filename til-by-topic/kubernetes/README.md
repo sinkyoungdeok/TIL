@@ -1253,3 +1253,82 @@ kubectl apply -f til-by-topic/kubernetes/3.Kubernetes와-Docker로-한-번에-�
 kubectl apply -f til-by-topic/kubernetes/3.Kubernetes와-Docker로-한-번에-끝내는-컨테이너-기반-MSA/ch8/rollingupdate.yaml # 변경사항 반영
 kubectl delete all -l app=my-app
 ```
+
+### Deployment Revision 목록 간단 조회 
+```
+kubectl rollout history deployment/my-app
+```
+
+### Deployment Revision 상세 조회 
+```
+kubectl rollout history deployment/my-app --revision=2
+```
+
+### Deployment 롤백 
+```
+kubectl rollout undo deployment/my-app # 직전 버전으로 롤백 
+kubectl rollout undo deployment/my-app --to-revision=1 # 1 버전으로 롤백 
+```
+
+### Deployment 롤백 사유 남기기
+```
+kubectl annotate deployment/my-app kubernetes.io/change-cause="image reverted to 1.0 for a few bugs"
+```
+
+### Deployment 롤백 예시 
+```
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-app
+  labels:
+    app: my-app
+  annotations:
+    "kubernetes.io/change-cause": "initial image 1.0"
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: my-app
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
+  template:
+    metadata:
+      labels:
+        app: my-app
+        project: fastcampus
+        env: production
+    spec:
+      containers:
+      - name: my-app
+        image: yoonjeong/my-app:1.0
+        ports:
+        - containerPort: 8080
+        resources:
+          limits:
+            memory: "64Mi"
+            cpu: "50m"
+```
+
+```
+kubectl apply -f til-by-topic/kubernetes/3.Kubernetes와-Docker로-한-번에-끝내는-컨테이너-기반-MSA/ch9/rollback.yaml # 배포 
+
+kubectl set image deployment/my-app my-app=yoonjeong/my-app:2.0 # 버전 변경 
+
+kubectl get deployment my-app -o wide # 버전 확인 
+
+kubectl annotate deployment/my-app kubernetes.io/change-cause="image updated to 2.0" # 버전 변경 사유 남기기 
+
+kubectl rollout history deployment/my-app # 버전 및 사유 확인 
+
+kubectl rollout undo deployment/my-app # 이전 버전으로 롤백 
+
+kubectl annotate deployment/my-app kubernetes.io/change-cause="rollbacked to 1.0 for a few bugs" # 롤백 사유 남기기 
+
+kubectl rollout history deployment/my-app # 버전 및 사유 확인 
+
+kubectl delete all -l app=my-app
+```
