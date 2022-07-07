@@ -14,6 +14,7 @@
 - [5. pod 살펴보기](#5-pod-살펴보기)
 - [6. replica set](#6-replica-set)
 - [7. deployment](#7-deployment)
+- [8. service](#8-service)
 
 
 ## 1. 설치 명령어 
@@ -1332,3 +1333,90 @@ kubectl rollout history deployment/my-app # 버전 및 사유 확인
 
 kubectl delete all -l app=my-app
 ```
+
+## 8. service
+
+### Pod 한계점 - 클라이언트 Pod IP 목록을 최신 상태로 관리 필요 
+- 변경이 잦은 Pod IP 목록에 영향을 받는 파드 클라이언트
+- 파드 클라이언트가 최신 상태의 모든 Pod IP를 알고 있어야 함
+- 클라이언트가 특정 Pod IP로 오프라인 상태의 Pod에 접근했다면 요청은 실패한다.
+
+### Pod 한계점 - Pod를 외부로 노출할 수 없다. 
+- Pod IP는 클러스터 내부에서만 접근할 수 있다.
+- 클러스터 외부에서 접근할 수 있는 방법이 필요하다.
+- kubectl port-forward 프로세스는 개발 단계에서만 사용해야 한다.
+
+### Service 개념 - Pod 집합에 대한 단일 엔드 포인트 생성 
+- 위에서 설명한 Pod의 한계점들을 극복하기 위해서 필요한 오브젝트
+- Service는 파드 추상화이다 == 파드들의 단일 엔드포인트 + 로드밸런싱
+- 파드 클라이언트는 Service IP:Port를 이용해서 파드와 통신할 수 있다.
+- Service는 Selector에 의해 선택된 파드 집합 중 임의의 파드로 트래픽을 전달한다.
+
+
+### Service 오브젝트 선언 
+```
+apiVersion: v1
+kind: Service
+metadata:
+  name: order
+  namespace: snackbar
+  labels:
+    app: order
+spec:
+  selector:
+    app: order # 유입된 트래픽을 전달할 파드 집합 
+  ports:
+    - port: 80 # 노출할 서비스 포트 
+      targetPort: 8080 # 서비스 포트와 연결할 컨테이너 포트, containerPort와 일치해야 됨 
+```
+
+### Service와 Endpoints - 최신 Pod IP 목록 관리 
+- EndPoints: Service가 노출하는 Pod IP와 Port의 최신 목록
+- Service 리소스를 생성하면 Service와 같은 이름으로 Endpoints 리소스가 생성됨
+- Service에 선언한 Selector의 파드 집합이 변경될 때마다 Endpoints 목록도 업데이트 된다
+- Service가 받은 트래픽을 Endpoints 중에 하나로 리다이렉트 한다.
+
+### Service와 통신하는 2가지 방법 
+1. 컨테이너 환경변수에 설정된 Service IP와 Port를 이용 
+2. Service 이름으로 DNS 서버에 질의하여 Service IP를 알아내는 방법 
+
+
+### Service와의 통신 - 환경변수 
+- 쿠버네티스가 Pod를 생성할 때 컨테이너 환경변수에 모든 Service IP와 Port를 추가한다
+- OOO_SERVICE_HOST, OOO_SERVICE_PORT
+- 주의1) Service를 클라이언트 Pod보다 먼저 생성해야 한다
+- 주의2) 다른 네임스페이스에 있는 Service 환경변수는 설정되지 않는다.
+
+### Service와의 통신 - DNS 
+- 쿠버네티스가 DNS 서버 IP 주소를 컨테이너의 /etc/resolve.conf 파일에 등록한다
+- Service 이름으로 요청을 실행하면 DNS 서버로부터 Service IP를 조회할 수 있다. 
+
+### Service의 종류 
+- ClusterIP, NodePort, LoadBalancer 타입이 있다.
+- Service 타입에 따라 클라이언트가 Service에 접근할 수 있는 방식이 달라진다.
+- LoadBalancer 타입은 NodePort, ClusterIP 기능을 모두 포함한다.
+
+### Service - ClusterIP
+- 기본 Service 타입
+- Pod IP 처럼 외부에서는 접근할 수 없는 IP를 할당 받는다
+- Server IP는 클러스터 내부 통신용으로 사용된다.
+- 굳이 외부에 노출할 필요가 없는 애플리케이션에 대해서 사용하면 좋다.
+
+### Service - NodePort 
+- 외부에서 접근할 수 있는 External IP가 아니라 NodePort를 할당 받는다
+- 할당받은 노드 Port를 통해 들어온 트래픽을 파드 집합으로 포워딩한다 (특정 노드의 IP로 통신을 해야됨)
+- 한계점 
+  -  지정한 노드가 사용할 수 없는 상태라면 -> 앞단에서 로드밸런서를 이용해서 건강한 상태의 노드로 트래픽을 전달할 수 있도록 만들어야됨. 
+
+### Service - LoadBalancer
+- 클라우드 서비스의 Load Balancer를 프로비저닝하고 External IP를 할당 받는다
+- 클라이언트는 Load Balancer IP를 통해 특정 서비스로 외부 트래픽을 포워딩할 수 있다.
+- 내부적으로는 Load Balancer에서 Node Port를 통해서 서비스로 연결되는 구조이다.
+
+### Service를 이용한 Pod 노출 
+- Service 리소스는 파드 집합에 대한 단일 엔드포인트를 제공
+- ClusterIP Service를 이용해서 클러스터 내부 Pod 간 통신에 단일 엔드포인트를 만들 수 있다
+- NodePort/LoadBalancer Service를 이용해서 클러스터 외부 트래픽을 Pod로 전달할 수 있다
+- Pod 안에서는 Service 이름과 네임스페이스 이름을 이용해서 다른 Pod와 통신할 수 있다.
+  - 같은 네임스페이스에 있는 Pod) <service-name>:<service-port>
+  - 다른 네임스페이스에 있는 Pod) <service-name>:<service-port>.<namespace>
