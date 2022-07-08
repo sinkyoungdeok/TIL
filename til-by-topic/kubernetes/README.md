@@ -1420,3 +1420,181 @@ spec:
 - Pod 안에서는 Service 이름과 네임스페이스 이름을 이용해서 다른 Pod와 통신할 수 있다.
   - 같은 네임스페이스에 있는 Pod) <service-name>:<service-port>
   - 다른 네임스페이스에 있는 Pod) <service-name>:<service-port>.<namespace>
+
+
+### 네임스페이스의 모든 리소스 조회 
+```
+kubectl get all -n <namespace-name>
+```
+
+### Endpoints의 리소스 조회 
+- 만약 Service IP로 요청에 실패한다면, Service EndPoints 구성을 확인한다.
+```
+kubectl get endpoints -n <namespace-name>
+```
+
+### 네임스페이스 생성 명령어
+```
+kubectl create namespace <namespace-name>
+```
+
+### 네임스페이스의 Service 상세 조회 
+```
+kubectl get svc <service-name> -o wide -n <namespace>
+```
+
+### Service ClusterIP 조회
+```
+kubectl get svc <service-name> -o jsonpath="{.spec.clusterIP}" -n <namespace>
+```
+
+
+
+### ClusterIP Service 배포 예시 
+```
+kubectl create namespace snackbar # 네임스페이스 생성 
+kubectl apply -f til-by-topic/kubernetes/3.Kubernetes와-Docker로-한-번에-끝내는-컨테이너-기반-MSA/ch10/service.yaml # 배포
+kubectl get all -n snackbar # 모든 리소스 조회 
+kubectl get svc order -o wide -n snackbar # service 상세 조회 
+kubectl get svc payment -o wide -n snackbar # service 상세 조회 
+kubectl get endpoints -n snackbar # endpoints 조회 
+kubectl get pod -o wide -n snackbar # pod 조회 
+kubectl get svc order -o json -n snackbar # clusterIP 조회를 위한 전체 조회 
+kubectl get svc order -o jsonpath="{.spec.clusterIP}" -n snackbar # clusterIP 조회 -> "10.80.9.122"
+
+curl 10.80.9.122 # 연결안됨 -> clusterIP이므로 외부에서 접근 불가 
+
+kubectl port-forward service/order -n snackbar 8080:80 # 포트포워딩
+```
+
+### Pod 컨테이너로 명령어 전달 
+```
+kubectl exec <pod-name> -n <namespace> -- <cmd>
+```
+
+### Pod 컨테이너 환경변수 확인 
+```
+kubectl exec <pod-name> -n <namespace> -- env | grep <pattern>
+```
+
+### ClusterIP Service 끼리 통신 예시 - 환경변수 활용
+```
+kubectl create namespace snackbar # 네임스페이스 생성 
+kubectl apply -f til-by-topic/kubernetes/3.Kubernetes와-Docker로-한-번에-끝내는-컨테이너-기반-MSA/ch10/service.yaml # 배포
+kubectl get all -n snackbar # 모든 리소스 조회 
+
+kubectl get pod -n snackbar # order pod 조회
+
+# order 컨테이너 환경변수 확인 
+kubectl exec order-5d45bf5796-8qr4n -n snackbar -- env | grep PAYMENT
+
+# payment 컨테이너 환경변수 확인
+kubectl exec payment-646db46775-5fc9k -n snackbar -- env | grep ORDER
+
+# snackbar 네임스페이스에 있는 order 컨테이너 쉘 접속 
+kubectl exec -it order-5d45bf5796-8qr4n -n snackbar -- sh
+
+# payment Service 환경변수를 이용해 order -> payment 파드 요청/응답 확인 
+curl $PAYMENT_SERVICE_HOST:$PAYMENT_SERVICE_PORT
+
+for i in `seq 1 10`; do curl -s $PAYMENT_SERVICE_HOST:$PAYMENT_SERVICE_PORT; done # payment 서비스의 로드밸런싱 확인 
+```
+
+
+### ClusterIP Service 끼리 통신 예시 - DNS 서버 활용
+- order pod 컨테이너 안에 설정 되어 있는 nameserver를 이용해서 서비스 이름으로 요청을 실행 했을 때, DNS 서버로부터 서비스 IP를 조회해오고 실제로 payment pod로 요청이 된다.
+- order pod 에서 payment pod로 요청을 하게 되면 다음 순서로 진행 된다.
+  1. order 컨테이너의 /etc/hosts, /etc/resolv.conf 파일 확인
+  2. Service이름 'payment'로 Payment 호출, 응답 확인
+- 쿠버네티스에서 사용하는 도메인 이름 규칙 - FQDN(Fully Qualified Domain Name)  
+  - FQDN == payment.snackbar.svc.cluster.local == <service-name>.<namespace>.svc.cluster.local
+
+```
+kubectl create namespace snackbar # 네임스페이스 생성 
+kubectl apply -f til-by-topic/kubernetes/3.Kubernetes와-Docker로-한-번에-끝내는-컨테이너-기반-MSA/ch10/service.yaml # 배포
+kubectl get all -n snackbar # 모든 리소스 조회 
+
+kubectl exec order-5d45bf5796-8qr4n -n snackbar -- curl -s payment:80 # 응답 성공 확인. 
+
+
+# 여기에는 payment 도메인이 등록되지 않다는것을 확인할 수 있다. 그래서 dns로 조회하게 된다.
+kubectl exec order-5d45bf5796-8qr4n -n snackbar -- cat /etc/hosts 
+
+# kubernetes의 dns 서버 조회 
+kubectl get all -n kube-system | grep kube-dns # ClusterIP: 10.80.0.10
+
+# nameserver 확인
+kubectl exec order-5d45bf5796-8qr4n -n snackbar -- cat /etc/resolv.conf # nameserver 10.80.0.10 (즉 kubernetes dns가 등록되어있음)
+
+kubectl exec -it order-5d45bf5796-8qr4n -n snackbar -- sh # order pod 접속 
+
+for i in `seq 1 10`; do curl -s payment:80; done # 로드 밸런싱 확인 
+
+curl payment.snackbar.svc.cluster.local # payment 응답 확인 
+
+curl payment.snackbar # payment 응답 확인 
+
+curl payment # payment 응답 확인 
+```
+
+
+### project=snackbar 레이블을 가진 모든 네임스페이스의 리소스 조회 
+```
+kubectl get all -l project=snackbar --all-namespaces
+```
+
+### proejct=snackbar 레이블을 가진 Service Endpoints 조회 
+```
+kubectl get endpoints -l project=snackbar --all-namespaces
+```
+
+### 모든 네임스페이스에서 project=snackbar 레이블을 가진 모든 리소스 제거 
+```
+kubectl delete all -l project=snackbar --all-namespaces
+```
+
+### ClusterIP Service - 서비스 이름으로 다른 네임스페이스에 있는 서비스 호출 
+1. fancy-snackbar 네임스페이스에 delivery Service와 Deployment 배포 
+2. order 컨테이너에서 delivery 서비스의 도메인 이름으로 요청 실행
+3. order 컨테이너에서 delivery 서비스 ClusterIP로 요청 실행
+4. order 컨테이너에서 환경변수 목록 조회 
+
+```
+kubectl create namespace snackbar # 네임스페이스 생성 
+kubectl apply -f til-by-topic/kubernetes/3.Kubernetes와-Docker로-한-번에-끝내는-컨테이너-기반-MSA/ch10/service.yaml # 배포
+kubectl get all -n snackbar # 모든 리소스 조회 
+
+kubectl create namespace fancy-snackbar # 네임스페이스 생성 
+kubectl apply -f til-by-topic/kubernetes/3.Kubernetes와-Docker로-한-번에-끝내는-컨테이너-기반-MSA/ch10/service2.yaml # 배포
+
+
+kubectl get all -l project=snackbar --all-namespaces # 모든 리소스 조회 
+kubectl get endpoints -l project=snackbar --all-namespaces # 엔드포인트 조회 
+
+
+kubectl get pod -n snackbar # 파드 조회 
+kubectl get svc -n fancy-snackbar # cluster-ip 조회 -> 10.80.0.32
+
+kubectl exec order-5d45bf5796-8qr4n -n snackbar -- curl -s 10.80.0.32 # delivery pod 요청 성공
+kubectl exec order-5d45bf5796-8qr4n -n snackbar -- curl -s delivery.fancy-snackbar # delivery pod 요청 성공
+kubectl exec order-5d45bf5796-8qr4n -n snackbar -- curl -s delivery # delivery pod 요청 실패. (같은 네임스페이스가 아니라서 실패)
+
+
+kubectl exec order-5d45bf5796-8qr4n -n snackbar -- env | grep delivery # 조회안됨, delivery는 나중에 배포되었기 때문에 먼저생성된 order에는 쿠버네티스가 환경변수를 설정하지 않는다. 
+
+kubectl delete all -l project=snackbar --all-namespaces # 모든 리소스 삭제 
+```
+
+### Service ClusterIP의 특징
+- Service는 파드 집합에 대한 단일 엔드포인트를 생성
+- Service를 생성하면 ClusterIP가 할당된다
+- ClusterIP는 클러스터 내부에서만 접속 가능 
+
+
+### Service를 이용해서 다른 Pod에게 요청을 보내는 방법 
+- 특정 애플리케이션 파드를 위해 배포된 Service 이름을 알아낸다.
+- 애플리케이션 컨테이너에서 ~~~_SERVICE_HOST 환경변수로 Service IP를 알아낼 수 있다.
+- 단, Pod 보다 늦게 생성한 Service 환경변수는 사용할 수 없다
+- 단, 다른 네임스페이스의 Service는 환경변수로 설정되지 않는다.
+- 애플리케이션 컨테이너에서 ServiceIP 대신 Service 이름을 도메인으로 요청을 보낼 수 있다.
+- 애플리케이션 컨테이너에서 Service Port는 ~~~_SERVICE_PORT 환경변수를 이용한다. 
