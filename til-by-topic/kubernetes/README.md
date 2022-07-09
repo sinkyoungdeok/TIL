@@ -1591,10 +1591,67 @@ kubectl delete all -l project=snackbar --all-namespaces # 모든 리소스 삭�
 - ClusterIP는 클러스터 내부에서만 접속 가능 
 
 
-### Service를 이용해서 다른 Pod에게 요청을 보내는 방법 
+### Service ClusterIP를 이용해서 다른 Pod에게 요청을 보내는 방법 
 - 특정 애플리케이션 파드를 위해 배포된 Service 이름을 알아낸다.
 - 애플리케이션 컨테이너에서 ~~~_SERVICE_HOST 환경변수로 Service IP를 알아낼 수 있다.
 - 단, Pod 보다 늦게 생성한 Service 환경변수는 사용할 수 없다
 - 단, 다른 네임스페이스의 Service는 환경변수로 설정되지 않는다.
 - 애플리케이션 컨테이너에서 ServiceIP 대신 Service 이름을 도메인으로 요청을 보낼 수 있다.
 - 애플리케이션 컨테이너에서 Service Port는 ~~~_SERVICE_PORT 환경변수를 이용한다. 
+
+
+### 외부에서 NodePort로 방화벽 해제 설정 
+```
+gcloud compute firewall-rules create <firewall-name> --allow tcp:31593 # 추가 
+
+gcloud compute firewall-rules delete <firewall-name> # 삭제 
+
+gcloud compute firewall-rules list # 정책 조회
+```
+
+### Service NodePort 타입 배포 예시
+
+```
+kubectl apply -f til-by-topic/kubernetes/3.Kubernetes와-Docker로-한-번에-끝내는-컨테이너-기반-MSA/ch11/se
+rvice.yaml  # 배포 
+
+kubectl get svc -l project=snackbar -n snackbar -o wide # service type 조회 
+
+curl 10.80.10.210:31433 # 요청 실패. 
+
+gcloud compute firewall-rules create order --allow tcp:31433 # 방화벽 추가 
+
+kubectl get nodes -o wide # 노드 External IP 조회 -> 조회한 노드중 아무거나 IP를 export
+
+export ORDER=34.71.118.169:31433 # 환경변수 추가 
+
+echo $ORDER # 환경변수 확인 
+
+curl http://$ORDER/menus # 요청 성공 
+
+# 주문 -> 영수증 출력  
+curl --request POST http://$ORDER/checkout \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "Pizza": 1,
+    "Coke": 1,
+    "Burger": 0,
+    "Juice": 0
+}' 
+
+gcloud compute firewall-rules delete order # 방화벽 삭제 
+
+kubectl delete all -l project=snackbar -n snackbar # 모든 리소스 종료 
+```
+
+### Service NodePort 특징 
+- 클러스터 내 모든 노드에 포트 할당은 Service를 NodePort 타입으로 생성 했을 때 일어난다
+- 노드의 External IP와 서비스 NodePort를 이용해서 파드에 접근할 수 있다.
+- 서비스 ClusterIP도 여전히 클러스터 내부에서 사용할 수 있다.
+
+### Service NodePort를 이용해서 다른 Pod에게 요청을 보내는 방법 
+- 서비스를 NodePort로 생성한다
+- NodePort에 대한 인바운드 트래픽 허용 정책을 클라우드 서비스에 설정한다
+- 노드 IP와 NodePort를 이용해서 원하는 파드 집합에 요청을 실행한다
+- 요청을 처리하는데 다른 파드의 응답이 필요하면 그 파드의 서비스 이름과 서비스 포트를 이용한다
+- 서비스 이름을 도메인 네임으로 DNS 서버에 IP를 조회할 수 있다.
