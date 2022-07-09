@@ -1655,3 +1655,48 @@ kubectl delete all -l project=snackbar -n snackbar # 모든 리소스 종료
 - 노드 IP와 NodePort를 이용해서 원하는 파드 집합에 요청을 실행한다
 - 요청을 처리하는데 다른 파드의 응답이 필요하면 그 파드의 서비스 이름과 서비스 포트를 이용한다
 - 서비스 이름을 도메인 네임으로 DNS 서버에 IP를 조회할 수 있다.
+
+### LoadBalancer 타입의 Service를 생성하여 외부 트래픽을 수신할 수 있다. 
+- NodePort를 이용해서 외부 트래픽을 받을 수 있었지만,
+- 특정 노드를 선택해서 외부 트래픽을 지속적으로 전달하게 될 텐데,
+- 그 선택한 노드가 문제가 생겼을 때에는 통신을 받을 수 없다.
+- 그러므로 앞단에서 LoadBalancer 타입의 서비스가 필요하다.
+- NodePort와의 다른점은 Order 서비스의 타입을 LoadBalancer로만 바꿔주면 된다.
+
+
+### Service LoadBalancer 타입 배포 예시
+
+```
+kubectl apply -f til-by-topic/kubernetes/3.Kubernetes와-Docker로-한-번에-끝내는-컨테이너-기반-MSA/ch12/service.yaml  # 배포 
+
+kubectl get svc -l project=snackbar -n snackbar -
+o wide # 리소스 조회 
+
+export ORDER=35.225.59.229 # 환경변수 설정
+
+curl http://$ORDER/menus # 메뉴 조회 
+
+# 주문 요청 
+curl --request POST http://$ORDER/checkout \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "Pizza": 1,
+    "Burger": 2,
+    "Coke": 0,
+    "Juice": 0
+}' 
+
+kubectl delete all -l project=snackbar -n snackbar # 모든 리소스 제거 
+```
+
+### Service LoadBalancer 특징 
+- LoadBalancer 타입의 서비스를 생성하면 클라우드 서비스의 로드밸런서가 실행 된다
+- 로드밸런서의 IP가 Service의 External IP로 할당 된다
+- Service의 EXternal IP이자 로드밸런서 IP로 외부에서 파드에 접근할 수 있다
+- 서비스 ClusterIP, NodePort의 기능도 여전히 사용할 수 있다.
+
+### Service LoadBalancer를 이용해서 다른 Pod에게 요청을 보내는 방법 
+- 서비스를 LoadBalancer로 생성한다
+- 서비스의 External IP를 이용해서 원하는 파드 집합에 요청을 실행한다
+- 요청을 처리하는데 다른 파드의 응답이 필요하면 그 파드의 서비스 이름과 서비스 포트를 이용한다
+- 서비스 이름을 도메인 네임으로 DNS 서버에게 IP를 조회할 수 있다.
