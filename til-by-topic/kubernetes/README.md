@@ -15,6 +15,7 @@
 - [6. replica set](#6-replica-set)
 - [7. deployment](#7-deployment)
 - [8. service](#8-service)
+- [9. ingress와 ingress controller](#9-ingress와-ingress-controller)
 
 
 ## 1. 설치 명령어 
@@ -1700,3 +1701,115 @@ kubectl delete all -l project=snackbar -n snackbar # 모든 리소스 제거
 - 서비스의 External IP를 이용해서 원하는 파드 집합에 요청을 실행한다
 - 요청을 처리하는데 다른 파드의 응답이 필요하면 그 파드의 서비스 이름과 서비스 포트를 이용한다
 - 서비스 이름을 도메인 네임으로 DNS 서버에게 IP를 조회할 수 있다.
+
+
+
+## 9. ingress와 ingress controller
+
+### ingress의 필요성 
+- 클라이언트는 수많은 LoadBalancer의 IP를 기억해야한다.
+
+### ingress란 
+- Service 추상화 
+- 의미 있는 단일 엔드포인트를 제공한다
+- 트래픽을 Service로 분산하기 위한 라우팅 규칙 모음
+- 클라이언트가 호출한 Host 헤더나 path를 통해 Service를 구분하고 트래픽을 포워딩한다 
+
+### ingress controller란 
+- Ingress 규칙에 따라 트래픽 분산을 실행하기 위한 리소스 
+- 쿠버네티스 클러스터 제공자가 구현한 Ingress Controller마다 기능이 다르다
+- 쿠버네티스 지원 Ingress Controller: https://bit.ly/3GkpoZq
+- Ingress 리소스를 생성하면 GKE가 Google Cloud load balancer를 Ingress Controller로 생성한다.
+
+### Ingress 오브젝트 선언 - 기본
+```
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata: 
+  name: snackbar
+  namespace: snackbar
+  labels: 
+    project: snackbar
+```
+
+### Ingress 오브젝트 선언 - 여러 Host로 서비스를 분리
+```
+# Host: order.fast-snackbar.com 을 Service에 매핑 
+spec:
+  rules:
+  - host: order.fast-snackbar.com # Host 헤더가 일치하는 요청만 매칭 
+    http:
+      paths:
+        - pathType: Prefix # /로 시작하는 모든 경로에 매칭 
+          path: /
+          backend: # order 서비스의 80 포트로 포워딩 
+            service:
+              name: order
+              port:
+                number: 80
+```
+
+```
+# Host: payment.fast-snackbar.com 을 Service에 매핑
+spec:
+  rules:
+  - host: payment.fast-snackbar.com # Host 헤더가 일치하는 요청만 매칭 
+    http:
+      paths:
+        - pathType: Prefix # /로 시작하는 모든 경로에 매칭 
+          path: / 
+          backend: # payment 서비스의 80 포트로 포워딩 
+            service:
+              name: payment
+              port:
+                number: 80
+```
+
+
+### Ingress 오브젝트 선언 - URL patfh 서비스를 분리 
+```
+# 하나의 host에 URL Path별로 서비스 매핑 
+rules:
+- http:
+  path:
+  - pathType: Prefix
+    path: /order # /order로 시작하는 모든 경로의 요청에 대해서 다음을 실행 
+    backend: # order 서비스의 80포트로 연결 
+      service:
+        name: order
+        port:
+          number: 80
+  - pathType: Prefix
+    path: /payment # /payment로 시작하는 모든 경로의 요청에 대해서 다음을 실행
+    backend: # payment 서비스의 80포트로 연결 
+      service:
+        name: payment
+        port:
+          number: 80
+```
+
+### Ingress 오브젝트 선언 - 매치되지 않은 트래픽 처리 
+```
+# defaultBackend 설정 
+spec:
+  defaultBackend: # defaultBackend는 Ingress에 정의되지 않는 요청을 받으면 처리한다. 
+    service:
+      name: order
+      port:
+        number: 80 
+```
+- Ingress에 정의되지 않은 요청이란 
+  - 정의하지 않은 host 헤더 요청을 받은 경우 
+  - path 표현식과 일치하지 않는 경우 
+
+### Ingress Controller로 트래픽을 수신하는 과정 
+![image](https://user-images.githubusercontent.com/28394879/178140405-a2601430-d794-4798-bcda-1f65299e7957.png)
+1. Ingress를 생성하게 되면, 구글 클라우드가 로드밸런서를 생성해서 Ingress Controller로 만듬
+2. Ingress Controller가 들어온 요청의 host 헤더 정보를 이용해서 트래픽을 내부에 있는 서비스로 전달해준다.
+3. 라우팅규칙은 우리가 생성한 Ingress를 보고 판단한다.
+
+
+### Ingress 특징 
+- 클라이언트는 클러스터 안에 있는 여러 Service를 하나의 IP로 접근할 수 있다
+- 쿠버네티스 클러스터에 존재하는 Service 리소스에 대한 라우팅 규칙을 선언한다
+- Ingress Controller가 받은 HTTP Request와 Host 헤더 정보나 URL Path에 따라 여러 서비스로 트래픽을 분산할 수 있다.
