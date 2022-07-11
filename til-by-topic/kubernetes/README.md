@@ -16,6 +16,7 @@
 - [7. deployment](#7-deployment)
 - [8. service](#8-service)
 - [9. ingress와 ingress controller](#9-ingress와-ingress-controller)
+- [10. liveness probe](#10-liveness-probe)
 
 
 ## 1. 설치 명령어 
@@ -1947,4 +1948,64 @@ done
 
 # snackbar 네임스페이스에 project=snackbar 레이블을 가진 모든 리소스 제거
 kubectl delete all -l project=snackbar -n snackbar
+```
+
+## 10. liveness probe
+
+### libenessProbe 필요성 
+- 파드는 생성했지만, 컨테이너가 어떠한 이유로 실패하고 실행되고 있지 않을 때
+
+### 쿠버네티스 kubelet이 알아야 하는 정보 
+- 컨테이너 상태를 확인하는 방법(Probe)
+- 언제 재시작 할 것인지 기준 
+
+
+### 쿠버네티스 kubelet이 컨테이너 상태를 확인하고 재시작하는 과정 
+1. kubelet이 pod가 배포되고, 도커에 의해 컨테이너가 실행이 되면, 주기적으로 endpoint를 호출해서 생사를 체크한다.
+2. 컨테이너가 응답을 주는것을 확인하고 사용자가 정의한 임계치를 넘어선 실패 응답을 받으면 컨테이너가 파드 내에 있는 컨테이너를 종료 시킨다.
+3. 새로운 컨테이너를 시작한다.
+
+
+### 파드의 livenessProbe
+- liveness: 살아있음
+- probe: 수사
+- 컨테이너가 실행중인지 확인하는 방법
+- 일정 수준 이상 연속해서 실패하면 컨테이너를 재시작.
+
+### HttpGet livenessProbe 선언 
+- HTTP status code로 살아있는지 확인하는 방법 
+ 
+```
+spec:
+  containers:
+  - name: myapp
+    image: yoonjeong/my-app:1.0
+    ports:
+    - containerPort: 8080
+    livenessProbe:
+      httpGet: # probe 엔드포인트 
+        path: /health
+        port: 8080
+      initialDelaySeconds: 3  # 컨테이너 시작 후 몇 초후에 probe를 시작 할 것인가 
+      periodSeconds: 1        # probe 실행 주기 
+      successThreshold: 1     # 몇 개 성공 시 실패 횟수를 초기화할 것인가 
+      failureThreshold: 1     # 연속으로 몇 번 실패 했을 때 컨테이너를 재시작 할 것인가
+      timeoutSeconds: 3       # 응답을 몇 초 만에 받아야 하는가 
+``` 
+
+
+### HttpGet livenessProbe 배포 예시 
+```
+# 배포 
+kubectl apply -f til-by-topic/kubernetes/3.Kubernetes와-Docker로-한-번에-끝내는-컨테이너-기반-MSA/ch14/pod-liveness-probe.yaml 
+
+# 모니터링 -> RESTARTS 횟수가 계속 늘어남 
+kubectl get pod -w
+
+# Pod 이벤트를 확인하여 문제 원인 확인 
+kubectl describe pod/unhealthy
+
+# 제거 
+kubectl delete pod healthy
+kubectl delete pod unhealthy
 ```
