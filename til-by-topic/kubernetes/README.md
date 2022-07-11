@@ -1813,3 +1813,138 @@ spec:
 - 클라이언트는 클러스터 안에 있는 여러 Service를 하나의 IP로 접근할 수 있다
 - 쿠버네티스 클러스터에 존재하는 Service 리소스에 대한 라우팅 규칙을 선언한다
 - Ingress Controller가 받은 HTTP Request와 Host 헤더 정보나 URL Path에 따라 여러 서비스로 트래픽을 분산할 수 있다.
+
+### Ingress IP와 Port 확인 
+```
+kubectl get ingress snackbar -n snackbar
+```
+
+### 인그레스 조회 
+```
+kubectl get ingress <ingress-name> -n <namespace>
+```
+
+### 인그레이스의 로드밸런서 IP 조회 
+```
+kubectl get ingress <ingress-name> -n <namespace> \
+-o jsonpath="{.status.loadBalancer.ingress[0].ip}"
+```
+
+### Multiple Host 방식으로 Ingress를 통해 여러 서비스 배포
+![image](https://user-images.githubusercontent.com/28394879/178282355-c1b21318-beb3-4bff-af6d-edbb3ee2a125.png)
+
+```
+# delivery, home 등 전부 배포 
+kubectl apply -f til-by-topic/kubernetes/3.Kubernetes와-Docker로-한-번에-끝내는-컨테이너-기반-MSA/ch13/backend 
+
+# ingress 배포 
+kubectl apply -f til-by-topic/kubernetes/3.Kubernetes와-Docker로-한-번에-끝내는-컨테이너-기반-MSA/ch13/ingress-multiple-hosts.yaml 
+
+# endpoint 조회 
+kubectl get endpoints -n snackbar
+
+# ingress 조회 (IP 등 )
+kubectl get ingress snackbar -n snackbar
+
+# Ingress IP 환경변수 설정
+export INGRESS_IP=$(kubectl get ingress snackbar -n snackbar -o jsonpath="{.status.loadBalancer.ingress[0].ip}")
+
+# 환경변수 확인 
+echo $INGRESS_IP
+
+# 주문 홈 요청 
+curl -H "Host: order.fast-snackbar.com" --request GET $INGRESS_IP
+
+# 주문 메뉴 조회 
+curl -H "Host: order.fast-snackbar.com" --request GET $INGRESS_IP/menus
+
+# 주문 요청
+curl -H "Host: order.fast-snackbar.com" --request POST $INGRESS_IP/checkout \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "Pizza": 1,
+    "Burger": 2,
+    "Coke": 0,
+    "Juice": 0
+}'
+
+
+
+# 결제 홈
+curl -H "Host: payment.fast-snackbar.com" --request GET $INGRESS_IP
+
+# 결제 정보 조회
+curl -H "Host: payment.fast-snackbar.com" -s --request POST $INGRESS_IP/receipt \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "Pizza": 1,
+    "Burger": 2,
+    "Coke": 0,
+    "Juice": 0
+}' | json_pp
+
+
+
+# 배달 홈
+curl -H "Host: delivery.fast-snackbar.com" $INGRESS_IP
+
+# 디폴트 백엔드 - 선언하지 않은 Host 헤더와 Path로 요청 실행 
+curl -H "Host: wrong.fast-snackbar.com" $INGRESS_IP
+curl -H "Host: wrong.fast-snackbar.com" $INGRESS_IP/ab
+
+# snackbar 네임스페이스에 project=snackbar 레이블을 가진 모든 리소스 제거
+kubectl delete all -l project=snackbar -n snackbar
+```
+
+
+
+### Single Host 방식으로 Ingress를 통해 여러 서비스 배포 
+![image](https://user-images.githubusercontent.com/28394879/178284144-fd88636b-1a10-4e6e-9388-06fc46634537.png)
+
+```
+# delivery, home 등 전부 배포 
+kubectl apply -f til-by-topic/kubernetes/3.Kubernetes와-Docker로-한-번에-끝내는-컨테이너-기반-MSA/ch13/backend 
+
+# ingress 배포 single-hosts는 host를 지정하지 않음.
+kubectl apply -f til-by-topic/kubernetes/3.Kubernetes와-Docker로-한-번에-끝내는-컨테이너-기반-MSA/ch13/ingress-single-hosts.yaml 
+
+# 주문 홈
+curl --request GET $INGRESS_IP/order
+
+# 주문 메뉴 조회 
+curl --request GET $INGRESS_IP/order/menus
+
+# 주문 요청
+curl --request POST $INGRESS_IP/order/checkout \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "Pizza": 1,
+    "Burger": 2,
+    "Coke": 0,
+    "Juice": 0
+}'
+
+# 결제 홈
+curl --request GET $INGRESS_IP/payment
+
+# 결제 정보 조회
+curl -s --request POST $INGRESS_IP/payment/receipt \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "Pizza": 1,
+    "Burger": 2,
+    "Coke": 0,
+    "Juice": 0
+}' | json_pp
+
+# 선언하지 않은 Path로 요청 실행 
+curl $INGRESS_IP/not-found
+
+# 메뉴조회 로드밸런싱 확인
+for i in {1..10};
+do curl $INGRESS_IP/order/menus;
+done
+
+# snackbar 네임스페이스에 project=snackbar 레이블을 가진 모든 리소스 제거
+kubectl delete all -l project=snackbar -n snackbar
+```
