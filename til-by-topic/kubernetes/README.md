@@ -18,6 +18,7 @@
 - [9. ingress와 ingress controller](#9-ingress와-ingress-controller)
 - [10. liveness probe](#10-liveness-probe)
 - [11. readiness probe](#11-readliness-probe)
+- [12. config map](#12-config-map)
 
 
 ## 1. 설치 명령어 
@@ -2087,4 +2088,196 @@ kubectl exec -it unhealthy -- mkdir /var/ready
 
 # 서비스, 파드 삭제
 kubectl delete all -l app=myapp
+```
+
+## 12. config map
+
+### config map 이란 
+- 애플리케이션과 도커 이미지로부터 설정 파일을 분리하는 방법 
+- 쿠버네티스는 Pod로부터 설정파일을 분리해서 관리할 수 있는 방법 
+- ConfigMap 오브젝트로 설정 파일을 관리하고 Pod와 분리할 수 있다. 
+
+### Pod에서 ConfigMap에 접근하는 방법 
+- Pod의 컨테이너 환경변수가 configmap의 값을 참조할 수 있다.
+- Pod 볼륨으로 ConfigMap을 사용할 수 있다. 
+
+
+### ConfigMap 장점 
+- pod가 종료되고 다시 생성되더라도 동일한 Pod 메니페스트에는 동일한 ConfigMap이름으로 참조하기 때문에 설정 파일의 정보를 재사용할 수 있다. 
+- ConfigMap 이름으로 설정값들을 참조하기 때문에 설정값의 변경이 자유롭다 
+
+### ConfigMap 리터럴로 생성 
+- key=value를 직접 커맨드라인에 작성하는 방법 
+
+```
+kubectl create configmap <name> --from-literal=key=value
+
+kubectl create configmap greeting-config \ 
+--from-literal=STUDENT_NAME=경덕 \
+--from-literal=MESSAGE=HI 
+```
+
+### Config 생성 확인 
+```
+kubectl get configmap greetng-config -o yaml
+```
+
+### ConfigMap을 참조해서 파드 컨테이너 환경변수 설정하기 
+```
+spec:
+  containers:
+    env:
+      - name: STUDENT_NAME
+        valueFrom:
+          configMapKeyRef:
+            name: greeting-config
+            key: STUDENT_NAME
+      - name: MESSAGE
+        valueFrom:
+          configMapKeyRef:
+            name: greeting-config
+            key: MESSAGE
+      - name: GREETING
+        value: $(MESSAGE)! $(STUDENT_NAME)
+```
+
+위아래 같음 
+```
+spec:
+  containers:
+    envFrom:
+      - configMapRef:
+        name: greeting-config
+    env:
+      - name: GREETING
+        value: $(MESSAGE)! $(STUDENT_NAME)
+```
+
+
+### ConfigMap 리터럴 + env 예시
+```
+# ConfigMap 생성
+kubectl create configmap greeting-config --from-literal=STUDENT_NAME=경덕 --from-literal=MESSAGE=안녕
+
+# 생성한 ConfigMap 확인
+kubectl get configmap greeting-config -o yaml
+
+# 파드 배포 
+kubectl apply -f til-by-topic/kubernetes/3.Kubernetes와-Docker로-한-번에-끝내는-컨테이너-기반-MSA/ch16/hello-app.yaml 
+
+# 환경변수 GREETING 출력 확인 - 포트포워딩 8080:8080 
+kubectl port-forward hello-app 8080:8080
+
+# 웹브라우저에서 실행 
+localhost:8080
+
+# 파드 삭제
+kubectl delete pod hello-app
+```
+
+### ConfigMap 리터럴 + envFrom 예시 
+```
+# hello-app 파드 생성
+kubectl apply -f til-by-topic/kubernetes/3.Kubernetes와-Docker로-한-번에-끝내는-컨테이너-기반-MSA/ch16/hello-app-envFrom.yaml 
+
+# Pod 확인
+kubectl get pod
+
+# 환경변수 GREETING 출력 확인 - 포트포워딩 8080:8080 
+kubectl port-forward hello-app 8080:8080
+
+# 웹브라우저에서 실행 
+localhost:8080
+
+# 파드 삭제
+kubectl delete pod hello-app
+
+kubectl delete configmap greeting-config
+```
+
+### 설정 파일로 ConfigMap을 생성
+```
+kubectl create configmap <name> --from-file=파일이나 디렉토리 경로 
+```
+
+예시
+```
+# configmap 생성 
+kubectl create configmap greeting-config-from-file --from-file=til-by-topic/kubernetes/3.Kubernetes와-Docker로-한-번에-끝내는-컨테이너-기반-MSA/ch16/configs
+
+# ConfigMap 확인 
+kubectl get configmap greeting-config-from-file -o yaml
+
+# hello-app 파드 생성
+kubectl apply -f til-by-topic/kubernetes/3.Kubernetes와-Docker로-한-번에-끝내는-컨테이너-기반-MSA/ch16/hello-app-file.yaml 
+
+# Pod 확인
+kubectl get pod
+
+# 환경변수 GREETING 출력 확인 - 포트포워딩 8080:8080 
+kubectl port-forward hello-app 8080:8080
+
+# 웹브라우저에서 실행 
+localhost:8080
+
+# 파드 삭제
+kubectl delete pod hello-app
+
+kubectl delete configmap greeting-config-from-file
+```
+
+
+### Pod 볼륨으로 ConfigMap 사용 
+- ConfigMap 타입의 볼륨을 Pod에 선언 
+- ConfigMap 이름으로 볼륨을 참조 
+- Pod에 선언한 ConfigMap 타입의 볼륨을 컨테이너에서 마운트 할 수 있다.
+![image](https://user-images.githubusercontent.com/28394879/178526946-49eedf27-2b13-4540-9b7f-a0994b32b7a7.png)
+
+```
+spec:
+  volumes:                             # Pod에서 사용할 볼륨 목록 선언                         
+  - name: app-config                   # 컨테이너에서 참조할 볼륨 이름 
+    configMap:
+      name: nginx-config               # 참조할 configmap 이름 
+  containers:
+  - name: nginx
+    image: nginx
+    ports:
+    - containerPort: 80
+    volumeMounts:                     # 컨테이너에서 Pod 볼륨 마운트 선언 
+    - name: app-config                # 마운팅할 Pod 볼륨 이름 
+      mountPath: /etc/nginx/conf.d    # 컨테이너 안에서 마운팅할 경로 
+```
+
+### Pod 볼륨으로 ConfigMap 사용 예시 
+![image](https://user-images.githubusercontent.com/28394879/178531996-b4a2e383-42fb-4fa0-be85-219d39437565.png)
+
+```
+# nginx-config라는 ConfigMap을 configs 디렉토리로부터 생성
+kubectl create configmap nginx-config --from-file=til-by-topic/kubernetes/3.Kubernetes와-Docker로-한-번에-끝내는-컨테이너-기반-MSA/ch17/configs
+
+# nginx-config라는 ConfigMap 확인 
+kubectl get configmap nginx-config -o yaml
+
+# hello-app 파드 생성
+kubectl apply -f til-by-topic/kubernetes/3.Kubernetes와-Docker로-한-번에-끝내는-컨테이너-기반-MSA/ch17/web-server.yaml
+
+# server.conf에 설정한대로 nginx 웹서버가 /myapp 요청을 my-app 컨테이너로 라우팅 하는지 확인 - 포트포워딩 8080:80 
+kubectl port-forward web-server 8080:80
+
+# 웹브라우저에서 실행 
+localhost:8080/myapp
+
+# nginx 접속 로그 확인
+kubectl exec web-server -- tail -10f /var/log/nginx/host.access.log
+
+# 컨테이너의 마운팅 경로 /etc/nginx/conf.d에서 ConfigMap 파일 확인 
+kubectl exec web-server -c nginx -- ls /etc/nginx/conf.d
+kubectl exec web-server -c nginx -- cat /etc/nginx/conf.d/server.conf
+
+# 파드 삭제
+kubectl delete pod web-server
+kubectl delete pod my-app
+kubectl delete svc my-app
+kubectl delete configmap nginx-config
 ```
