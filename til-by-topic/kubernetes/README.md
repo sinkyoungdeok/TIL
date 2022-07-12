@@ -17,6 +17,7 @@
 - [8. service](#8-service)
 - [9. ingress와 ingress controller](#9-ingress와-ingress-controller)
 - [10. liveness probe](#10-liveness-probe)
+- [11. readiness probe](#11-readliness-probe)
 
 
 ## 1. 설치 명령어 
@@ -2008,4 +2009,82 @@ kubectl describe pod/unhealthy
 # 제거 
 kubectl delete pod healthy
 kubectl delete pod unhealthy
+```
+
+
+## 11. readiness probe
+
+### readinessProbe 필요성 
+- 파드는 생성했지만, 컨테이너가 아직 준비되지 않았을 때 사용 
+
+
+### readinessProbe 동작 과정 
+1. Kubelet이 컨테이너의 상태를 계속 체크하면서 readinessProbe를 호출한다.
+2. 응답으로 500이나 타임아웃과 같은 에러코드를 지속적으로 리턴한다.
+3. 어느정도 실패 임계치를 넘어서면 pod 목록으로부터 문제가 있는 pod를 제거한다.
+4. 준비가 완료되었다고 판단이 서면, 다시 서비스 엔드포인트에 pod를 다시 추가한다.
+
+
+### readniessProbe란 
+- readiness: 준비성 
+- probe: 수사
+- 컨테이너가 요청을 받을 준비가 되었는지 확인하는 방법 
+- 일정 수준 이상 연속해서 실패하면 서비스 엔드포인트에서 파드를 제거 
+
+### exec readinessProbe 선언 
+- process exit status code로 준비 상태를 확인 하는 방법 
+```
+spec:
+  containers:
+    - name: myapp
+      image: yoonjeong/my-app:1.0
+      ports:
+      - containerPort: 8080
+      readinessProbe:
+        exec:                   # 컨테이너에서 실행할 명령어 probe
+          command:
+          - ls
+          - /var/ready
+      initialDelaySeconds: 3    # 컨테이너 시작 후 몇 초 후에 probe를 시작할 것인가 
+      periodSeconds: 1          # probe 실행 주기 
+      successThreshold: 1       # 몇 개 성공 시 실패 횟수를 초기화할 것인가 
+      failureThreshold: 1       # 연속으로 몇 번 실패 했을 때 파드가 준비되지 않았다고 표시할 것인가
+      timeoutSeconds: 3         # 응답을 몇 초 만에 받아야 하는가 
+```
+
+### readinessProbe 배포 예시 
+```
+# 로드밸런서 배포 
+kubectl apply -f til-by-topic/kubernetes/3.Kubernetes와-Docker로-한-번에-끝내는-컨테이너-기반-MSA/ch15/service.yaml 
+
+# 서비스 ExternalIP 확인
+kubectl get svc -w
+
+# 서비스 엔드포인트를 환경변수 SERVICE로 저장
+export SERVICE=$(kubectl get svc myapp -o jsonpath="{.status.loadBalancer.ingress[0].ip}")
+
+# healthy, unhealthy 파드 생성 
+kubectl apply -f til-by-topic/kubernetes/3.Kubernetes와-Docker로-한-번에-끝내는-컨테이너-기반-MSA/ch15/pod-readinessProbe-probe.yaml
+
+# 서비스 엔드포인트를 관찰
+kubectl get endpoints -w
+
+# 파드 READY를 관찰, 몇 초가 흐른 뒤...
+kubectl get pod -o wide -w
+
+# Pod 이벤트를 확인하여 문제 원인 확인
+kubectl describe pod/unhealthy
+
+# 서비스 엔드포인트로 요청 실행
+for i in {0..5};
+do curl -v $SERVICE;
+done
+
+# unhealthy 파드에 접속하여 /var/ready 디렉토리 생성
+kubectl exec -it unhealthy -- mkdir /var/ready 
+
+# 서비스 엔드포인트, 파드 READY 상태를 관찰
+
+# 서비스, 파드 삭제
+kubectl delete all -l app=myapp
 ```
