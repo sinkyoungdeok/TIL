@@ -19,6 +19,7 @@
 - [10. liveness probe](#10-liveness-probe)
 - [11. readiness probe](#11-readliness-probe)
 - [12. config map](#12-config-map)
+- [13. secret](#13-secret)
 
 
 ## 1. 설치 명령어 
@@ -2280,4 +2281,93 @@ kubectl delete pod web-server
 kubectl delete pod my-app
 kubectl delete svc my-app
 kubectl delete configmap nginx-config
+```
+
+
+## 13. secret
+
+### Secret 개념 
+- 애플리케이션 설정 파일에는 서버 접속을 위한 비밀번호, 암호화를 위한 public/private key 등 노출이 되면 안되는 민감 정보도 있다.
+- 민감 정보를 관리하기 위한 쿠버네티스 오브젝트는 Secret이다.
+- ConfigMap처럼 민감한 데이터를 Key/Value 쌍으로 관리한다.
+- 쿠버네티스가 Secret 값을 Base64로 인코딩해서 관리한다.
+- 컨테이너에서 Secret 값을 읽을 때에는 디코딩되어 전달된다.
+- Pod 선언 시 Secret 볼륨이나 환경변수를 통해서 Secret 값을 사용할 수 있다. 
+- 애플리케이션의 민감 데이터를 관리하기 위해 별도의 서버를 실행할 필요가 없다.
+- 애플리케이션 컨테이너에서 디코딩할 필요 없다.
+- Secret 데이터는 메모리에 저장되기 때문에 접근이 어렵다.
+
+
+### Secret 사용 방법 2가지 
+1. Pod의 컨테이너 환경변수가 Secret의 값을 참조할 수 있다.
+2. Pod 볼륨으로 Secret을 사용할 수 있다. 
+
+즉 
+1. 컨테이너 env.valueFrom.secretMapKeyRef 사용 
+2. 컨테이너 envFrom.secretRef 사용 
+3. Secret을 Pod 볼륨으로 연결하고 컨테이너에서 마운트 
+
+
+### Secret 타입의 볼륨을 Pod에 선언하는 방법 
+```
+spec:
+  volumes:          # Pod에서 사용할 볼륨 목록 선언 
+  - name: tls       # 컨테이너에서 참조할 볼륨 이름 
+    secret:
+      secretName: tls-config    # 참조할 Secret 이름
+  containers:
+  - name: nginx
+    image: nginx
+    ports:
+    - containerPort: 80
+    volumeMounts:                 # 컨테이너에서 Pod 볼륨 마운트 선언 
+    - name: tls                   # 마운팅할 Pod 볼륨 이름
+      mountPath: /etc/nginx/tls   # 컨테이너 안에서 마운팅할 경로 
+```
+
+
+### Secret 활용 예시 
+![image](https://user-images.githubusercontent.com/28394879/178752282-c68d13ed-ae4d-4dcf-b01b-ad4f1067299a.png)
+```
+# tls-config라는 이름으로 generic타입의 secret 생성 
+ubectl create secret generic tls-config --from-file=til-by-topic/kubernetes/3.Kubernetes와-Docker로-한-번에-끝내는-컨테이너-기반-MSA/ch18/secrets
+
+# tls-config 라는 Secret 조회 
+kubectl get secret tls-config -o yaml
+
+# nginx 컨테이너가 https 트래픽을 처리할 수 있도록 TLS 인증서와 private key의 위치를 알려주어야 함 - server.conf 설정
+kubectl create configmap nginx-config --from-file=til-by-topic/kubernetes/3.Kubernetes와-Docker로-한-번에-끝내는-컨테이너-기반-MSA/ch18/configs
+
+# 배포 
+kubectl apply -f til-by-topic/kubernetes/3.Kubernetes와-Docker로-한-번에-끝내는-컨테이너-기반-MSA/ch18/web-server.yaml
+
+# 생성한 파드 확인
+kubectl get pod
+
+# www.fastcampus-kubernetes.com 도메인 요청을 위한 /etc/hosts 파일 수정 -> 맨밑에 추가 
+sudo vi /etc/hosts
+127.0.0.1 www.fastcampus-kubernetes.com
+
+# nginx 웹서버 컨테이너 포트포워딩 8443:443 
+kubectl port-forward web-server 8443:443
+
+# https 요청 전송 - curl이 서버 인증서를 확인하는 과정을 실행한다 -> 결과: 실패 
+curl -sv https://www.fastcampus-kubernetes.com:8443/myapp
+
+# curl 클라이언트가 nginx 서버로부터 받은 인증서를 신뢰할 수 있도록 자체 서명한 인증서(secrets/https.cert)를 서버 인증서 검증에 사용하도록 설정
+curl --cacert til-by-topic/kubernetes/3.Kubernetes와-Docker로-한-번에-끝내는-컨 테이너-기반-MSA/ch18/secrets/https.cert -sv https://www.fastcampus-kubernetes.com:8443/myapp
+# 결과 - 정상 응답
+
+
+# 컨테이너의 마운팅 경로 /etc/nginx/conf.d, /etc/nginx/tls 확인
+kubectl exec web-server -c nginx -- ls /etc/nginx/conf.d
+kubectl exec web-server -c nginx -- ls /etc/nginx/tls
+kubectl exec web-server -c nginx -- cat /etc/nginx/tls/https.cert # Base64 디코딩 
+
+# 파드 삭제
+kubectl delete pod web-server
+kubectl delete pod my-app
+kubectl delete svc my-app
+kubectl delete configmap nginx-config
+kubectl delete secret tls-config
 ```
