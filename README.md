@@ -6,7 +6,7 @@
 - [kubernetes](./til-by-topic/kubernetes)
 - [aws](./til-by-topic/aws)
 - [msa](https://github.com/sinkyoungdeok/msa)
-- [ELK](https://github.com/sinkyoungdeok/ELK)
+- [ELK](./til-by-topic/elk)
 - [Kafka](./til-by-topic/kafka/)
 - [Kotlin](./til-by-topic/kotlin)
 - [elasticsearch](./til-by-topic/elasticsearch/)
