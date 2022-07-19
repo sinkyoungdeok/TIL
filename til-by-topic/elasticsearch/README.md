@@ -3,6 +3,7 @@
 ## 목록 
 - [1. 설치 명령어](#1-설치-명령어)
 - [2. lucene](#2-lucene)
+- [3. elasticsearch](#3-elasticsearch)
 
 
 
@@ -155,3 +156,88 @@ tar -xvzf logstash-8.3.1-darwin-x86_64.tar.gz
 - Offset은 Token의 Start와 End에 대한 정보를 가짐 
 - 추출된 Token, Position, Offset 정보를 포함해서 Term이라고 하고, 이를 이용해서 강조와 동의어에 활용한다.
 
+
+## 3. elasticsearch
+
+### elasticsearch vs DBMS
+| DBMS | Elasticsearch |
+| --- | --- |
+| DBMS HA 구성(MMM, M/S) | Cluster |
+| DBMS Instance | Node | 
+| Table | Index |
+| Partition | Shared / Routing |
+| Row | Document |
+| Column | Field |
+| Row of columnar data | Serialized JSON document |
+| Join | Nested or Parent/Child |
+| SQL(DML) | QueryDSL |
+| Index | Analyzed |
+| Primary Key | _id |
+| Configuration | elasticsearch.yaml & Settings |
+| Schema | Mappings |
+
+### elasticsearch 설치 
+
+local 에 설치 
+```
+wget https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-8.3.1-darwin-aarch64.tar.gz
+tar -xvzf elasticsearch-8.3.1-darwin-aarch64.tar.gz
+cd elasticsearch-8.3.1
+bin/elasticsearch # 일반 실행 
+bin/elasticsearch -d -p pid # 백그라운드 실행 
+
+curl http://localhost:9200
+
+pkill -F pid # 종료 
+```
+
+docker 에 설치 
+```
+# m1, intel 둘다 됨 
+docker run -d -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" docker.elastic.co/elasticsearch/elasticsearch:7.15.0
+```
+
+### elasticsearch Single Node 구성 - local
+설정 작성 
+```
+vi config/elasticsearch.yml
+
+# 빈곳에 밑에 내용을 작성 
+cluster.name: kdsin
+node.name: single-node
+discovery.type: single-node
+```
+실행 
+```
+bin/elasticsearch -d -p PID
+```
+
+로그 확인 
+```
+curl http://localhost:9200/_cat/nodes\?format\=json\&pretty
+```
+
+### elasticsearch Single Node 구성 - docker compose 
+```
+version: '3.7'
+services:
+    es-singlenode:
+        image: docker.elastic.co/elasticsearch/elasticsearch:7.15.0
+        container_name: es-singlenode
+        environment:
+            - node.name=single-node
+            - cluster.name=kdsin
+            - discovery.type=single-node
+        ports:
+            - 9200:9200
+            - 9300:9300
+        networks:
+            - es-bridge
+networks:
+    es-bridge:
+        driver: bridge
+```
+
+```
+docker-compose -f es-single-node.yml up -d
+```

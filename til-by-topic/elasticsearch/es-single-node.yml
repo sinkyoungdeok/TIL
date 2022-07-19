@@ -1,0 +1,17 @@
+version: '3.7'
+services:
+    es-singlenode:
+        image: docker.elastic.co/elasticsearch/elasticsearch:7.15.0
+        container_name: es-singlenode
+        environment:
+            - node.name=single-node
+            - cluster.name=kdsin
+            - discovery.type=single-node
+        ports:
+            - 9200:9200
+            - 9300:9300
+        networks:
+            - es-bridge
+networks:
+    es-bridge:
+        driver: bridge
