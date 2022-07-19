@@ -241,3 +241,60 @@ networks:
 ```
 docker-compose -f es-single-node.yml up -d
 ```
+
+### elasticsearch Cluster 구성 - local 
+
+```
+cp -rf elasticsearch-8.3.1 es1
+cp -rf elasticsearch-8.3.1 es2
+cp -rf elasticsearch-8.3.1 es3
+
+es1/bin/elasticsearch -d -p PID
+es2/bin/elasticsearch -d -p PID
+es3/bin/elasticsearch -d -p PID
+
+curl localhost:9200/_cat/nodes?v # 실행된 es 3대 확인 
+
+pkill -F es1/pid 
+pkill -F es2/pid 
+pkill -F es3/pid 
+```
+
+```
+vi es1/config/elasticsearch.yml 
+cluster.name: kdsin
+node.name: es1
+node.roles: [ "master" ]
+
+vi es2/config/elasticsearch.yml 
+cluster.name: kdsin
+node.name: es2
+node.roles: [ "master", "data"]
+
+vi es3/config/elasticsearch.yml 
+cluster.name: kdsin
+node.name: es3
+node.roles: [ "master", "data"]
+
+es1/bin/elasticsearch -d -p PID
+es2/bin/elasticsearch -d -p PID
+es3/bin/elasticsearch -d -p PID
+
+curl localhost:9200/_cat/nodes?v # 실행된 es 3대 확인 
+
+pkill -F es1/pid 
+pkill -F es2/pid 
+pkill -F es3/pid 
+```
+
+### node roles 종류
+- data(-d): 
+- ingest(-i): 
+- remote_cluster_client(-r): 각각의 서로 다른 클러스터들 간에 데이터를 함께 조회할 수 있도록 해주는 역할을 함 
+- coordinating node only(-): 데이터를 가질 수 없고, 실제 request response 역할을 함 
+- 등등 
+
+
+### elasticsearch Cluster 구성 - docker compose
+
+
