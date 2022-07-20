@@ -3,7 +3,7 @@
 ## 목록 
 - [1. 설치 명령어](#1-설치-명령어)
 - [2. lucene](#2-lucene)
-- [3. elasticsearch](#3-elasticsearch)
+- [3. elasticsearch 기본 개념](#3-elasticsearch-기본-개념)
 
 
 
@@ -157,7 +157,7 @@ tar -xvzf logstash-8.3.1-darwin-x86_64.tar.gz
 - 추출된 Token, Position, Offset 정보를 포함해서 Term이라고 하고, 이를 이용해서 강조와 동의어에 활용한다.
 
 
-## 3. elasticsearch
+## 3. elasticsearch 기본 개념
 
 ### elasticsearch vs DBMS
 | DBMS | Elasticsearch |
@@ -296,5 +296,31 @@ pkill -F es3/pid
 
 
 ### elasticsearch Cluster 구성 - docker compose
+```
+mkdir kdsin-data1
+mkdir kdsin-logs1
+mkdir kdsin-data2
+mkdir kdsin-logs2
+mkdir kdsin-data3
+mkdir kdsin-logs3
+
+docker-compose -f cluster-node.yml up
+
+curl localhost:9200/_cat/nodes?format=json&pretty
+```
+
+분리해서 실행 방법 (위 처럼 한 파일에 쓰는 방법보다 분리하는게 더 좋음)
+```
+docker-compose -f docker-compose-cluster-node1.yml up -d
+docker-compose -f docker-compose-cluster-node2.yml up -d
+docker-compose -f docker-compose-cluster-node3.yml up -d
+```
 
 
+### elasticsearch Single node VS Cluster node
+- Single Node
+  - 별 다른 설정 없이 실행 
+  - 테스트로 사용하는 경우에 사용
+- Cluster 
+  - cluster.name, node.name, discovery.seed_hosts, cluster.initial_master_nodes, node.roles 설정 필요 
+  - 운영 환경에서 사용 

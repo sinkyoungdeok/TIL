@@ -1,7 +1,7 @@
 version: '3.7'
 services:
   kdsin-es1:
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.12.0
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.15.0
     container_name: kdsin-es1
     environment:
       - node.name=kdsin-es1
@@ -31,18 +31,18 @@ services:
       retries: 3
     restart: always
     volumes:
-      - facam-data1:/usr/share/elasticsearch/data:rw
-      - facam-logs1:/usr/share/elasticsearch/logs:rw
+      - kdsin-data1:/usr/share/elasticsearch/data:rw
+      - kdsin-logs1:/usr/share/elasticsearch/logs:rw
 #      - ${FULL-PATH-DATA}:/usr/share/elasticsearch/data:rw
 #      - ${FULL-PATH-LOG}:/usr/share/elasticsearch/logs:rw
     ports:
       - 9200:9200
       - 9300:9300
     networks:
-      - facam-bridge
+      - kdsin-bridge
 
   kdsin-es2:
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.12.0
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.15.0
     container_name: kdsin-es2
     environment:
       - node.name=kdsin-es2
@@ -72,18 +72,18 @@ services:
       retries: 3
     restart: always
     volumes:
-      - facam-data2:/usr/share/elasticsearch/data:rw
-      - facam-logs2:/usr/share/elasticsearch/logs:rw
+      - kdsin-data2:/usr/share/elasticsearch/data:rw
+      - kdsin-logs2:/usr/share/elasticsearch/logs:rw
 #      - ${FULL-PATH-DATA}:/usr/share/elasticsearch/data:rw
 #      - ${FULL-PATH-LOG}:/usr/share/elasticsearch/logs:rw
     ports:
       - 9201:9200
       - 9301:9300
     networks:
-      - facam-bridge
+      - kdsin-bridge
 
   kdsin-es3:
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.12.0
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.15.0
     container_name: kdsin-es3
     environment:
       - node.name=kdsin-es3
@@ -113,30 +113,30 @@ services:
       retries: 3
     restart: always
     volumes:
-      - facam-data3:/usr/share/elasticsearch/data:rw
-      - facam-logs3:/usr/share/elasticsearch/logs:rw
+      - kdsin-data3:/usr/share/elasticsearch/data:rw
+      - kdsin-logs3:/usr/share/elasticsearch/logs:rw
 #      - ${FULL-PATH-DATA}:/usr/share/elasticsearch/data:rw
 #      - ${FULL-PATH-LOG}:/usr/share/elasticsearch/logs:rw
     ports:
       - 9202:9200
       - 9302:9300
     networks:
-      - facam-bridge
+      - kdsin-bridge
 
 volumes:
-  facam-data1:
+  kdsin-data1:
     driver: local
-  facam-logs1:
+  kdsin-logs1:
     driver: local
-  facam-data2:
+  kdsin-data2:
     driver: local
-  facam-logs2:
+  kdsin-logs2:
     driver: local
-  facam-data3:
+  kdsin-data3:
     driver: local
-  facam-logs3:
+  kdsin-logs3:
     driver: local
 
 networks:
-  facam-bridge:
+  kdsin-bridge:
     driver: bridge

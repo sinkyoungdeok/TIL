@@ -1,0 +1,53 @@
+version: '3.7'
+services:
+  fastcampus-es2:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.12.0
+    container_name: fastcampus-es2
+    environment:
+      - node.name=fastcampus-es2
+      - cluster.name=fastcampus
+      - discovery.seed_hosts=host.docker.internal:9300,fastcampus-es2,host.docker.internal:9302
+      - cluster.initial_master_nodes=fastcampus-es1,fastcampus-es2,fastcampus-es3
+      - path.data=/usr/share/elasticsearch/data
+      - path.logs=/usr/share/elasticsearch/logs
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nproc:
+        soft: 1024000
+        hard: 1024000
+      nofile:
+        soft: 1024000
+        hard: 1024000
+    sysctls:
+      net.core.somaxconn: 65000
+    healthcheck:
+      test: ["CMD-SHELL", "curl --silent --fail localhost:9200/_cat/health || exit 1"]
+      interval: 30s
+      timeout: 30s
+      retries: 3
+    restart: always
+    volumes:
+      - facam-data2:/usr/share/elasticsearch/data:rw
+      - facam-logs2:/usr/share/elasticsearch/logs:rw
+#      - ${FULL-PATH-DATA}:/usr/share/elasticsearch/data:rw
+#      - ${FULL-PATH-LOG}:/usr/share/elasticsearch/logs:rw
+    ports:
+      - 9201:9200
+      - 9301:9300
+    networks:
+      - facam-bridge
+
+volumes:
+  facam-data2:
+    driver: local
+  facam-logs2:
+    driver: local
+
+networks:
+  facam-bridge:
+    driver: bridge
+
