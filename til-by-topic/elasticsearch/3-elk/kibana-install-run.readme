@@ -1,0 +1,26 @@
+다운로드 받기
+$ wget https://artifacts.elastic.co/downloads/kibana/kibana-7.12.0-darwin-x86_64.tar.gz
+$ tar -xvzf kibana-7.12.0-darwin-x86_64.tar.gz
+$ bin/kibana
+
+start.sh)
+#!/bin/bash
+
+DIR_NAME=`dirname "$0"`
+DIR_HOME=`cd $DIR_NAME; pwd`
+
+$DIR_HOME/bin/kibana> /dev/null 2>&1 & KIBANA_PID=$!
+echo $KIBANA_PID > $DIR_HOME/bin/kibana.pid
+
+stop.sh)
+#!/bin/bash드
+
+DIR_NAME=`dirname "$0"`
+DIR_HOME=`cd $DIR_NAME; pwd`
+
+KIBANA_PID=`cat $DIR_HOME/bin/kibana.pid`
+kill -9 $KIBANA_PID
+
+echo "Kibana Daemon($KIBANA_PID) is killed"
+rm -f $DIR_HOME/bin/kibana.pid
+

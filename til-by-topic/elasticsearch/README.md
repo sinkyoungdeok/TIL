@@ -4,6 +4,7 @@
 - [1. 설치 명령어](#1-설치-명령어)
 - [2. lucene](#2-lucene)
 - [3. elasticsearch 기본 개념](#3-elasticsearch-기본-개념)
+- [4. elk 구성](#4-elk-구성)
 
 
 
@@ -324,3 +325,79 @@ docker-compose -f docker-compose-cluster-node3.yml up -d
 - Cluster 
   - cluster.name, node.name, discovery.seed_hosts, cluster.initial_master_nodes, node.roles 설정 필요 
   - 운영 환경에서 사용 
+
+
+## 4. elk 구성
+
+### kibana 기본 개념 
+- 저장된 데이터를 조회하고 분석할 수 있도록 기능을 제공하는 도구 
+- Elastic사에서는 Kibana를 Elasticsearch의 공식 interface라고 이야기함 
+- 초기: Dashboard, Visualization을 제공하기 위한 용도
+- 현재: Elastic Stack을 운영하고 모니터링하는 용도까지 확대 
+- Kibana는 단독으로 사용할 수 있는 도구가 아니고, elasticsearch 와 함께 사용 해야 한다.
+  - elasticsearch 없이, 실행하면 오류 뜬다.
+
+### kiana 구성 - local 
+```
+# elasticsearch 먼저 실행 
+bin/elasticsearch -d -p PID
+
+# kibana 실행 
+bin/kibana
+
+curl localhost:5601
+```
+
+### kibana 구성 - docker compose
+```
+docker-compose -f 1-single-node/es-single-node.yml up -d
+docker-compose -f 3-elk/docker-compose-kibana.yml up -d
+```
+
+``` 
+# 볼륨 활용 
+docker-compose -f 1-single-node/es-single-node.yml up -d
+docker-compose -f 3-elk/docker-compose-kibana-volume.yml up -d
+```
+
+### Logstash 기본 개념 
+- 다양한 소스 데이터를 가공해서 Elasticsearch로 적재하는 도구 
+- 다양한 Input, Filter, Output 의 Pipeline 구조를 가짐
+- 이벤트 데이터에 대한 스트림을 필터할 수 있는 다양한 Codec 사용 가능 
+- 자원을 무겁게 사용하기 때문에 Agent 로 사용하기 보다는 데이터를 받아 정제/가공 후 적재하는 Ingestor 역할로 활용하는게 더 좋다.
+- Pipeline: Input -> Filter -> Output
+
+### Logstash 구성 - local
+
+elasticsearch에서 남긴 log를 logstash에서 input file로 읽고 output으로 elasticsearch로 전송.
+```
+vi elasticsearch-7.15.0/config/log4j2.properties
+# status = error -> status = info 로 변경 / 남기는 로그가 많아지도록 설정 
+
+# elasticsearch 설정 
+bin/elasticsearch -d -p PID
+
+bin/logstash -f 3-elk/logstash-eslog.conf
+```
+
+### Filebeat 기본 개념 
+- Beats라는 플랫폼을 사용하는 Stack 들이 많이 잇다.
+- Beats는 Shipper Agent 역할을 한다.
+- Official Beats 와 Community Beats 들이 다양하게 존재한다.
+- Logstash 보다 리소스를 적게 사용하기 떄문에 Agent로 많이 사용 
+- Pipeline: Input -> Module -> Processor -> Output
+  - Module: 다양한 Input Source 데이터에 대한 수집, 시각화를 위한 형태로 만들어서 제공하기 위한 유틸성 패키지
+  - Processor: 입력 받은 데이터 이벤트의 메시지를 전역으로 처리하기 위해 정의하는 도구 
+
+| Filebeat | Logstash |
+| --- | --- |
+| Input | Input |
+| Module | Codec |
+| Processor | Filter |
+| Output | Output |
+
+
+### Filebeat 구성 - local 
+```
+filebeat-7.15.0-darwin-x86_64/filebeat -e -c 3-elk/filebeat-eslog.yml
+```
