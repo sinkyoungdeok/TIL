@@ -21,6 +21,13 @@
   - [오케스트레이션 없이 문제가 생겼다면](#오케스트레이션-없이-문제가-생겼다면)
   - [오케스트레이션이 있을 때 문제가 생겼다면](#오케스트레이션이-있을-때-문제가-생겼다면)
   - [오케스트레이션의 예시](#오케스트레이션의-예시)
+- [4. Apache Spark 환경 설정](#4-apache-spark-환경-설정)
+  - [필요한 환경 & 패키지](#필요한-환경--패키지)
+  - [아나콘다 설치](#아나콘다-설치)
+  - [java 설치](#java-설치)
+  - [scala 설치](#scala-설치)
+  - [spark 설치](#spark-설치)
+  - [pyspark 설치](#pyspark-설치)
 
 
 
@@ -178,3 +185,38 @@ A & B: ???
 
 <img width="570" alt="image" src="https://user-images.githubusercontent.com/28394879/180633651-bd9cbf63-f3a3-4611-b37c-7a65f6a98aef.png">
 
+## 4. Apache Spark 환경 설정
+
+### 필요한 환경 & 패키지 
+1. python
+2. 주피터 노트북 
+3. java
+4. spark
+5. pyspark
+
+### 아나콘다 설치 
+- https://www.anaconda.com/products/distribution
+- 아나콘다 설치하면 python과 python의 기본 패키지들은 자동으로 설치되고, python과 주피터 노트북을 동시에 쉽게 설치가 가능하다. 
+
+### java 설치 
+```
+brew install --cask adoptopenjdk8
+```
+
+### scala 설치 
+```
+brew install scala
+```
+
+### spark 설치 
+```
+brew install apache-spark
+```
+
+### pyspark 설치 
+```
+pip --version # 경로가 anaconda 인것을 확인
+pip install pyspark
+
+pyspark # spark 터미널이 뜨는지 확인
+```
