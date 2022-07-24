@@ -32,6 +32,12 @@
   - [모빌리티 데이터 다운로드](#모빌리티-데이터-다운로드)
 - [5. spark](#5-spark)
   - [우버 트립수 세기](#우버-트립수-세기)
+  - [hadoop의 특징](#hadoop의-특징)
+  - [spark의 특징](#spark의-특징)
+  - [spark Cluster](#spark-cluster)
+  - [개인 컴퓨터에서는 spark가 느린 이유](#개인-컴퓨터에서는-spark가-느린-이유)
+  - [spark의 핵심 데이터 모델 RDD](#spark의-핵심-데이터-모델-rdd)
+  - [Pandas vs Spark](#pandas-vs-spark)
 
 
 
@@ -255,3 +261,48 @@ spark-submit count_trips.py # 트립 수 세기
 
 python3 visualiza_trips_date.py # 차트로 그리기 
 ``` 
+
+### hadoop의 특징 
+- HDFS 파일 시스템
+- Yarn 리소스 관리 
+- Map Reduce 연산 엔진 -> Spark가 이것을 대체한다.
+
+### spark의 특징 
+- 빠르다 = 빅데이터의 In-Memory 연산 
+- 노드는 필요에 따라 계속 늘릴 수 있다. 
+- 수평적 확장이 가능하다. 
+- Hadoop MapReduce 보다 빠르다
+  - 메모리 상에선 100배
+  - 디스크 상에선 10배 
+- Lazy Evaluation 
+  - 태스크를 정의할 때는 연산을 하지 않다가 결과가 필요할 때 연산한다.
+  - 기다리면서 연산 과정을 최적화 할 수 있다. 
+
+### spark Cluster
+- Driver Program, Cluster Manager, Worker Node 로 이루어져 있다.
+- Driver Program: 우리가 사용하는 컴퓨터, python | java | scala 와 같은 script로 task을 정의한다.
+- Cluster Manager: 정의된 task 즉 일거리를 분배 한다. 
+  - hadoop에서는 yarn cluster manager을 사용할 수 있다.
+  - aws에서는 elastic mapreduce manager을 사용할 수 있다. 
+- Worker Node
+  - 1CPU코어 당 1Node 배치 
+  - 인메모리 연산을 진행한다.
+
+### 개인 컴퓨터에서는 spark가 느린 이유 
+- spark는 확장성을 고려해서 설계 했기 때문 
+
+### spark의 핵심 데이터 모델 RDD 
+- Resilient Distributed Dataset (RDD)
+- 여러 분산 노드에 걸쳐서 저장
+- 변경이 불가능
+- 여러개의 파티션으로 분리 
+
+### Pandas vs Spark
+| Pandas | Spark |
+| --- | --- |
+| 1개의 노드 | 여러개의 노드 |
+| Eager Execution - 코드가 바로 실행 | Lazy Execution - 실행이 필요할 때 까지 기다림 |
+| 컴퓨터 하드웨어에 제한을 받음 | 수평적 확장이 가능 |
+| In-Memory 연산 | In-Memory 연산 |
+| Mutable Data | Immutable Data |
+
