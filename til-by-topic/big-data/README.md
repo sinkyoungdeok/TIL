@@ -40,6 +40,14 @@
   - [Pandas vs Spark](#pandas-vs-spark)
   - [Spark 버전별 특징](#spark-버전별-특징)
   - [Spark 구성](#spark-구성)
+  - [RDD란](#rdd란)
+  - [RDD 특징 - 1. 데이터 추상화](#rdd-특징---1-데이터-추상화)
+  - [RDD 특징 - 2. 탄력적 & 불변](#rdd-특징---2-탄력적--불변)
+  - [RDD 특징 - 3. Type-safe](#rdd-특징---3-type-safe)
+  - [RDD 특징 - 4. Unstructured / Structured Data](#rdd-특징---4-unstructured--structured-data)
+  - [RDD 특징 - 5. Lazy](#rdd-특징---5-lazy)
+  - [Spark Operation](#spark-operation)
+  - [RDD를 쓰는 이유](#rdd를-쓰는-이유)
 
 
 
@@ -339,3 +347,46 @@ python3 visualiza_trips_date.py # 차트로 그리기
 - Spark Streaming
 - MLlib
 - GraphX
+
+
+### RDD란 
+```
+lines = sc.textFile("") # lines == RDD 
+```
+- Resilient Distributed Dataset 
+
+### RDD 특징 - 1. 데이터 추상화  
+- 데이터는 클러스터에 흩어져있지만 하나의 파일인것 처럼 사용 가능 
+
+### RDD 특징 - 2. 탄력적 & 불변
+- 탄력적이고 불변하는 성질이 있다 (Resilient & Immutable)
+- 데이터가 여러군데서 연산을 하다가 여러 노드 중 하나가 망가진다면? (네트워크 장애 | 하드웨어 / 메모리 문제 | 알수없는 갖가지 이유 떄문에)
+- 데이터가 불변(Imuutable) 하면 문제가 일어날 때 복원이 가능해진다.
+- RDD1이 변환을 거치면, RDD1이 바뀌는게 아니라 새로운 RDD2가 만들어진다. (Imuutable)
+- 변환을 거칠 때 마다 연산의 기록이 남는다.
+- RDD의 변환 과정은 하나의 비순환 그래프(Acyclic Graph)로 그릴 수 있는데, 이 특징 덕분에 문제가 생길 경우에 쉽게 전 RDD로 돌아갈 수 있다. 
+- Node 1이 연산 중 문제가 생기면 다시 복원 후 Node2 에서 연산하면 된다. (Resillient)
+
+### RDD 특징 - 3. Type-safe
+- 컴파일시 Type을 판별할 수 있어 문제를 일찍 발견할 수 있다.
+
+### RDD 특징 - 4. Unstructured / Structured Data
+- Structured / Unstructured 둘다 담을 수 있다.
+- Unstructured Data - 로그 or 자연어 
+- Structured Data - RDB or DataFrame
+
+### RDD 특징 - 5. Lazy
+- 결과가 필요할 떄 까지 연산을 하지 않는다 
+- 두가지 연산이 있는데, T = 변환 A = 액션, 예) RDD1 -> T -> RDD2 -> T -> RDD3 -> A --> RDD4
+- 액션을 할 때 까지 변환은 실행되지 않는다.
+- Action을 만나면 그때 변환(T) 연산을 진행한다. 
+
+### Spark Operation
+- Spark Operation = Transform + Action
+
+### RDD를 쓰는 이유 
+- 유연하다
+- 짧은 코드로 할 수 있는게 많다
+- 개발할 때 무엇보다는 어떻게에 대해 더 생각하게 한다 (how-to)
+  - 게으른 연산 덕분에 데이터가 어떻게 변환될지 생각하게 된다
+  - 데이터가 지나갈 길을 닦는 느낌 
