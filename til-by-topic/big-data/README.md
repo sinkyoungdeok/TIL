@@ -38,6 +38,8 @@
   - [개인 컴퓨터에서는 spark가 느린 이유](#개인-컴퓨터에서는-spark가-느린-이유)
   - [spark의 핵심 데이터 모델 RDD](#spark의-핵심-데이터-모델-rdd)
   - [Pandas vs Spark](#pandas-vs-spark)
+  - [Spark 버전별 특징](#spark-버전별-특징)
+  - [Spark 구성](#spark-구성)
 
 
 
@@ -306,3 +308,34 @@ python3 visualiza_trips_date.py # 차트로 그리기
 | In-Memory 연산 | In-Memory 연산 |
 | Mutable Data | Immutable Data |
 
+
+### Spark 버전별 특징 
+- Spark 1.0 
+  - 2014 년 정식 발표 
+  - RDD를 이용한 인메모리 처리 방식
+  - DataFrame (V1.3)
+  - Project Tungsten - 엔진 업그레이드로 메모리와 CPU 효율 회적화 
+- Spark 2.0
+  - 2016 년 발표 
+  - 단순화 되고 성능 개선
+  - Structed Streaming
+  - Dataset 이라는 DataFrame의 확장형 자료구조 등장
+  -  Catalyst Optimizer 프로젝트 - 언어에 상관없이 동일한 성능을 보장 - Scala, Java, Python, R 
+- Spark 3.0
+  - 2020 년 발표 
+  - Mlib 기능 추가
+  - Spark SQL 기능 추가
+  - Spark 2.4보다 약 2배 빨라짐 - Adaptive execution, Dynamic partition pruning
+  - PySpark 사용성 개선
+  - 딥러닝 지원 강화 - GPU노드 지원, 머신러닝 프레임워크와 연계 가능
+  - GraphX - 분산 그래프 연산
+  - Python2 지원이 끊김
+  - 쿠버네티스 지원 강화 
+- 새 기능이 추가되고 성능이 좋아지고 있지만, 근본은 바뀌지 않는다.
+
+### Spark 구성 
+- Spark Core
+- Spark SQL
+- Spark Streaming
+- MLlib
+- GraphX
