@@ -31,7 +31,6 @@
   - [실습 파일 다운로드](#실습-파일-다운로드)
   - [모빌리티 데이터 다운로드](#모빌리티-데이터-다운로드)
 - [5. spark](#5-spark)
-  - [우버 트립수 세기](#우버-트립수-세기)
   - [hadoop의 특징](#hadoop의-특징)
   - [spark의 특징](#spark의-특징)
   - [spark Cluster](#spark-cluster)
@@ -48,6 +47,7 @@
   - [RDD 특징 - 5. Lazy](#rdd-특징---5-lazy)
   - [Spark Operation](#spark-operation)
   - [RDD를 쓰는 이유](#rdd를-쓰는-이유)
+  - [우버 트립수 세기](#우버-트립수-세기)
 
 
 
@@ -265,13 +265,6 @@ git clone https://github.com/keon/data-engineering.git
 
 ## 5. spark
 
-### 우버 트립수 세기
-```
-spark-submit count_trips.py # 트립 수 세기 
-
-python3 visualiza_trips_date.py # 차트로 그리기 
-``` 
-
 ### hadoop의 특징 
 - HDFS 파일 시스템
 - Yarn 리소스 관리 
@@ -390,3 +383,12 @@ lines = sc.textFile("") # lines == RDD
 - 개발할 때 무엇보다는 어떻게에 대해 더 생각하게 한다 (how-to)
   - 게으른 연산 덕분에 데이터가 어떻게 변환될지 생각하게 된다
   - 데이터가 지나갈 길을 닦는 느낌 
+
+### 우버 트립수 세기
+```
+spark-submit count_trips.py # 트립 수 세기 
+
+python3 visualiza_trips_date.py # 차트로 그리기 
+
+jupyter notebook . # 주피터로 count_trips.ipynb 열기 -> 코드에 대한 자세한 설명들 
+``` 
