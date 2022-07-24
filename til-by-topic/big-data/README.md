@@ -30,6 +30,8 @@
   - [pyspark 설치](#pyspark-설치)
   - [실습 파일 다운로드](#실습-파일-다운로드)
   - [모빌리티 데이터 다운로드](#모빌리티-데이터-다운로드)
+- [5. spark](#5-spark)
+  - [우버 트립수 세기](#우버-트립수-세기)
 
 
 
@@ -230,7 +232,7 @@ git clone https://github.com/keon/data-engineering.git
 
 ### 모빌리티 데이터 다운로드 
 - https://www1.nyc.gov/site/tlc/about/tlc-trip-record-data.page
-- March - High Volume For-Hire Vehicle Trip Records 다운로드 
+- 2020 March - High Volume For-Hire Vehicle Trip Records 다운로드 
 - clone 한 리포에 넣기 
   - data-engineering/01-spark/data/fhvhv_tripdata_2020-03.parquet
 
@@ -243,3 +245,13 @@ git clone https://github.com/keon/data-engineering.git
 | PULocationID | 승차 지역 ID |
 | DOLocationID | 하차 지역 ID |
 | SR_Flag | 합승 여부 Flag | 
+
+
+## 5. spark
+
+### 우버 트립수 세기
+```
+spark-submit count_trips.py # 트립 수 세기 
+
+python3 visualiza_trips_date.py # 차트로 그리기 
+``` 
