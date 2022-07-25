@@ -52,6 +52,7 @@
   - [일반 병렬처리](#일반-병렬처리)
   - [분산된 환경에서의 병렬처리](#분산된-환경에서의-병렬처리)
   - [분산처리 문제](#분산처리-문제)
+- [7. RDD](#7-rdd)
   - [Key-Value RDD 이란](#key-value-rdd-이란)
   - [Single-Value RDD vs Key-Value RDD](#single-value-rdd-vs-key-value-rdd)
   - [Key-Value RDD 개념](#key-value-rdd-개념)
@@ -59,6 +60,10 @@
   - [Key-Value RDD - Join](#key-value-rdd---join)
   - [Key-Value RDD - Mapping values](#key-value-rdd---mapping-values)
   - [Key-Value RDD - 예시](#key-value-rdd---예시)
+  - [RDD Transformations vs Actions](#rdd-transformations-vs-actions)
+  - [Transformations](#transformations)
+  - [Narrow Transformations](#narrow-transformations)
+  - [Wide Transformations](#wide-transformations)
 
 
 
@@ -442,6 +447,8 @@ filter를 통해서 데이터양을 줄이고 처리하는것이 효율적이기
 """
 ```
 
+## 7. RDD 
+
 ### Key-Value RDD 이란
 - Structured Data를 Spark와 연계해서 쓸수 있게 해주는 도구 중 하나이다. 
 - Key와 Value 쌍을 갖는 Key-Value RDD
@@ -517,3 +524,50 @@ count = pairs.reduceByKey(lambda a, b,: a+b)
 ```
 1-spark/category-review-average.ipynb
 ```
+
+### RDD Transformations vs Actions
+- Transformation
+  - 결과값으로 새로운 RDD를 반환
+  - 지연 실행 - Lazy Execution 
+  - map()
+  - flatMap()
+  - filter()
+  - distinct()
+  - reduceByKey()
+  - groupByKey()
+  - mapValues()
+  - flatMapValues()
+  - sortByKey()
+- Actions
+  - 결과값을 연산하여 출력하거나 저장 (python object 반환 )
+  - 즉시 실행 - Eager Execution
+  - collect()
+  - count()
+  - countByValues()
+  - take()
+  - top()
+  - reduce()
+  - fold()
+  - foreach()
+
+```
+1-spark/rdd_transformations_actions.ipynb
+```
+
+
+### Transformations
+- transformations = Narrow + Wide 
+
+
+### Narrow Transformations
+- 1:1 변환 
+- filter(), map(), flatMap(), sample(), union()
+- 1열을 조작하기 위해 다른 열/파티션의 데이터를 쓸 필요가 없음.
+
+### Wide Transformations
+- Shuffling
+- Intersection and join, distinct, cartesian, reduceByKey(), groupByKey()
+- 아웃풋 RDD의 파티션에 다른 파티션의 데이터가 들어갈 수 있음 
+- 성능상 많은 리소스를 요구하게 되고, 최소화하고 최적화가 필요하다.
+
+
