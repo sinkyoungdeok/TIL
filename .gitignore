@@ -38,3 +38,7 @@ out/
 
 *.lock
 *.bin
+
+### jupyter
+.ipynb_checkpoints/
+.ipynb_checkpoints/**.ipynb

@@ -52,6 +52,13 @@
   - [일반 병렬처리](#일반-병렬처리)
   - [분산된 환경에서의 병렬처리](#분산된-환경에서의-병렬처리)
   - [분산처리 문제](#분산처리-문제)
+  - [Key-Value RDD 이란](#key-value-rdd-이란)
+  - [Single-Value RDD vs Key-Value RDD](#single-value-rdd-vs-key-value-rdd)
+  - [Key-Value RDD 개념](#key-value-rdd-개념)
+  - [Key-Value RDD - Reduction](#key-value-rdd---reduction)
+  - [Key-Value RDD - Join](#key-value-rdd---join)
+  - [Key-Value RDD - Mapping values](#key-value-rdd---mapping-values)
+  - [Key-Value RDD - 예시](#key-value-rdd---예시)
 
 
 
@@ -421,7 +428,7 @@ RDD.map(<task>)
 - 부분 실패 - 노드 몇개가 프로그램과 상관 없는 이유로 인해 실패 
 - 속도 - 많은 네트워크 통신을 필요로 하는 작업은 속도가 저하 
 
-```
+```python
 RDD.map(A).filter(B).reduceByKey(C).take(100) # 1 
 RDD.map(A).reduceByKey(C).filter(B).take(100) # 2 
 
@@ -433,4 +440,80 @@ filter를 통해서 데이터양을 줄이고 처리하는것이 효율적이기
 메모리 > 디스크 > 네트워크 순으로 빠르기떄문에 메모리에서 최대한 많이 처리하는 것이 좋다.
 네트워크는 메모리 연산에 비해 100만배 정도 느리다 
 """
+```
+
+### Key-Value RDD 이란
+- Structured Data를 Spark와 연계해서 쓸수 있게 해주는 도구 중 하나이다. 
+- Key와 Value 쌍을 갖는 Key-Value RDD
+- (Key, Value) 쌍을 갖기 때문에 Pairs RDD라도고 불림 
+- 간단한 데이터베이스처럼 다룰 수 있다.
+
+### Single-Value RDD vs Key-Value RDD 
+- Single-Value RDD: 테스트에 등장하는 단어 수 세기 (날짜) -> 1차원 적인 연산 
+- Key-Value RDD: 넷플릭스 드라마가 받은 평균 별점 (날짜, 승객수) -> 고차원 적인 연산 
+
+### Key-Value RDD 개념 
+- Key와 Value 쌍을 가진다 
+  - 예) 지역 ID 별로 택시 운행수는 어떻게 될까?
+    - Key: 지역 ID
+    - Value: 운행 수 
+  - 다른예) 드라마 별로 별점 수 모아보기, 평균 구하기 
+  - 다른예) 이커머스 사이트에서 상품당 별 평점 구하기 
+- 코드상으로는 많이 다르지 않다 
+```python 
+pairs = rdd.map(lambda x: (x,1))
+
+"""
+[ 
+  지역
+  지역
+]
+
+[ 
+  (지역, 1)
+  (지역, 1)
+]
+"""
+``` 
+
+### Key-Value RDD - Reduction
+- reduceByKey() - 키 값을 기준으로 테스크 처리
+- groupByKey() - 키 값을 기준으로 벨류를 묶는다
+- sortByKey() - 키 값을 기준으로 정렬
+- keys() - 키 값 추출
+- values() - 벨류값 추출 
+```python
+pairs = rdd.map(lambda x: (x,1))
+count = pairs.reduceByKey(lambda a, b,: a+b) 
+
+"""
+짜장면 
+짜장면
+짬뽕
+짬뽕 
+
+(짜장면, 1)
+(짜장면, 1)
+(짬뽕, 1)
+(짬뽕, 1)
+
+(짜장면, 2)
+(짬뽕, 2)
+"""
+```
+
+### Key-Value RDD - Join
+- join 
+- rightOuterJoin
+- leftOuterJoin
+- subtractByKey
+
+### Key-Value RDD - Mapping values
+- key를 바꾸지 않는경우 map()대신 value만 다루는 mapValues() 함수를 쓰는게 좋다 
+  - spark 내부에서 파티션을 유지할 수 있어서 더욱 효율적이다.
+- mapValues(), flatMapValues() 두개다 Value만 다루는 연산들이고 RDD에서 key는 유지됨 
+
+### Key-Value RDD - 예시 
+```
+1-spark/category-review-average.ipynb
 ```
