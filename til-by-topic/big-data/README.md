@@ -78,6 +78,13 @@
   - [Fold & Partition](#fold--partition)
   - [GroupBy](#groupby)
   - [Aggregate](#aggregate)
+  - [Key-Value RDD Transformations & Actions](#key-value-rdd-transformations--actions)
+  - [Key-Value RDD - GroupByKey](#key-value-rdd---groupbykey)
+  - [Key-Value RDD - ReduceByKey](#key-value-rdd---reducebykey)
+  - [Key-Value RDD - mapValues](#key-value-rdd---mapvalues)
+  - [Key-Value RDD - countByKey](#key-value-rdd---countbykey)
+  - [Key-Value RDD - keys()](#key-value-rdd---keys)
+  - [Key-Value RDD - Joins](#key-value-rdd---joins)
 
 
 
@@ -754,3 +761,100 @@ sc.parallelize([1,2,3,4]).aggregate((0,0), seqOp, combOp) # (10,4)
 sc.parallelize([]).aggregate((0,0), seqOp, combOp) # (0,0)
 ```
 ![image](https://user-images.githubusercontent.com/28394879/181008948-71b5ead0-6178-4b2b-9adf-66d720775aa7.png)
+
+### Key-Value RDD Transformations & Actions
+- Transformations
+  - groupByKey
+  - reduceByKey
+  - mapValues
+  - keys
+  - join (+leftOuterJoin, rightOuterJoin)
+- Actions
+  - countByKey
+- Key-Value RDD에서 Tranformations가 많은 이유: 처리과정에서 나온 결과값이 파티션이 유지가 안되더라도 값이 굉장히 크기 때문에 
+
+### Key-Value RDD - GroupByKey
+- groupBy: 함수를 기준으로 Group
+```python
+rdd = parallelize([1,1,2,3,5,8])
+result = rdd.groupBy(lambda x: x % 2).collect()
+sorted([(x, sorted(y)) for (x,y) in result()])
+# [(0, [2,8]), (1, [1,1,3,5])]
+```
+
+- groupByKey: Key를 기준으로 Group
+```python
+rdd = parallelize([("a", 1), ("b", 1), ("a", 1)])
+sorted(rdd.groupByKey().mapValues(len).collect())
+# [('a',2), ('b',1)]
+
+sorted(rdd.groupByKey().mapValues(list).collect())
+# [('a', [1,1]), ('b', [1])]
+```
+
+### Key-Value RDD - ReduceByKey
+- reduce: 함수를 기준으로 요소들을 합침 (action)
+```python
+sc.parallelize([1,2,3,4,5]).reduce(add) 
+# 15
+```
+
+- reduceBykey: key를 기준으로 그룹을 만들고 합침 (trans)
+```python
+rdd = sc.parallelize([("a",1), ("b",1), ("a",1)])
+sorted(rdd.reduceByKey(add).collect())
+# [('a',2), ('b',1)]
+```
+
+- 개념적으로는 groupByKey + reduction
+- 하지만, groupByKey보다 훨씬 빠르다 
+
+### Key-Value RDD - mapValues
+- 함수를 밸류에게만 적용한다
+- 파티션과 키는 그대로 납둔다. (파티션과 키를 왔다갔다 하지않아서 네트워크 비용을 줄일 수 있다)
+```python
+x = sc.parallelize([("a", ["apple","banana","lemon"]), ("b", ["grapes"])])
+def f(x): return len(x)
+x.mapValues(f).collect()
+# [('a',3), ('b',1)]
+```
+
+### Key-Value RDD - countByKey
+- 각 키가 가진 요소들을 센다
+```python
+rdd = sc.parallelize([("a",1), ("b",1), ("a",1)])
+sorted(rdd.countByKey().items())
+# [('a',2), ('b',1)]
+``` 
+
+
+### Key-Value RDD - keys()
+- Transformation
+- 모든 Key를 가진 RDD를 생성 
+
+```python
+m = sc.parallelize([(1,2), (3,4)]).keys()
+m.collect()
+# [1,3]
+``` 
+
+### Key-Value RDD - Joins
+- Transformation
+- 여러개의 RDD를 합치는데 사용
+- 대표적으로 두가지의 join 방식이 존재한다.
+  - Inner Join (join)
+  - Outer join (left outer, right outer)
+
+```
+rdd1 = sc.parallelize([("foo",1), ("bar",2), ("baz",3)])
+rdd2 = sc.parallelize([("foo",4), ("bar",5), ("bar", 6), ("zoo", 1)])
+
+rdd1.join(rdd2).collect()
+# [('bar',(2,5)), ('bar', (2,6)), ('foo', (1,4))]
+
+rdd1.leftOuterJoin(rdd2).collect()
+# [('baz', (3, None)), ('bar', (2,5)), ('bar', (2,6)), ('foo', (1,4))]
+
+rdd1.rightOuterJoin(rdd2).collect()
+# [('bar', (2,5)), ('bar', (2,6)), ('zoo', (None,1)), ('foo', (1,4))]
+```
