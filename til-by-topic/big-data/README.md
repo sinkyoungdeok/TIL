@@ -67,6 +67,8 @@
   - [Lazy 연산의 장점](#lazy-연산의-장점)
   - [Storage Level](#storage-level)
   - [Cache & Persist](#cache--persist)
+  - [Master Worker Topology](#master-worker-topology)
+  - [Spark 동작 과정](#spark-동작-과정)
 
 
 
@@ -608,3 +610,40 @@ result2 = categoryReviews.mapValues(lambda x: (x,1)).collect()
   - DF: MEMORY_AND_DISK
 - Persist
   - Storage Level을 사용자가 원하는대로 지정 가능 
+
+
+### Master Worker Topology
+- spark는 Master Worker Topology로 구성 되어 있다.
+- 스파크를 쓰면서 잊지 말아야 할 점
+  - 항상 데이터가 여러 곳에 분산되어 있다는 것
+  - 같은 연산이어도 여러 노드에 걸쳐서 실행 된다는 점 
+
+### Spark 동작 과정
+![image](https://user-images.githubusercontent.com/28394879/181002397-623e80e4-ec6f-4a05-a500-19fcfc1ae51b.png)
+
+1. Driver Program이 Spark Context를 생성해서 어플리케이션을 만든다.
+2. Spark Context가 Cluster Manager에 연결을 한다.
+3. Cluster Manager가 자원들을 할당한다.
+4. Cluster Manager가 클러스터에 있는 노드들의 Executor를 수집한다.
+5. Executor들은 연산을 수행하고 데이터를 저장한다.
+6. Spark Context가 Executor 들에게 실행할 Task를 전송한다음에 
+7. 실행된 Task들이 결과값들을 내뱉는데, 이것을 Driver Program에 보내게 된다.
+
+```python
+RDD.foreach(lambda x: print(x)) 
+"""
+Driver Program에서 위 코드를 실행하면 실행결과가 아무것도 나오지 않는다.
+왜냐하면 foreach가 액션이기 때문에, Driver가 아닌 Executor에서 바로 실행 되기 떄문이다.
+"""
+```
+
+```python
+foods = sc.parallelize(["짜장면","마라탕", ...])
+three = foods.take(3)
+
+"""
+three 결과값은 Driver Program에 저장 된다.
+일반적으로 액션은 Driver Pgogram이 Worker Node로부터 데이터를 받는 것 까지 포함 한다.
+결국, Executor에게 take 연산을 시행하라고 명령하고, 그결과를 driver node에게 돌려달라고 요청하는 것이다. 
+"""
+```
