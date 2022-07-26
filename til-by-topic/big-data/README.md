@@ -85,6 +85,18 @@
   - [Key-Value RDD - countByKey](#key-value-rdd---countbykey)
   - [Key-Value RDD - keys()](#key-value-rdd---keys)
   - [Key-Value RDD - Joins](#key-value-rdd---joins)
+  - [Shuffling](#shuffling)
+  - [Partitioner를 이용한 성능 최적화 (Shuffle 최소화)](#partitioner를-이용한-성능-최적화-shuffle-최소화)
+  - [Partition의 목적](#partition의-목적)
+  - [Partition 특징](#partition-특징)
+  - [Partition의 종류](#partition의-종류)
+  - [Hash Partitioning](#hash-partitioning)
+  - [Range Partitioning](#range-partitioning)
+  - [Memory & Disk Partition](#memory--disk-partition)
+  - [Disk Partition](#disk-partition)
+  - [Repartition & Coalesce](#repartition--coalesce)
+  - [연산 중에 파티션을 만드는 작업들](#연산-중에-파티션을-만드는-작업들)
+  - [map vs mapValues](#map-vs-mapvalues)
 
 
 
@@ -858,3 +870,119 @@ rdd1.leftOuterJoin(rdd2).collect()
 rdd1.rightOuterJoin(rdd2).collect()
 # [('bar', (2,5)), ('bar', (2,6)), ('zoo', (None,1)), ('foo', (1,4))]
 ```
+
+
+### Shuffling
+- 그룹핑시 데이터를 한 노드에서 다른노드로 옮길 때 사용
+- 성능을 (많이) 저하시킨다
+- groupByKey를 할 때도 발생한다.
+- 여러 노드에서 데이터를 주고 받게 되서 네트워크 연산의 비용이 높다
+- Shuffle을 일으킬 수 있는 작업들
+  - Join, leftOuterJoin, rightOuterJoin
+  - GroupByKey
+  - ReduceByKey
+  - ComebineByKey
+  - Distinct
+  - Intersection
+  - Repartition
+  - Coalesce
+- Shuffle이 발생하는 시점
+  - 결과로 나오는 RDD가 원본 RDD의 다른 요소를 참조하거나 다른 RDD를 참조할 때 
+
+### Partitioner를 이용한 성능 최적화 (Shuffle 최소화)
+- 미리 파티션을 만들어 두고 캐싱 후 reduceByKey 실행
+- 미리 파티션을 만들어 두고 캐싱 후 join 실행
+- 둘다 파티션과 캐싱을 조합해서 최대한 로컬 환경에서 연산이 실행되도록 하는 방식 
+- 셔플을 최소화하면 10배의 성능 향상이 가능하다.
+
+예시 groupByKey vs reduceByKey
+```
+# reduceByKey
+(textRDD
+.flatMap(lambda lin: line.split()) # 동일한 노드에서 실행
+.map(lambda work: (word, 1)) # 동일한 노드에서 실행 
+.reduceByKey(lambda a, b: a+b)) # 셔플 발생 
+
+# groupByKey
+(textRDD
+.flatMap(lambda line: line.split())
+.map(lambda word: (word,1)) 
+.groupByKey() # 셔플 발생
+.map(lambda (w, counts): (w, sum(counts)))) 
+
+# 가급적이면, groupByKey대신에 reduceByKey로 대체 가능하니까 reduceByKey를 사용하자.
+```
+
+### Partition의 목적
+- 데이터를 최대한 균일하게 퍼트리고, 쿼리가 같이 되는 데이터를 최대한 옆에 두어 검색 성능을 향상 
+
+### Partition 특징 
+- RDD는 쪼개져서 여러 파티션에 저장됨
+- 하나의 파티션은 하나의 노드(서버)에
+- 하나의 노드는 여러개의 파티션을 가질 수 있음
+- 파티션의 크기와 배치는 자유롭게 설정 가능하며 성능에 큰 영향을 미침
+- Key-Value RDD를 사용할 때만 의미가 있다.
+- 스파크의 파티셔닝 == 일반 프로그래밍에서 자료구조를 선택하는 것 
+
+### Partition의 종류 
+- Hash Partitioning
+- Range Partitioning
+
+### Hash Partitioning
+- 데이터를 여러 파티션에 균일하게 분배하는 방식
+- 딕셔너리와 비슷한 방식으로 분배 
+- 잘못된 사용
+  - 데이터를 여러 파티션에 균일하게 분배하는 방식인데,
+  - [극단적인 예] 2개의 파티션이 있는 상황에서 짝수의 Key만 있는 데이터셋에 Hash 함수가 (x%2)인 경우 (한쪽 파티션만 사용.)
+
+### Range Partitioning
+- 순서가 있는, 정렬된 파티셔닝
+- 키의 순서에 따라 정렬
+- 키의 집합의 순서에 따라 정렬   
+- 서비스의 쿼리 패턴이 날짜 위주면 일별 Range Partition 고려 
+
+### Memory & Disk Partition
+- Disk에서: partitionBy() (보통 이것을 많이 사용)
+- 메모리에서: repartition(), coalesce()
+
+### Disk Partition
+- 사용자가 지정한 파티션을 가지는 RDD를 생성하는 함수: partitionBy()
+- 파티션을 만든 후엔 persist()를 해야 한다
+  - 하지않으면, 다음 연산에 불릴떄 마다 반복하게 된다 (셔플링이 반복적으로 일어난다)
+```
+pairs = sc.parallelize([1,2,3,4,2,4,1]).map(lambda x: (x,x))
+pairs.collect()
+# [(1,1),(2,2),(3,3),(4,4),(2,2),(4,4),(1,1)]
+
+pairs.partitionBy(2).glom().collect()
+# [[(2,2), (4,4), (2,2), (4,4)], [(1,1), (3,3), (1,1)]]
+
+pairs.partitionBy(2, lambda x: x%2).glom().collect()
+# [[(2,2), (4,4), (2,2), (4,4)], [(1,1), (3,3), (1,1)]]
+
+# glom은 파티션정보까지 같이 보는 함수 
+```
+
+### Repartition & Coalesce
+- 둘다 파티션의 갯수를 조절하는데 사용
+- 둘다 shuffling을 동반하여 매우 비싼 작업
+- Repartition: 파티션의 크기를 줄이거나 늘리는데 사용
+- Coalesce: 파티션의 크기를 줄이는데 사용 (줄일땐 Repartition보다 성능이 좋음 )
+
+### 연산 중에 파티션을 만드는 작업들 
+- Join (+ Outer join) 
+- groupByKey
+- reduceByKey
+- foldByKey
+- partitionBy
+- Sort
+- mapValues (parent)
+- flatMapValues (parent)
+- filter (parent)
+- 등
+- mapValues, flatMapValues, filter는 parent RDD에서 파티션이 정의되어 있으면 그걸 그대로 사용
+
+### map vs mapValues
+- map, flatMap은 왜 파티션을 안만들까? => map, flatMap은 key값이 바뀔 수 있기 때문에 파티션을 해놓은게 의미가 없어질 수 있기 때문
+- 그래서 파티션이 잘 정의되어 있다면 mapValues, flatMapValues를 쓰는것이 좋다.
+
