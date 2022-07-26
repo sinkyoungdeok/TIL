@@ -69,6 +69,15 @@
   - [Cache & Persist](#cache--persist)
   - [Master Worker Topology](#master-worker-topology)
   - [Spark 동작 과정](#spark-동작-과정)
+  - [Reduction Operations](#reduction-operations)
+  - [Parallel Reduction](#parallel-reduction)
+  - [Reduction Actions](#reduction-actions)
+  - [Reduce](#reduce)
+  - [Partition](#partition)
+  - [Fold](#fold)
+  - [Fold & Partition](#fold--partition)
+  - [GroupBy](#groupby)
+  - [Aggregate](#aggregate)
 
 
 
@@ -647,3 +656,101 @@ three 결과값은 Driver Program에 저장 된다.
 결국, Executor에게 take 연산을 시행하라고 명령하고, 그결과를 driver node에게 돌려달라고 요청하는 것이다. 
 """
 ```
+
+### Reduction Operations
+- Reduction: 요소들을 모아서 하나로 합치는 작업, 많은 Spark의 연산들이 reduction이다.
+- 대부분의 Action은 Reduction이다.
+- Reduction: 근접하는 요소들을 모아서 하나의 결과로 만드는 일 
+- 파일 저장, collect() 등과 같이 Reduction이 아닌 액션도 있다.
+
+### Parallel Reduction
+- 파티션 마다 독립적으로 작업을 처리할 수 있어야 분산된 병렬 처리가 가능하다.
+- 파티션이 다른 파티션의 결과에 의존하게 되면, 한 테스크가 전 테스크를 기다려야 되기 때문에 작업을 동시에 처리할 수 없게 되고 병렬 처리가 불가능해지므로 분산에 의미가 없어진다.
+ 
+
+### Reduction Actions
+- 대표적인 Reduction Actions: Reduce, Fold, GroupBy, Aggregate 
+
+
+### Reduce 
+```python
+from operator import add
+sc.parallelize([1,2,3,4,5]).reduce(add) 
+# 15 
+```
+
+
+### Partition
+- 파티션이 어떻게 나뉠지 프로그래머가 정확히 알기 어렵다.
+- 연산의 순서와 상관 없이 결과 값을 보장하려면 
+  - 교환 법칙 (a*b = b*a)
+  - 결합 법칙 (a*b)*c = a*(b*c)
+```
+# 파티션에 따라 결과 값이 달라지게 된다.
+# 분산된 파티션들의 연산과 합치는 부분을 나눠서 생각해야 한다. 
+
+>>> sc.parallelize([1,2,3,4]).reduce(lambda x,y: (x*2)+y) # 파티션 지정 X 
+26
+>>> sc.parallelize([1,2,3,4],1).reduce(lambda x,y: (x*2)+y) # 파티션 1개로 지정
+26
+>>> sc.parallelize([1,2,3,4],2).reduce(lambda x,y: (x*2)+y) # 파티션 2개로 지정
+18
+>>> sc.parallelize([1,2,3,4],3).reduce(lambda x,y: (x*2)+y) # 파티션 3개로 지정
+18
+>>> sc.parallelize([1,2,3,4],4).reduce(lambda x,y: (x*2)+y) # 파티션 4개로 지정
+26
+
+"""
+(1,2,3,4) -> ((1*2+2)*2+3)*2+4=26 # 파티션 1
+(1,2)(3,4) -> ((1*2+2)*2 + (3*2)+4) = 18 # 파티션 2
+"""
+```
+
+### Fold
+- Reduce와 유사하지만, Fold는 시작값을 설정해준다 라는 부분만 다름.
+```python
+from operator import add
+sc.parallelize([1,2,3,4,5]).fold(0, add) 
+# 15 
+```
+
+
+### Fold & Partition
+```python
+rdd = sc.parallelize([2,3,4],4)
+rdd.reduce(lambda x, y: x*y) # 24
+rdd.fold(1, lambda x, y: x*y) # 24
+
+rdd.reduce(lambda x, y: x+y) # 9 (0+2+3+4 =9)
+rdd.fold(1, lambda x, y: x+y) # 14 (1+1) + (1+2) + (1+3) + (1+4) = 14 , 각 파티션의 시작값이 1
+
+```
+
+
+### GroupBy
+```python
+rdd = sc.parallelize([1,1,2,3,5,8])
+result = rdd.groupBy(lambda x: x % 2).collect()
+sorted([(x, sorted(y)) for (x,y) in result])
+# [(0, [2,8]), (1, [1,1,3,5])]
+```
+
+### Aggregate
+- RDD 데이터 타입과 Action 결과 타입이 다를 경우 사용
+- 파티션 단위의 연산 결과를 합치는 과정을 거친다
+- RDD.aggregate(zeroValue, seqOp, combOp)
+  - zeroValue: 각 파티션에서 누적할 시작 값
+  - seqOp: 타입 변경 함수
+  - combOp: 합치는 함수 
+- 많이 쓰이는 reduction action
+- 대부분의 데이터 작업은 크고 복잡한 데이터 타입 -> 정제된 데이터 
+
+
+```
+seqOp = (lambda x,y: (x[0] + y, x[1] + 1))
+combOp = (lambda x,y: (x[0] + y[0], x[1] + y[1]))
+
+sc.parallelize([1,2,3,4]).aggregate((0,0), seqOp, combOp) # (10,4)
+sc.parallelize([]).aggregate((0,0), seqOp, combOp) # (0,0)
+```
+![image](https://user-images.githubusercontent.com/28394879/181008948-71b5ead0-6178-4b2b-9adf-66d720775aa7.png)
