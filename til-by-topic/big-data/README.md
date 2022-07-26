@@ -64,6 +64,9 @@
   - [Transformations](#transformations)
   - [Narrow Transformations](#narrow-transformations)
   - [Wide Transformations](#wide-transformations)
+  - [Lazy 연산의 장점](#lazy-연산의-장점)
+  - [Storage Level](#storage-level)
+  - [Cache & Persist](#cache--persist)
 
 
 
@@ -571,3 +574,37 @@ count = pairs.reduceByKey(lambda a, b,: a+b)
 - 성능상 많은 리소스를 요구하게 되고, 최소화하고 최적화가 필요하다.
 
 
+### Lazy 연산의 장점 
+- 메모리를 최대한 활용할 수 있다. (디스크, 네트워크 연산을 최소화 할 수 있다.)
+- 데이터를 다루는 task는 반복되는 경우가 많아서(ex 머신러닝 학습), Lazy로 처리하면 비효율적인부분을 효율적으로 처리할 수 있다.
+  - Task -> Disk -> Task -> Disk 로 작업을 하면 Disk에 자주들르게 되어서 비효율적이다.
+  - Task -> Task 로 넘어갈 때 in-memory로 주고받으면 효율적이다.
+  - in-memory로 주고 받으려면 어떤 데이터를 메모리에 남겨야 할 지 알아야 가능하다. 
+  - Transformations는 지연 실행 되기 때문에 메모리에 저장해둘 수 있다.
+
+### Storage Level
+- MEMORY_ONLY: 메모리에만 저장 
+- MEMORY_AND_DISK: 메모리와 디스크 모두 저장, 메모리에 없을경우 디스크까지 보겠다.
+- MEMORY_ONLY_SER: 메모리를 아끼기 위해서 serialize (꺼내올 때 deserialize 과정이 추가됨)
+- MEMORY_AND_DISK_SER: 메모리와 디스크에 serialize
+- DISK_ONLY: 디스크에만
+
+### Cache & Persist
+- 데이터를 메모리에 남겨두고 싶을 때 사용할 수 있는 함수
+```
+categoryReviews = filtered_lines.map(parse)
+
+result1 = categoryReviews.take(10)
+result2 = categoryReviews.mapValues(lambda x: (x,1)).collect()
+
+# categoryReviews는 result1과 result2를 만들면서 2번 만들어짐.
+# .persist()를 추가하면 메모리에 저장해두고 쓸 수 있음 
+# categoryReviews = filtered_lines.map(parse).cache()
+``` 
+
+- Cache
+  - 디폴트 Storage Level 사용 
+  - RDD: MEMORY_ONLY
+  - DF: MEMORY_AND_DISK
+- Persist
+  - Storage Level을 사용자가 원하는대로 지정 가능 
