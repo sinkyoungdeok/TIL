@@ -101,6 +101,18 @@
   - [Structured Data vs Unstructured Data](#structured-data-vs-unstructured-data)
   - [Structured Data vs RDDs](#structured-data-vs-rdds)
   - [Spark SQL](#spark-sql)
+  - [Spark SQL의 목적](#spark-sql의-목적)
+  - [Spark SQL 소개](#spark-sql-소개)
+  - [DataFrame](#dataframe)
+  - [SparkSession](#sparksession)
+  - [DataFrame 만드는 법](#dataframe-만드는-법)
+  - [RDD로부터 DataFrame 만들기](#rdd로부터-dataframe-만들기)
+  - [파일로부터 DataFrame 만들기](#파일로부터-dataframe-만들기)
+  - [DataFrame을 데이터베이스 테이블처럼 사용하기](#dataframe을-데이터베이스-테이블처럼-사용하기)
+  - [Spark에서 사용할 수 있는 SQL문](#spark에서-사용할-수-있는-sql문)
+  - [Python에서 Spark SQL 사용하기](#python에서-spark-sql-사용하기)
+  - [RDD를 사용안하고 DataFrame을 사용했을 때의 장점](#rdd를-사용안하고-dataframe을-사용했을-때의-장점)
+  - [Datasets](#datasets)
 
 
 
@@ -1020,3 +1032,136 @@ join().filter() vs filter().join() 을 비교하면 당연히 filter().join()이
 - 유저가 일일이 function을 정의하는 일 없이 작업을 수행 할 수 있다.
 - 자동으로 연산이 최적화 된다 
 
+### Spark SQL의 목적 
+- 스파크 프로그래밍 내부에서 관계형 처리를 하기 위해 사용
+- 스키마의 정보를 이용해 자동으로 최적화를 하기 위해 사용
+- 외부 데이터셋을 사용하기 쉽게 하기 위해 사용 
+
+### Spark SQL 소개 
+- 스파크 위에 구현된 하나의 패키지
+- 3개의 주요 API
+  - SQL
+  - DataFrame
+  - Datasets
+- 2개의 백엔드 컴포넌트
+  - Catalyst - 쿼리 최적화 엔진
+  - Tungsten - 시리얼라이저(용량 최적화)
+
+### DataFrame
+- Spark Core에 RDD가 있다면, Spark SQL에는 DataFrame이 있다.
+- DataFrame은 테이블 데이터셋이라고 보면 됨
+- 개념적으로는 RDD에 스키마가 적용된 것이라고 보면 됨 
+
+### SparkSession
+- Spark Core에 SparkContext가 있다면 Spark SQL에는 SparkSession이 있다.
+
+```python
+spark = SparkSession.builder.appName("test-app").getOrCreate()
+```
+
+### DataFrame 만드는 법
+- RDD에서 스키마를 정의한다음 변형을 하거나
+- CSV, JSON등의 데이터를 받아오면 된다
+
+
+### RDD로부터 DataFrame 만들기 
+- Schema를 자동으로 유추해서 DataFrame 만들기
+- Schema를 사용자가 정의하기 
+
+```python
+# RDD 만들기
+lines = sc.textfile("example.csv")
+data = lines.map(lambda x: x.split(","))
+preprocessed = data.map(lambda x: Row(name=x[0], price=int(x[1])))
+ 
+# Infer (Schema를 유추해서 만들기)
+df = spark.createDataFrame(preprocessed)
+
+# Specify (Schema를 사용자가 정의하기)
+schema = StructType(
+  StructField("name", StringType(), True),
+  StructField("price", StringType(), True)
+)
+spark.createDataFrame(preprocessed, schema).show()
+```
+
+### 파일로부터 DataFrame 만들기 
+```python
+from pyspark.sql import SparkSession
+spark = SparkSession.builder.appName("test-app").getOrCreate()
+
+# JSON
+dataframe = spark.read.json('dataset/nyt2.json')
+# TXT FILE
+dataframe_txt = spark.read.text('text_data.txt')
+# CSV FILE
+dataframe_csv = spark.read.csv('csv_data.csv')
+# PARQUET FILE
+dataframe_parquet = spark.read.load('parquet.data.parquet')
+```
+
+### DataFrame을 데이터베이스 테이블처럼 사용하기 
+- createOrReplaceTempView() 함수로 temporary view를 만들어 줘야 함.
+```python
+data.createOrReplaceTempView("mobility_data")
+spark.sql("SELECT pickup_datetime FROM mobility_data LIMIT 5").show()
+``` 
+
+
+### Spark에서 사용할 수 있는 SQL문 
+- Hive Query Language와 거의 동일 
+- Select
+- From
+- Where
+- Count
+- Having
+- Group By
+- Order By
+- Sort By
+- Distinct
+- Join
+
+### Python에서 Spark SQL 사용하기 
+- Spark SQL을 사용하기 위해 사용하는 SparkSession
+- SparkSession 으로 불러오는 데이터는 DataFrame
+```python
+from pyspark.sql import SparkSession
+spark = SparkSession.builder.appName("test-app").getOrCreate()
+
+# JSON
+dataframe = spark.read.json('dataset/nyt2.json')
+# TXT FILE
+dataframe_txt = spark.read.text('text_data.txt')
+# CSV FILE
+dataframe_csv = spark.read.csv('csv_data.csv')
+# PARQUET FILE
+dataframe_parquet = spark.read.load('parquet.data.parquet')
+```
+
+- SQL문을 사용해서 쿼리가 가능하다.
+```python
+data.createOrReplaceTempView("mobility_data")
+spark.sql("SELECT pickup_datetime FROM mobility_data LIMIT 5").show()
+```
+
+- 함수를 사용해서 쿼리도 가능하다.
+```python
+df.select(df['name'], df['age'] + 1).show()
+
+df.filter(df['age'] > 21).show()
+
+df.groupBy("age").count().show()
+``` 
+
+- DataFrame을 RDD로 변환해 사용할 수도 있다.
+  - `rdd = df.rdd.map(tuple)`
+  - (하지만, RDD를 덜 사용하는 쪽이 좋다)
+
+### RDD를 사용안하고 DataFrame을 사용했을 때의 장점 
+- MLLib이나 Spark Streaming 같은 다른 스파크 모듈들과 사용하기 편하다.
+- 개발하기 편하다.
+- 최적화도 알아서 된다.
+
+### Datasets
+- Type이 있는 DataFrame
+- PySpark에선 크게 신경쓰지 않아도 된다.
