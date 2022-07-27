@@ -97,7 +97,10 @@
   - [Repartition & Coalesce](#repartition--coalesce)
   - [연산 중에 파티션을 만드는 작업들](#연산-중에-파티션을-만드는-작업들)
   - [map vs mapValues](#map-vs-mapvalues)
-
+- [8. Spark SQL](#8-spark-sql)
+  - [Structured Data vs Unstructured Data](#structured-data-vs-unstructured-data)
+  - [Structured Data vs RDDs](#structured-data-vs-rdds)
+  - [Spark SQL](#spark-sql)
 
 
 
@@ -985,4 +988,35 @@ pairs.partitionBy(2, lambda x: x%2).glom().collect()
 ### map vs mapValues
 - map, flatMap은 왜 파티션을 안만들까? => map, flatMap은 key값이 바뀔 수 있기 때문에 파티션을 해놓은게 의미가 없어질 수 있기 때문
 - 그래서 파티션이 잘 정의되어 있다면 mapValues, flatMapValues를 쓰는것이 좋다.
+
+
+## 8. Spark SQL
+
+join().filter() vs filter().join() 을 비교하면 당연히 filter().join()이 성능이 더 빠르다.  
+위와 같은 고민을 스파크가 알아서 해주면 좋겠는데, 어떻게 가능할까?  
+데이터가 구조화 되어 있다면 자동으로 최적화가 가능하다.
+
+### Structured Data vs Unstructured Data 
+- Unstructured: Free Form 
+  - 로그 파일 
+  - 이미지
+- Semi Structured: 행과 열
+  - CSV
+  - JSON
+  - XML
+- Structured: 행과 열 + 데이터 타입 (스키마)
+  - 데이터베이스
+
+### Structured Data vs RDDs
+- RDD에서는 
+  - 데이터의 구조를 모르기 떄문에 데이터를 다루는 것을 개발자에게 의존한다.
+  - map, flatMap, filter 등을 통해 유저가 만든 function을 수행
+- Structured Data에서는
+  - 데이터의 구조를 이미 알고 있으므로 어떤 테스크를 수행할 것인지 정의만 하면 됨
+  - 최적화도 자동으로 할 수 있음 
+
+### Spark SQL
+- 구조화된 데이터를 다룰 수 있게 해준다.
+- 유저가 일일이 function을 정의하는 일 없이 작업을 수행 할 수 있다.
+- 자동으로 연산이 최적화 된다 
 
