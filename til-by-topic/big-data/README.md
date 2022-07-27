@@ -113,6 +113,7 @@
   - [Python에서 Spark SQL 사용하기](#python에서-spark-sql-사용하기)
   - [RDD를 사용안하고 DataFrame을 사용했을 때의 장점](#rdd를-사용안하고-dataframe을-사용했을-때의-장점)
   - [Datasets](#datasets)
+  - [SQL 실습](#sql-실습)
 
 
 
@@ -1165,3 +1166,8 @@ df.groupBy("age").count().show()
 ### Datasets
 - Type이 있는 DataFrame
 - PySpark에선 크게 신경쓰지 않아도 된다.
+
+### SQL 실습 
+```
+./1-spark/learn-sql.ipynb
+```
