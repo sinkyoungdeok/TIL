@@ -114,6 +114,13 @@
   - [RDD를 사용안하고 DataFrame을 사용했을 때의 장점](#rdd를-사용안하고-dataframe을-사용했을-때의-장점)
   - [Datasets](#datasets)
   - [SQL 실습](#sql-실습)
+  - [DataFrame 특징](#dataframe-특징)
+  - [DataFrame의 스키마를 확인하는 법](#dataframe의-스키마를-확인하는-법)
+  - [DataFrame Operations](#dataframe-operations)
+  - [DataFrame Select](#dataframe-select)
+  - [DataFrame Agg](#dataframe-agg)
+  - [DataFrame GroupBy](#dataframe-groupby)
+  - [DataFrame Join](#dataframe-join)
 
 
 
@@ -1171,3 +1178,79 @@ df.groupBy("age").count().show()
 ```
 ./1-spark/learn-sql.ipynb
 ```
+
+
+### DataFrame 특징
+- 관계형 데이터이다.
+- 한마디로 관계형 데이터셋 = RDD + Relation
+- RDD가 함수형 API를 가졌다면 DataFrame은 선언형 API
+- 자동으로 최적화가 가능
+- 타입이 없다 
+- RDD의 확장판 
+  - 지연 실행 (Lazy Execution)
+  - 분산 저장
+  - Immutable
+  - 열(Row) 객체가 있다
+  - SQL 쿼리를 실행할 수 있다.
+  - 스키마를 가질 수 있고 이를 통해 성능을 더욱 최적화 할 수 있다
+  - CSV, JSON, Hive 등으로 읽어오거나 변환이 가능 
+
+### DataFrame의 스키마를 확인하는 법 
+- dtypes
+- show()
+  - 테이블 형태로 데이터를 출력
+  - 첫 20개의 열만 보여준다
+- printSchema()
+  - 스키마를 트리 형태로 볼 수 있다.
+
+### DataFrame Operations
+- SQL 과 비슷한 작업이 가능하다.
+- Select
+- Where
+- Limit
+- OrderBy
+- GroupBy
+- Join
+
+### DataFrame Select
+- 사용자가 원하는 Column이나 데이터를 추출 하는데 사용 
+```python
+df.select('*').collect()
+df.select('name','age').collect()
+df.select(df.name, (df.age+10).alias('age')).collect()
+``` 
+
+### DataFrame Agg
+- Aggregate의 약자로, 그룹핑 후 데이터를 하나로 합치는 작업 
+```python
+df.agg({"age",: "max"}).collect() 
+# [Row(max(age)=5)]
+
+from pyspark.sql improt functions as F
+df.agg(F.min(df.age)).collect()
+# [Row(min(age)=2)]
+``` 
+
+### DataFrame GroupBy
+- 사용자가 지정한 column을 기준으로 데이터를 Grouping하는 작업 
+```python
+df.groupBy().avg().collect()
+# [Row(avg(age)=3.5)]
+
+sorted(df.groupBy('name').agg({'age': 'mean'}).collect())
+# [Row(name='Alice', avg(age)=2.0), Row(name='Bob', avg(age)=5.0)]
+
+sorted(df.groupBy(df.name).avg().collect())
+# [Row(name='Alice', avg(age)=2.0), Row(name='Bob', avg(age)=5.0)]
+
+sorted(df.groupBy(['name', df.age]).count().collect())
+# [Row(name='Alice', age=2, count=1), Row(name='Bob', age=5, count=1)]
+``` 
+
+### DataFrame Join
+- 다른 DataFrame과 사용자가 지정한 Column을 기준으로 합치는 작업 
+```python
+df.join(df2, 'name').select(df.name, df2.height).collect()
+# [Row(name='Bob', height=85)]
+``` 
+
