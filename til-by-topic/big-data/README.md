@@ -121,6 +121,7 @@
   - [DataFrame Agg](#dataframe-agg)
   - [DataFrame GroupBy](#dataframe-groupby)
   - [DataFrame Join](#dataframe-join)
+  - [Spark SQL로 트립 수 세기](#spark-sql로-트립-수-세기)
 
 
 
@@ -1254,3 +1255,8 @@ df.join(df2, 'name').select(df.name, df2.height).collect()
 # [Row(name='Bob', height=85)]
 ``` 
 
+### Spark SQL로 트립 수 세기 
+- 이전에 RDD로 실습해보았는데, 이번엔 Spark SQL로 해보자. 
+```
+./1-spark/trip_count_sql.ipynb
+```
