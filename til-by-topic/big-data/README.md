@@ -132,6 +132,7 @@
   - [Logical Planning 최적화](#logical-planning-최적화)
   - [Explain](#explain)
   - [Tungsten](#tungsten)
+  - [UDF](#udf)
 
 
 
@@ -1352,3 +1353,13 @@ spark.sql(query).explain(True)
   - 메모리 관리 최적화
   - 캐시 활용 연산
   - 코드 생성 
+
+
+### UDF 
+- user-defined-functions
+- sql 문안에서 쓸 수 있는 function을 만드는것
+
+실습
+```
+./1-spark/user-defined-functions.ipynb
+``` 
