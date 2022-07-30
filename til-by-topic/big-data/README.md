@@ -123,6 +123,15 @@
   - [DataFrame Join](#dataframe-join)
   - [Spark SQL로 트립 수 세기](#spark-sql로-트립-수-세기)
   - [Spark SQL로 뉴욕의 각 행정구 별 데이터 추출하기](#spark-sql로-뉴욕의-각-행정구-별-데이터-추출하기)
+  - [Spark의 두개의 엔진](#spark의-두개의-엔진)
+  - [Logical Plan이란](#logical-plan이란)
+  - [Physical Plan이란](#physical-plan이란)
+  - [Catalyst 란](#catalyst-란)
+  - [Catalyst Logical Plan -> Physical Plan 동작 순서](#catalyst-logical-plan---physical-plan-동작-순서)
+  - [Catalyst Pipeline](#catalyst-pipeline)
+  - [Logical Planning 최적화](#logical-planning-최적화)
+  - [Explain](#explain)
+  - [Tungsten](#tungsten)
 
 
 
@@ -1267,3 +1276,79 @@ df.join(df2, 'name').select(df.name, df2.height).collect()
 ```
 ./1-spark/trip_count_sql_by_zone-Copy1.ipynb
 ```
+
+### Spark의 두개의 엔진 
+- 스파크는 쿼리를 돌리기 위해 두가지 엔진을 사용한다.
+- Catalyst, Tungsten
+
+### Logical Plan이란
+- 수행 해야 하는 모든 transformation 단계에 대한 추상화
+- 데이터가 어떻게 변해야 하는지 정의하지만,
+- 실제 어디서 어떻게 동작 하는지는 정의하지 않음
+
+### Physical Plan이란 
+- Logical Plan이 어떻게 클러스터 위에서 실행 될지 정의
+- 실행 전략을 만들고 Cost Model에 따라 최적화
+
+### Catalyst 란 
+- SQL과 DataFrame이 구조가 있는 데이터를 다룰 수 있게 해주는 모듈 
+- Logical Plan을 Physical Plan으로 바꾸는 일을 한다.
+
+### Catalyst Logical Plan -> Physical Plan 동작 순서
+1. 분석: DataFrame 객체의 relation을 계산, 칼럼의 타입과 이름 확인 
+2. Logical Plan 최적화
+   1. 상수로 표현된 표현식을 Compile Time에 계산 (x runtime)
+   2. Predicate Pushdown: join & filter -> filter & join
+   3. Projection Pruning: 연산에 필요한 칼럼만 가져오기 
+3. Physical Plan 만들기: Spark에서 실행 가능한 Plan으로 변환 
+4. 코드 제네레이션: 최적화된 Physical Plan을 Java Bytecode로 
+
+
+### Catalyst Pipeline
+![image](https://user-images.githubusercontent.com/28394879/181866781-ef7fdbb0-f0e4-4994-85ac-7625c6235e9b.png)
+
+### Logical Planning 최적화 
+
+```sql
+SELECT zone_data.Zone, count(*) AS trips \
+  FROM trip_data JOIN zone_data \
+  ON trip_data.PULocationID = zone_data.LocationID \
+  WHERE trip_data.hvfhs_license_num = 'HV0003' \
+  GROUP BY zone_data.Zone order by trips desc
+```
+
+기본 순서
+1. Scan: 두개의 테이블에서 데이터 추출
+2. Join: `join`
+3. Filter: `trip_data.hvfhs_license_num = 'HV0003`
+4. Project: `count(*) AS trips`
+5. Aggregate: `group by`
+
+최적화 
+1. Scan: 두개의 테이블에서 데이터 추출
+2. Filter: `trip_data.hvfhs_license_num = 'HV0003`
+3. Join: `join`
+4. Project: `count(*) AS trips`
+5. Aggregate: `group by`
+
+
+### Explain 
+```python
+spark.sql(query).explain(True)
+```
+
+![image](https://user-images.githubusercontent.com/28394879/181867021-4e99de57-a90c-4e1a-ac9a-d8e0ac99b2e5.png)
+- explain(True) 명령어를 입력하면 아래의 정보들을 보여준다 
+  - Parsed Logical Plan: 사용자가 쓴 코드 그대로 
+  - Analyzed Logical Plan: 사용자가 지정한 테이블의 무슨 컬럼이 있는지 확인한다.
+  - Optimized Logical Plan: Filtering코드를 더 빨리 하는 등 최적화된 코드를 보여준다 
+  - Physical Plan: 디테일한 Plan을 보여줌
+- explain(True 없이) 명령어를 입력하면 아래 정보만 나온다.
+  - Physical Plan
+
+### Tungsten
+- Physical Plan이 선택되고 나면 분산 환경에서 실행될 Bytecode가 만들어진다. (Code Generation)
+- 스파크 엔진의 성능 향상이 목적
+  - 메모리 관리 최적화
+  - 캐시 활용 연산
+  - 코드 생성 
