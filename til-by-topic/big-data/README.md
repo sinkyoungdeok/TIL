@@ -122,6 +122,7 @@
   - [DataFrame GroupBy](#dataframe-groupby)
   - [DataFrame Join](#dataframe-join)
   - [Spark SQL로 트립 수 세기](#spark-sql로-트립-수-세기)
+  - [Spark SQL로 뉴욕의 각 행정구 별 데이터 추출하기](#spark-sql로-뉴욕의-각-행정구-별-데이터-추출하기)
 
 
 
@@ -1259,4 +1260,10 @@ df.join(df2, 'name').select(df.name, df2.height).collect()
 - 이전에 RDD로 실습해보았는데, 이번엔 Spark SQL로 해보자. 
 ```
 ./1-spark/trip_count_sql.ipynb
+```
+
+### Spark SQL로 뉴욕의 각 행정구 별 데이터 추출하기
+- 두 테이블의 JOIN 실습 
+```
+./1-spark/trip_count_sql_by_zone-Copy1.ipynb
 ```
