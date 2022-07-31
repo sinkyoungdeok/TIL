@@ -134,6 +134,18 @@
   - [Tungsten](#tungsten)
   - [UDF](#udf)
   - [뉴욕 택시 데이터 분석](#뉴욕-택시-데이터-분석)
+- [9. MLlib](#9-mllib)
+  - [MLlib이란](#mllib이란)
+  - [Machine Learning 이란](#machine-learning-이란)
+  - [MLlib의 여러 컴포넌트](#mllib의-여러-컴포넌트)
+  - [ML 파이프라인 구성](#ml-파이프라인-구성)
+  - [MLlib으로 할 수 있는 것들](#mllib으로-할-수-있는-것들)
+  - [MLlib은 DataFrame위에서 동작한다.](#mllib은-dataframe위에서-동작한다)
+  - [MLlib의 주요 Components](#mllib의-주요-components)
+  - [MLlib - Transformer](#mllib---transformer)
+  - [MLlib - Estimator](#mllib---estimator)
+  - [MLlib - Evaluator](#mllib---evaluator)
+  - [MLlib - Pipeline](#mllib---pipeline)
 
 
 
@@ -1369,3 +1381,95 @@ spark.sql(query).explain(True)
 ```
 ./1-spark/taxi-analysis.ipynb
 ```
+
+## 9. MLlib
+
+### MLlib이란 
+- Machine Learning Library
+- ML을 쉽고 확장성 있게 적용하기 위해 사용
+- 머신러닝 파이프라인 개발을 쉽게 하기 위해 
+
+### Machine Learning 이란 
+- 데이터를 이용해 코딩을 하는 일 
+- 최적화와 같은 방법을 통해 패턴을 찾는일 
+
+### MLlib의 여러 컴포넌트 
+- 알고리즘
+  - Classification
+  - Regression
+  - Clustering
+  - Recommendation
+- 파이프라인
+  - Training
+  - Evaluating
+  - Tuning
+  - Persistence
+- Feature Engineering
+  - Extraction
+  - Transformation
+- Utils
+  - Linear algebra
+  - Statistics
+
+### ML 파이프라인 구성
+- 데이터 로딩 -> 전처리 -> 학습 -> 모델 평가
+- 파라미터 튜닝 후 위 과정을 다시 시도 
+
+### MLlib으로 할 수 있는 것들
+- 피쳐 엔지니어링
+- 통계적 연산
+- 흔히 쓰이는 ML알고리즘들
+  - Regression (Linea, Logistic)
+  - Support Vector Machines
+  - Naive Bayes
+  - Decision Tree
+  - K-Means clustering
+- 추천 (Alternating Least Squares)
+
+### MLlib은 DataFrame위에서 동작한다.
+- 아직 RDD API가 있지만, "maintenance mode"
+  - 새로운 API는 개발이 끊김
+- DataFrame을 쓰는 MLlib API를 Spark ML이라고도 부름 
+
+### MLlib의 주요 Components
+- DataFrame
+- Transformer
+- Estimator
+- Evaluator
+- Pipeline
+- Parameter
+
+### MLlib - Transformer
+- 피쳐 변환과 학습된 모델을 추상화
+- 모든 Transformer는 transform() 함수를 갖고 있다
+- 데이터를 학습이 가능한 포멧으로 바꾼다
+- DF를 받아 새로운 DF를 만드는데, 보통 하나 이상의 column을 더하게 된다
+- 예)
+  - Data Normalization
+  - Tokenization
+  - 카테고리컬 데이터를 숫자로 (one-hot encoding)
+
+### MLlib - Estimator
+- 모델의 학습 과정을 추상화
+- 모든 Estimator는 fit() 함수를 갖고 있다
+- fit()은 DataFrame을 받아 Model을 반환
+- 모델을 하나의 Transformer
+- 예)
+  - lr = LinearRegression()
+  - model = lr.fit(data) 
+
+### MLlib - Evaluator
+- metric을 기반으로 모델의 성능을 평가
+  - 예) Root mean squared error (RMSE)
+- 모델을 여러개 만들어서, 성능을 평가 후 가장 좋은 모델을 뽑는 방식으로 모델 튜닝을 자동화 할 수 있다.
+- 예)
+  - BinarClassificationEvaluator
+  - CrossValidator
+
+### MLlib - Pipeline
+- ML의 워크플로우를 정의할 때 사용
+- 여러 stage를 담고 있다
+- 저장될 수 있다. (persist)
+- 파이프라인 예: 데이터로딩 -> 전처리 -> 학습 -> 모델평가 
+- Transformer -> Tranformer -> Estimator -> Evaluator -> Model 
+
