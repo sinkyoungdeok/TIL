@@ -152,6 +152,7 @@
   - [영화 추천 파이프라인 구축](#영화-추천-파이프라인-구축)
   - [Supervised Leaning](#supervised-leaning)
   - [택시비 예측하기1](#택시비-예측하기1)
+  - [택시비 예측하기2](#택시비-예측하기2)
 
 
 
@@ -1510,4 +1511,9 @@ spark.sql(query).explain(True)
  ### 택시비 예측하기1
  ```
  ./1-spark/taxi-fare-prediction.ipynb
+ ```
+
+ ### 택시비 예측하기2 
+ ```
+  ./1-spark/taxi-fare-prediction-2.ipynb
  ```
