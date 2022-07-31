@@ -147,6 +147,8 @@
   - [MLlib - Evaluator](#mllib---evaluator)
   - [MLlib - Pipeline](#mllib---pipeline)
   - [첫 파이프라인 구축](#첫-파이프라인-구축)
+  - [ALS 추천 알고리즘](#als-추천-알고리즘)
+  - [추천이란](#추천이란)
 
 
 
@@ -1479,3 +1481,15 @@ spark.sql(query).explain(True)
 ./1-spark/logistic-regression.ipynb
 ./1-spark/pipeline.ipynb
 ```
+
+### ALS 추천 알고리즘 
+- Alternating Least Squares
+
+<img width="410" alt="image" src="https://user-images.githubusercontent.com/28394879/182013892-443abd23-5c92-438d-97ff-0e5cf6d15f87.png">
+- 유저 A와 B의 취향이 비슷하다는 것을 알 수 있다.
+- 이때, 유저 A에게 Casablanca를 추천하는 알고리즘이다.
+
+### 추천이란 
+- 아직 못본 영화들의 평점을 예하고,
+- 값을 정렬해서 제일 위에서 부터 유저에게 전달하는 것이 추천이다.
+
