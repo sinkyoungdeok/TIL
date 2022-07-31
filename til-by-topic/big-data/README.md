@@ -146,6 +146,7 @@
   - [MLlib - Estimator](#mllib---estimator)
   - [MLlib - Evaluator](#mllib---evaluator)
   - [MLlib - Pipeline](#mllib---pipeline)
+  - [첫 파이프라인 구축](#첫-파이프라인-구축)
 
 
 
@@ -1473,3 +1474,8 @@ spark.sql(query).explain(True)
 - 파이프라인 예: 데이터로딩 -> 전처리 -> 학습 -> 모델평가 
 - Transformer -> Tranformer -> Estimator -> Evaluator -> Model 
 
+### 첫 파이프라인 구축 
+```
+./1-spark/logistic-regression.ipynb
+./1-spark/pipeline.ipynb
+```
