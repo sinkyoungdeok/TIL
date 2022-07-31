@@ -151,6 +151,7 @@
   - [추천이란](#추천이란)
   - [영화 추천 파이프라인 구축](#영화-추천-파이프라인-구축)
   - [Supervised Leaning](#supervised-leaning)
+  - [택시비 예측하기1](#택시비-예측하기1)
 
 
 
@@ -1506,4 +1507,7 @@ spark.sql(query).explain(True)
 - Regression: 예측된 값이 실수
 - Classification: 예측된 값이 클래스(카테고리)
 
- 
+ ### 택시비 예측하기1
+ ```
+ ./1-spark/taxi-fare-prediction.ipynb
+ ```
