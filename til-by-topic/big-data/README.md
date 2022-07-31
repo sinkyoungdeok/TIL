@@ -153,6 +153,8 @@
   - [Supervised Leaning](#supervised-leaning)
   - [택시비 예측하기1](#택시비-예측하기1)
   - [택시비 예측하기2](#택시비-예측하기2)
+  - [하이퍼 파라미터 최적화](#하이퍼-파라미터-최적화)
+  - [모델 저장 & 로딩](#모델-저장--로딩)
 
 
 
@@ -1508,12 +1510,22 @@ spark.sql(query).explain(True)
 - Regression: 예측된 값이 실수
 - Classification: 예측된 값이 클래스(카테고리)
 
- ### 택시비 예측하기1
- ```
- ./1-spark/taxi-fare-prediction.ipynb
- ```
+### 택시비 예측하기1
+```
+./1-spark/taxi-fare-prediction.ipynb
+```
 
- ### 택시비 예측하기2 
- ```
-  ./1-spark/taxi-fare-prediction-2.ipynb
- ```
+### 택시비 예측하기2 
+```
+./1-spark/taxi-fare-prediction-2.ipynb
+```
+
+### 하이퍼 파라미터 최적화 
+```
+./1-spark/taxi-fare-prediction-hyper.ipynb
+```
+
+### 모델 저장 & 로딩 
+```
+./1-spark/taxi-fare-prediction-hyper.ipynb
+```
