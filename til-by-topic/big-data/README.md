@@ -150,6 +150,7 @@
   - [ALS 추천 알고리즘](#als-추천-알고리즘)
   - [추천이란](#추천이란)
   - [영화 추천 파이프라인 구축](#영화-추천-파이프라인-구축)
+  - [Supervised Leaning](#supervised-leaning)
 
 
 
@@ -1498,3 +1499,11 @@ spark.sql(query).explain(True)
 ```
 ./1-spark/movie-recommendation.ipynb
 ```
+
+### Supervised Leaning 
+- 지도 학습
+- Regression, Classification 둘다 지도학습이다.
+- Regression: 예측된 값이 실수
+- Classification: 예측된 값이 클래스(카테고리)
+
+ 
