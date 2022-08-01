@@ -184,6 +184,7 @@
   - [Airflow CLI command](#airflow-cli-command)
   - [Airflow DAGs 대시보드](#airflow-dags-대시보드)
   - [Airflow DAG View](#airflow-dag-view)
+  - [NFT 파이프라인 프로젝트 소개](#nft-파이프라인-프로젝트-소개)
 
 
 
@@ -1780,3 +1781,7 @@ airflow users create --role Admin --username admin --email admin --firstname adm
 - `Gantt`: 각각의 task가 실행하면서 얼만큼의 시간을 소비했나 볼 수 있다.
 - `Details`: 여러가지 Metadata 확인
 - `Code`: DAG 코드 확인 
+
+### NFT 파이프라인 프로젝트 소개 
+- OpenSea 사이트의 NFT데이터를 추출해 테이블에 저장하기
+- 테이블 생성 -> API 확인 -> NFT 정보 추출 -> NFT 정보 가공 -> NFT 정보 저장 
