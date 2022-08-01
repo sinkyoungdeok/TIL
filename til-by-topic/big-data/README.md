@@ -180,6 +180,7 @@
   - [Airflow의 Multi Node Architecture](#airflow의-multi-node-architecture)
   - [Airflow 동작 방식](#airflow-동작-방식)
   - [DAG의 생성과 실행](#dag의-생성과-실행)
+  - [Airflow 설치](#airflow-설치)
 
 
 
@@ -1724,3 +1725,25 @@ terminal1) test test testa
 - Executor가 그 Task를 실행시킨 다음, 완료후 Metastore에 완료했다고 보고한다. (완료된 Task Instance는 Dag Run을 업데이트 한다)
 - Scheduler가 Metastore를 통해서 DAG 실행이 완료됐나 확인을 하고 DagRun Status를 Completed로 변경한다.
 - Web Server가 Metastore를 통해서 DAG 실행이 완료됐나 확인을 하고 UI 업데이트를 한다.
+
+
+### Airflow 설치 
+```
+# m1 에서는 이 방법으로 설치 안됨.
+pip --version # anaconda 로 설치된지 확인
+pip install apache-airflow
+
+airflow db init 
+airflow werbserver -p 8080
+airflow users create --role Admin --username admin --email admin --firstname admin --lastname admin --password admin
+```
+
+```
+# m1 
+curl -LfO 'https://airflow.apache.org/docs/apache-airflow/2.1.1/docker-compose.yaml'
+docker-compose up airflow-init
+docker-compose up -d 
+
+docker exec -it docker exec -it 64bb1d858ab5ad7babfad795a6e3dc60121e27b15a83c37bda4f54a6a /bin/sh # webserver container 접속 
+airflow users create --role Admin --username admin --email admin --firstname admin --lastname admin --password admin
+```

@@ -45,3 +45,8 @@ out/
 
 ### spark
 .checkpoint
+
+### airflow
+**/2-airflow/dags
+**/2-airflow/logs
+**/2-airflow/plugins
