@@ -181,6 +181,7 @@
   - [Airflow 동작 방식](#airflow-동작-방식)
   - [DAG의 생성과 실행](#dag의-생성과-실행)
   - [Airflow 설치](#airflow-설치)
+  - [Airflow CLI command](#airflow-cli-command)
 
 
 
@@ -1747,3 +1748,13 @@ docker-compose up -d
 docker exec -it docker exec -it 64bb1d858ab5ad7babfad795a6e3dc60121e27b15a83c37bda4f54a6a /bin/sh # webserver container 접속 
 airflow users create --role Admin --username admin --email admin --firstname admin --lastname admin --password admin
 ```
+
+### Airflow CLI command
+- `airflow -h`: 각종 명령어 설명 보기 
+- `airflow webserver`: webserver 시작
+- `airflow users create ~~`: user 추가 
+- `airflow scheduler`: scheduler 시작
+- `airflow db init`: db에 기본적인 파이프라인 생성 및 기본 설정 
+- `airflow dags list`: 현재 돌아가는 dag들 출력 
+- `airflow tasks list example_xcom`: example_xcom 안에 존재하는 task들 조회 
+- `airflow dgas trigger -e 2022-01-01 example_xcom`: 특정 dag를 트리거 
