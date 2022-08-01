@@ -176,6 +176,10 @@
   - [Operator](#operator)
   - [작업(Task)](#작업task)
   - [Airflow의 유용성](#airflow의-유용성)
+  - [Airflow의 One Node Architecture](#airflow의-one-node-architecture)
+  - [Airflow의 Multi Node Architecture](#airflow의-multi-node-architecture)
+  - [Airflow 동작 방식](#airflow-동작-방식)
+  - [DAG의 생성과 실행](#dag의-생성과-실행)
 
 
 
@@ -1683,3 +1687,40 @@ terminal1) test test testa
   - 실험
   - 데이터 인프라 관리 
 
+### Airflow의 One Node Architecture
+![image](https://user-images.githubusercontent.com/28394879/182063274-f9587c59-d6e2-4002-a9b3-340bae1f9d69.png)
+- WebServer, Metastore, Scheduler, Executor가 존재
+- 동작 과정
+  - Metastore에서 dag에 대한 정보를 담고 있어서, Web server와 Scheduler가 그 정보를 읽어 오고 Executor로 이 정보를 보내서 실행을 한다.
+  - 이렇게 실행된 Task Instance는 metastore로 보내져서 상태를 업데이트 한다.
+  - 이렇게 업데이트된 상태를 다시 Web Server와 Scheduler가 읽어와서 Task가 잘 완료가 되었는지 확인을 한다.
+- Executor에 Queue가 존재해서 순서를 정할 수 있게 된다.
+
+### Airflow의 Multi Node Architecture
+![image](https://user-images.githubusercontent.com/28394879/182063326-650f9174-2ea7-4487-9925-5c5828bf8bee.png)
+- Queue가 Executor 바깥에 존재 한다 (One Node Architecture와의 큰 차이점)
+- Celery Broker가 Queue이다.
+- 동작 과정
+  - MetaStore에서 dag정보를 webserver와 scheduler가 정보를 읽고, celery executor를 통해서 celery broker에 task 순서대로 담는다.
+  - 순서대로 담긴 task를 worker들이 하나씨 가져가서 순서대로 실행된다.
+  - 이렇게 실행된 dag들은 완료되면 celery executor 그리고 metastore에 보고가 된다.
+  - 이렇게 완료된 상태를 UI와 Scheduler가 다시읽어와서 완료되는 것을 확인한다.
+
+### Airflow 동작 방식
+1. DAG를 작성하여 Workflow를 만든다. DAG는 Task로 구성되어 있다
+2. Task는 Operator가 인스턴스화 된 것
+3. DAG를 실행시킬 때 Scheduler가 DagRun 오브젝트를 만든다
+4. DagRun 오브젝트는 Task Instance를 만든다
+5. Worker가 Task를 수행 후 DagRun 의 상태를 "완료"로 바꿔놓는다.
+
+### DAG의 생성과 실행 
+- 유저가 새로운 DAG를 작성 후 Folder DAGs 안에 배치
+- Web Server와 Scheduler가 DAG를 파싱
+- Scheduler가 Metastore를 통해 DagRun 오브젝트를 생성 
+  - DagRun은 사용자가 작성한 DAG의 인스턴스
+  - DagRun status: Running
+- Scheduler가 Task Instance 오브젝트 (Dag run 오브젝트의 인스턴스 == Task Instance) 를 스케줄링
+- Trigger가 상황에 맞으면 Scheduler가 Task Instance를 Executor로 보냄
+- Executor가 그 Task를 실행시킨 다음, 완료후 Metastore에 완료했다고 보고한다. (완료된 Task Instance는 Dag Run을 업데이트 한다)
+- Scheduler가 Metastore를 통해서 DAG 실행이 완료됐나 확인을 하고 DagRun Status를 Completed로 변경한다.
+- Web Server가 Metastore를 통해서 DAG 실행이 완료됐나 확인을 하고 UI 업데이트를 한다.
