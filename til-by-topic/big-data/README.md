@@ -185,6 +185,7 @@
   - [Airflow DAGs 대시보드](#airflow-dags-대시보드)
   - [Airflow DAG View](#airflow-dag-view)
   - [NFT 파이프라인 프로젝트 소개](#nft-파이프라인-프로젝트-소개)
+  - [nft-pipeline](#nft-pipeline)
 
 
 
@@ -1785,3 +1786,10 @@ airflow users create --role Admin --username admin --email admin --firstname adm
 ### NFT 파이프라인 프로젝트 소개 
 - OpenSea 사이트의 NFT데이터를 추출해 테이블에 저장하기
 - 테이블 생성 -> API 확인 -> NFT 정보 추출 -> NFT 정보 가공 -> NFT 정보 저장 
+
+
+### nft-pipeline 
+```
+./2-airflow/nft-pipeline.py  # 기본 dag 구성
+# 생성 후 dag 대시보드에 등장하는지 확인 
+```
