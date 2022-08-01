@@ -166,6 +166,16 @@
   - [Transformations](#transformations-1)
   - [State 관리](#state-관리)
   - [간단한 스트리밍 구현](#간단한-스트리밍-구현)
+- [11. Apache Airflow](#11-apache-airflow)
+  - [Apache Airflow란](#apache-airflow란)
+  - [워크플로우 관리 문제](#워크플로우-관리-문제)
+  - [cron script와 같은 기존 방식의 문제점](#cron-script와-같은-기존-방식의-문제점)
+  - [AirFlow란](#airflow란)
+  - [Workflow란](#workflow란)
+  - [Airflow의 구성요소](#airflow의-구성요소)
+  - [Operator](#operator)
+  - [작업(Task)](#작업task)
+  - [Airflow의 유용성](#airflow의-유용성)
 
 
 
@@ -1613,3 +1623,63 @@ terminal2) python3 ./1-spark/streaming.py
 terminal1) test testa testb
 terminal1) test test testa
 ```
+
+
+## 11. Apache Airflow
+
+### Apache Airflow란 
+- 에어비앤비에서 개발한 워크플로우 스케줄링, 모니터링 플랫폼
+- 실제 데이터의 처리가 이루어지는 곳은 아니다.
+- 2016년 아파치 재단 incubator program
+- 현재 아파치 탑레벨 프로젝트
+- Airbnb, Yahoo, Paypal, Intel, Stripe
+
+
+### 워크플로우 관리 문제 
+- 매일 10시에 주기적으로 돌아가는 데이터 파이프라인을 만들려면?
+- 기존 방식: cron script로 사용 
+- 매일 10시에 주기적으로 돌아가는 데이터 파이프라인 (외부 api로 download -> process(Spark Job) -> store(DB))들을 수십개 만들어야 한다면?
+
+
+### cron script와 같은 기존 방식의 문제점 
+- 실패 복구: 언제 어떻게 다시 실행할 것인가? Backfill
+- 모니터링: 잘 돌아가고 있는지 확인하기 힘들다
+- 의존성 관리: 데이터 파이프라인간 의존성이 있는 경우 상위 데이터 파이프라인이 잘 돌아가고 있는지 파악이 힘들다
+- 확장성: 중앙화 해서 관리하는 툴이 없기 떄문에 분산된 환경에서 파이프라인들을 관리하기 어렵다
+- 배포: 새로운 워크플로우를 배포하기 힘들다
+
+### AirFlow란 
+- 워크플로우를 작성하고 스케줄링하고 모니터링 하는 작업을 프로그래밍 할 수 있게 해주는 플랫폼 
+- 파이썬으로 쉬운 프로그래밍이 가능
+- 분산된 환경에서 확장성이 있음
+- 웹 대시보드 (UI)
+- 커스터마이징이 가능 
+
+### Workflow란
+- 의존성으로 연결된 작업(task)들의 집합 == DAG == Directed Acyclic Graph
+
+### Airflow의 구성요소
+- 웹 서버 - 웹 대시보드 UI
+- 스케줄러 - 워크플로우가 언제 실행되는지 관리
+- Metastore - 메타데이터 관리
+- Executor - 테스크가 어떻게 실행되는지 정의
+- Worker - 테스크를 실행하는 프로세스
+
+### Operator
+- 작업을 정의하는데 사용 
+- Action Operators: 실제 연산을 수행
+- Transfer Operators: 데이터를 옮김
+- Sensor Operators: 테스크를 언제 실행시킬 트리거를 기다림
+
+### 작업(Task)
+- Operator를 실행시키면 Task가 된다
+- Task = Operator Instance
+
+### Airflow의 유용성 
+- 여러 데이터 엔지니어링 환경에서 유용하게 쓰일 수 있다
+  - 데이터 웨어하우스
+  - 머신러닝
+  - 분석
+  - 실험
+  - 데이터 인프라 관리 
+
