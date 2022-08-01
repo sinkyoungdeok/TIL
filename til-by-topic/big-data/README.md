@@ -182,6 +182,8 @@
   - [DAG의 생성과 실행](#dag의-생성과-실행)
   - [Airflow 설치](#airflow-설치)
   - [Airflow CLI command](#airflow-cli-command)
+  - [Airflow DAGs 대시보드](#airflow-dags-대시보드)
+  - [Airflow DAG View](#airflow-dag-view)
 
 
 
@@ -1758,3 +1760,23 @@ airflow users create --role Admin --username admin --email admin --firstname adm
 - `airflow dags list`: 현재 돌아가는 dag들 출력 
 - `airflow tasks list example_xcom`: example_xcom 안에 존재하는 task들 조회 
 - `airflow dgas trigger -e 2022-01-01 example_xcom`: 특정 dag를 트리거 
+
+### Airflow DAGs 대시보드 
+- `Owner`: Dag 관리자
+- `Runs`: 실행 중인 DAG의 상태
+- `Schedule`: 주기를 나타내는 설정
+- `Last Run`: 최근 실행 날짜
+- `Next Run`: 다음 실행이 언제될지 나타냄
+- `Recent Tasks`: 방금 실행된 Task들을 보여줌
+- `Actions`: DAG를 지우거나 실행
+- `Links`: 마우스 갖다대면 여러가지 Link들이 보임 
+
+### Airflow DAG View 
+![image](https://user-images.githubusercontent.com/28394879/182180245-c3f88701-fef3-4216-9035-53d536fbe7e1.png)
+- `Tree`: Task들의 상태를 보기 편함
+- `Graph`: Task들의 의존성을 확인할 때 좋음, 각 Task들의 Log 정보 등을 확인하기에도 좋음
+- `Calendar`: 날짜별로 실패 없이 잘 돌아갔나 확인 가능 
+- `Task Duration`, `Task Tries`, `Landing Times`: 날짜기반으로 뭔가확인인데 설치 직후엔 볼게 없음
+- `Gantt`: 각각의 task가 실행하면서 얼만큼의 시간을 소비했나 볼 수 있다.
+- `Details`: 여러가지 Metadata 확인
+- `Code`: DAG 코드 확인 
