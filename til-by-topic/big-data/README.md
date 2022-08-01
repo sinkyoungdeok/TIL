@@ -165,6 +165,7 @@
   - [Streaming Query: Processing Details](#streaming-query-processing-details)
   - [Transformations](#transformations-1)
   - [State 관리](#state-관리)
+  - [간단한 스트리밍 구현](#간단한-스트리밍-구현)
 
 
 
@@ -1604,3 +1605,11 @@ spark.readStream.format("kafka")
 - 이전 데이터에 대한 정보를 State로 주고 받을 수 있다.
 - 예) 카테고리별 (키값 별) 총합 
 
+### 간단한 스트리밍 구현 
+```
+terminal1) nc -lk 9999 # 소켓 열기 
+terminal2) python3 ./1-spark/streaming.py
+
+terminal1) test testa testb
+terminal1) test test testa
+```

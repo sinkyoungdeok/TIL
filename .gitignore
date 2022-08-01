@@ -42,3 +42,6 @@ out/
 ### jupyter
 .ipynb_checkpoints/
 .ipynb_checkpoints/**.ipynb
+
+### spark
+.checkpoint
