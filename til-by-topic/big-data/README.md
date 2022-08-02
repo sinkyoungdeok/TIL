@@ -189,6 +189,7 @@
   - [Airflow - 내장 Operators](#airflow---내장-operators)
   - [Airflow - Action Operator](#airflow---action-operator)
   - [NFT 파이프 라인 - create table task 추가](#nft-파이프-라인---create-table-task-추가)
+  - [NFT 파이프 라인 - Sensor 로 API 확인하기](#nft-파이프-라인---sensor-로-api-확인하기)
 
 
 
@@ -1835,4 +1836,19 @@ with DAG(dag_id='nft-pipeline',
 
 ```
 airflow tasks test nft-pipeline creating_table 2021-01-01 # task 실행 
+```
+
+### NFT 파이프 라인 - Sensor 로 API 확인하기 
+- `Airflow 대시보드 -> Admin -> Connections -> 추가 -> connection id = opensea_api, conneciton Type = http, host: https://api.opensea.io/ 로 Save` 
+
+```python
+is_api_available = HttpSensor(
+        task_id = 'is_api_available',
+        http_conn_id = 'opensea_api',
+        endpoint = 'api/v1/assets?collection=doodles-official&limit=1
+    )
+```
+
+```
+airflow tasks test nft-pipeline is_api_available 2021-01-01 # task 실행 
 ```
