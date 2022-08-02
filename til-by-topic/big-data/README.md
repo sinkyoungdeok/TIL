@@ -1795,7 +1795,7 @@ airflow users create --role Admin --username admin --email admin --firstname adm
 
 ### NFT 파이프라인 - DAG Skeleton
 ```
-./2-airflow/nft-pipeline.py  # 기본 dag 구성
+./2-airflow/1-sqlite.py  # 기본 dag 구성
 # 생성 후 dag 대시보드에 등장하는지 확인 
 ```
 
@@ -1815,24 +1815,8 @@ airflow users create --role Admin --username admin --email admin --firstname adm
 - `Airflow 대시보드 -> Admin -> Connections -> 추가 -> connection id =db_sqlite, conneciton Type = Sqlite 로 Save` 
 
 
-```python
-with DAG(dag_id='nft-pipeline', 
-        schedule_interval='@daily',
-        default_args=default_arg,
-        tags = ['nft'],
-        catchup=False) as dag:
-    
-    createing_table = SqliteOperator(
-        task_id = 'creating_table',
-        sqlite_conn_id = 'db_sqlite',
-        sql = '''
-            CREATE TABLE IF NOT EXISTS nfts (
-                token_id TEXT PRIMARY KEY,
-                name TEXT NOT NULL,
-                image_url TEXT NOT NULL
-            )
-        '''
-    )
+```
+./2-airflow/2-create-table.py
 ```
 
 ```
@@ -1842,12 +1826,8 @@ airflow tasks test nft-pipeline creating_table 2021-01-01 # task 실행
 ### NFT 파이프 라인 - Sensor 로 API 확인하기 
 - `Airflow 대시보드 -> Admin -> Connections -> 추가 -> connection id = opensea_api, conneciton Type = http, host: https://api.opensea.io/ 로 Save` 
 
-```python
-is_api_available = HttpSensor(
-        task_id = 'is_api_available',
-        http_conn_id = 'opensea_api',
-        endpoint = 'api/v1/assets?collection=doodles-official&limit=1
-    )
+```
+./2-airflow/3-sensor.py
 ```
 
 ```
@@ -1859,12 +1839,8 @@ airflow tasks test nft-pipeline is_api_available 2021-01-01 # task 실행
 
 - `Airflow 대시보드 -> Admin -> Connections -> 추가 -> connection id = githubcontent_api, conneciton Type = http, host: https://raw.githubusercontent.com/ 로 Save`
 
-```python
-is_api_available = HttpSensor(
-        task_id='is_api_available',
-        http_conn_id='githubcontent_api',
-        endpoint='keon/data-engineering/main/02-airflow/nftresponse.json'
-    )
+```
+./2-airflow/3-sensor.py
 ```
 
 ```
