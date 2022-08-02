@@ -27,6 +27,6 @@ with DAG(dag_id='nft-pipeline',
 
     is_api_available = HttpSensor(
         task_id='is_api_available',
-        http_conn_id='opensea_api',
-        endpoint='api/v1/assets?collection=doodles-official&limit=1'
+        http_conn_id='githubcontent_api',
+        endpoint='keon/data-engineering/main/02-airflow/nftresponse.json'
     )
