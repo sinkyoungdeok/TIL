@@ -188,6 +188,7 @@
   - [NFT 파이프라인 - DAG Skeleton](#nft-파이프라인---dag-skeleton)
   - [Airflow - 내장 Operators](#airflow---내장-operators)
   - [Airflow - Action Operator](#airflow---action-operator)
+  - [NFT 파이프 라인 - create table task 추가](#nft-파이프-라인---create-table-task-추가)
 
 
 
@@ -1751,7 +1752,7 @@ curl -LfO 'https://airflow.apache.org/docs/apache-airflow/2.1.1/docker-compose.y
 docker-compose up airflow-init
 docker-compose up -d 
 
-docker exec -it docker exec -it 64bb1d858ab5ad7babfad795a6e3dc60121e27b15a83c37bda4f54a6a /bin/sh # webserver container 접속 
+docker exec -it 64bb1d858ab5ad7babfad795a6e3dc60121e27b15a83c37bda4f54a6a /bin/sh # webserver container 접속 
 airflow users create --role Admin --username admin --email admin --firstname admin --lastname admin --password admin
 ```
 
@@ -1807,3 +1808,31 @@ airflow users create --role Admin --username admin --email admin --firstname adm
 2. Transfer Operator는 데이터를 옮길 때 사용
 3. Sensors: 조건이 맞을 때 까지 기다린다
 
+
+### NFT 파이프 라인 - create table task 추가 
+- `Airflow 대시보드 -> Admin -> Connections -> 추가 -> connection id =db_sqlite, conneciton Type = Sqlite 로 Save` 
+
+
+```python
+with DAG(dag_id='nft-pipeline', 
+        schedule_interval='@daily',
+        default_args=default_arg,
+        tags = ['nft'],
+        catchup=False) as dag:
+    
+    createing_table = SqliteOperator(
+        task_id = 'creating_table',
+        sqlite_conn_id = 'db_sqlite',
+        sql = '''
+            CREATE TABLE IF NOT EXISTS nfts (
+                token_id TEXT PRIMARY KEY,
+                name TEXT NOT NULL,
+                image_url TEXT NOT NULL
+            )
+        '''
+    )
+```
+
+```
+airflow tasks test nft-pipeline creating_table 2021-01-01 # task 실행 
+```
