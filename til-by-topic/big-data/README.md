@@ -185,7 +185,9 @@
   - [Airflow DAGs 대시보드](#airflow-dags-대시보드)
   - [Airflow DAG View](#airflow-dag-view)
   - [NFT 파이프라인 프로젝트 소개](#nft-파이프라인-프로젝트-소개)
-  - [nft-pipeline](#nft-pipeline)
+  - [NFT 파이프라인 - DAG Skeleton](#nft-파이프라인---dag-skeleton)
+  - [Airflow - 내장 Operators](#airflow---내장-operators)
+  - [Airflow - Action Operator](#airflow---action-operator)
 
 
 
@@ -1788,8 +1790,20 @@ airflow users create --role Admin --username admin --email admin --firstname adm
 - 테이블 생성 -> API 확인 -> NFT 정보 추출 -> NFT 정보 가공 -> NFT 정보 저장 
 
 
-### nft-pipeline 
+### NFT 파이프라인 - DAG Skeleton
 ```
 ./2-airflow/nft-pipeline.py  # 기본 dag 구성
 # 생성 후 dag 대시보드에 등장하는지 확인 
 ```
+
+
+### Airflow - 내장 Operators
+1. BashOperator
+2. PythonOperator
+3. EmailOperator
+
+### Airflow - Action Operator
+1. Action Operator는 액션을 실행한다 (데이터를 추출, 데이터 프로세싱 등)
+2. Transfer Operator는 데이터를 옮길 때 사용
+3. Sensors: 조건이 맞을 때 까지 기다린다
+
