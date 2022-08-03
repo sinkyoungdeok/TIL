@@ -191,6 +191,7 @@
   - [NFT 파이프 라인 - create table task 추가](#nft-파이프-라인---create-table-task-추가)
   - [NFT 파이프 라인 - Sensor 로 API 확인하기](#nft-파이프-라인---sensor-로-api-확인하기)
   - [NFT 파이프 라인 - OpenSea API 오류 대처법](#nft-파이프-라인---opensea-api-오류-대처법)
+  - [NFT 파이프 라인 - HttpOperator로 데이터 불러오기](#nft-파이프-라인---httpoperator로-데이터-불러오기)
 
 
 
@@ -1795,7 +1796,7 @@ airflow users create --role Admin --username admin --email admin --firstname adm
 
 ### NFT 파이프라인 - DAG Skeleton
 ```
-./2-airflow/1-sqlite.py  # 기본 dag 구성
+./2-airflow/01-sqlite.py  # 기본 dag 구성
 # 생성 후 dag 대시보드에 등장하는지 확인 
 ```
 
@@ -1816,7 +1817,7 @@ airflow users create --role Admin --username admin --email admin --firstname adm
 
 
 ```
-./2-airflow/2-create-table.py
+./2-airflow/02-create-table.py
 ```
 
 ```
@@ -1827,7 +1828,7 @@ airflow tasks test nft-pipeline creating_table 2021-01-01 # task 실행
 - `Airflow 대시보드 -> Admin -> Connections -> 추가 -> connection id = opensea_api, conneciton Type = http, host: https://api.opensea.io/ 로 Save` 
 
 ```
-./2-airflow/3-sensor.py
+./2-airflow/03-sensor.py
 ```
 
 ```
@@ -1840,9 +1841,18 @@ airflow tasks test nft-pipeline is_api_available 2021-01-01 # task 실행
 - `Airflow 대시보드 -> Admin -> Connections -> 추가 -> connection id = githubcontent_api, conneciton Type = http, host: https://raw.githubusercontent.com/ 로 Save`
 
 ```
-./2-airflow/3-sensor.py
+./2-airflow/03-sensor.py
 ```
 
 ```
 airflow tasks test nft-pipeline is_api_available 2021-01-01 # task 실행 
+```
+
+### NFT 파이프 라인 - HttpOperator로 데이터 불러오기
+```
+./2-airflow/04-extract-data.py
+```
+
+```
+airflow tasks test nft-pipeline extract_nft 2021-01-01 # task 실행 
 ```
