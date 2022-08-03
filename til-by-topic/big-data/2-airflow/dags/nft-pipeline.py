@@ -6,6 +6,7 @@ from airflow.providers.sqlite.operators.sqlite import SqliteOperator
 from airflow.providers.http.sensors.http import HttpSensor
 from airflow.providers.http.operators.http import SimpleHttpOperator
 from airflow.operators.python import PythonOperator
+from airflow.operators.bash import BashOperator
 from pandas import json_normalize
 
 default_arg = {
@@ -61,4 +62,9 @@ with DAG(dag_id='nft-pipeline',
     process_nft = PythonOperator(
         task_id='process_nft',
         python_callable=_processing_nft
+    )
+
+    store_nft = BashOperator(
+        task_id='store_nft',
+        bash_command='echo -e ".separator ","\n.import /tmp/processed_nft.csv nfts" | sqlite3 /opt/airflow/'
     )

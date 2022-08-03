@@ -193,6 +193,7 @@
   - [NFT 파이프 라인 - OpenSea API 오류 대처법](#nft-파이프-라인---opensea-api-오류-대처법)
   - [NFT 파이프 라인 - HttpOperator로 데이터 불러오기](#nft-파이프-라인---httpoperator로-데이터-불러오기)
   - [NFT 파이프 라인 - process](#nft-파이프-라인---process)
+  - [NFT 파이프 라인 - store](#nft-파이프-라인---store)
 
 
 
@@ -1867,4 +1868,13 @@ airflow tasks test nft-pipeline extract_nft 2021-01-01 # task 실행
 airflow tasks test nft-pipeline process_nft 2021-01-01 # task 실행 
 
 cat /tmp/processed_nft.csv # 결과 확인 
+```
+
+### NFT 파이프 라인 - store
+```
+./2-airflow/06-store.py
+
+airflow tasks test nft-pipeline store_nft 2021-01-01 # task 실행 
+
+# airflow.db가 어딨는지 찾아야됨.
 ```
