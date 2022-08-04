@@ -66,5 +66,5 @@ with DAG(dag_id='nft-pipeline',
 
     store_nft = BashOperator(
         task_id='store_nft',
-        bash_command='echo -e ".separator ","\n.import /tmp/processed_nft.csv nfts" | sqlite3 /opt/airflow/'
+        bash_command='echo -e ".separator ","\n.import /tmp/processed_nft.csv nfts" | sqlite3 /opt/airflow.db'
     )

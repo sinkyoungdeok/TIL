@@ -1876,5 +1876,5 @@ cat /tmp/processed_nft.csv # 결과 확인
 
 airflow tasks test nft-pipeline store_nft 2021-01-01 # task 실행 
 
-# airflow.db가 어딨는지 찾아야됨.
+# docker에서는 'airflow.db' 가 따로 없는듯. 그래서 해결은 못했음.
 ```
