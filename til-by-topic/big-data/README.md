@@ -196,6 +196,7 @@
   - [NFT 파이프 라인 - store](#nft-파이프-라인---store)
   - [NFT 파이프 라인 - 테스크간 의존성 만들기](#nft-파이프-라인---테스크간-의존성-만들기)
   - [Backfill](#backfill)
+  - [Airflow로 Spark 파이프라인 관리하기 - Airflow와 Spark 환경세팅 및 사용하기](#airflow로-spark-파이프라인-관리하기---airflow와-spark-환경세팅-및-사용하기)
 
 
 
@@ -1896,3 +1897,55 @@ airflow에서 DAG 활성화 해서 순차적으로 실행되는지 확인.
 - DAG 시작 날짜를 `2021-01-01`로 해두고, 현재 `2022-08-06`에 `catcup(True)`로하면 어떻게 될까?
   - 기존에 이미 실행된게 있으면 돌아가지 않는다. -> 기존 DAG를 지우고, Browse -> DAG Run -> nft-pipeline 제거 
   - 제거하고나면 바로 1월1일부터 거의 1년치가 동시에 돌아가게 된다.
+
+
+### Airflow로 Spark 파이프라인 관리하기 - Airflow와 Spark 환경세팅 및 사용하기
+```
+1. webserver docker 접속
+2. pip install apache-airflow-providers-apache-spark
+3. fhvhv_tripdata_2020-03.csv 파일 webserver로 전송
+```
+
+```python
+# webserver docker에서 count_trips.py 작성 
+# 패키지를 가져오고
+from pyspark import SparkConf, SparkContext
+import pandas as pd
+
+# Spark 설정
+conf = SparkConf().setMaster("local").setAppName("uber-date-trips")
+sc = SparkContext(conf=conf)
+
+# 우리가 가져올 데이터가 있는 파일
+directory = "/home/airflow/data"
+filename = "fhvhv_tripdata_2020-03.csv"
+
+# 데이터 파싱
+lines = sc.textFile(f"file:///{directory}/{filename}")
+header = lines.first() 
+filtered_lines = lines.filter(lambda row:row != header) 
+
+# 필요한 부분만 골라내서 세는 부분
+# countByValue로 같은 날짜등장하는 부분을 센다
+dates = filtered_lines.map(lambda x: x.split(",")[2].split(" ")[0])
+result = dates.countByValue()
+
+# 아래는 Spark코드가 아닌 일반적인 파이썬 코드
+# CSV로 결과값 저장 
+pd.Series(result, name="trips").to_csv("trips_date.csv")
+```
+
+```
+Admin -> Connectors -> 추가 
+Connect id: spark_local
+Connection Type: Spark
+Host: local 
+
+Save
+```
+
+```
+airflow tasks test spark-example submit_job 2021-01-01
+
+./2-airflow/dags/spark-example.py # 코드 위치 
+```
