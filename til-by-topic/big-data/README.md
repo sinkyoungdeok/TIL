@@ -197,6 +197,7 @@
   - [NFT 파이프 라인 - 테스크간 의존성 만들기](#nft-파이프-라인---테스크간-의존성-만들기)
   - [Backfill](#backfill)
   - [Airflow로 Spark 파이프라인 관리하기 - Airflow와 Spark 환경세팅 및 사용하기](#airflow로-spark-파이프라인-관리하기---airflow와-spark-환경세팅-및-사용하기)
+  - [택시비 예측 파이프라인 만들기](#택시비-예측-파이프라인-만들기)
 
 
 
@@ -1948,4 +1949,9 @@ Save
 airflow tasks test spark-example submit_job 2021-01-01
 
 ./2-airflow/dags/spark-example.py # 코드 위치 
+```
+
+### 택시비 예측 파이프라인 만들기
+```
+./2-airflow/taxi-price.py
 ```
