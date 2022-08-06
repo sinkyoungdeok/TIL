@@ -30,7 +30,7 @@ with DAG(dag_id='nft-pipeline',
         schedule_interval='@daily',
         default_args=default_arg,
         tags = ['nft'],
-        catchup=False) as dag:
+        catchup=True) as dag:
     
     createing_table = SqliteOperator(
         task_id = 'creating_table',
