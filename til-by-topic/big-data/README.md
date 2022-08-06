@@ -194,6 +194,7 @@
   - [NFT 파이프 라인 - HttpOperator로 데이터 불러오기](#nft-파이프-라인---httpoperator로-데이터-불러오기)
   - [NFT 파이프 라인 - process](#nft-파이프-라인---process)
   - [NFT 파이프 라인 - store](#nft-파이프-라인---store)
+  - [NFT 파이프 라인 - 테스크간 의존성 만들기](#nft-파이프-라인---테스크간-의존성-만들기)
 
 
 
@@ -1877,4 +1878,11 @@ cat /tmp/processed_nft.csv # 결과 확인
 airflow tasks test nft-pipeline store_nft 2021-01-01 # task 실행 
 
 # docker에서는 'airflow.db' 가 따로 없는듯. 그래서 해결은 못했음.
+```
+
+### NFT 파이프 라인 - 테스크간 의존성 만들기 
+```
+./2-airflow/07-dependency.py
+
+airflow에서 DAG 활성화 해서 순차적으로 실행되는지 확인.
 ```
