@@ -198,6 +198,14 @@
   - [Backfill](#backfill)
   - [Airflow로 Spark 파이프라인 관리하기 - Airflow와 Spark 환경세팅 및 사용하기](#airflow로-spark-파이프라인-관리하기---airflow와-spark-환경세팅-및-사용하기)
   - [택시비 예측 파이프라인 만들기](#택시비-예측-파이프라인-만들기)
+- [12. Kafka](#12-kafka)
+  - [전통적인 아키텍쳐](#전통적인-아키텍쳐)
+  - [전통적인 아키텍처의 문제점](#전통적인-아키텍처의-문제점)
+  - [Kafka 소개 1](#kafka-소개-1)
+  - [Kafka 소개 2](#kafka-소개-2)
+  - [Kafka를 이용한 아키텍쳐](#kafka를-이용한-아키텍쳐)
+  - [Kafka의 장점들](#kafka의-장점들)
+  - [Kafka 사용 예](#kafka-사용-예)
 
 
 
@@ -1955,3 +1963,53 @@ airflow tasks test spark-example submit_job 2021-01-01
 ```
 ./2-airflow/taxi-price.py
 ```
+
+## 12. Kafka
+
+### 전통적인 아키텍쳐 
+![image](https://user-images.githubusercontent.com/28394879/183271665-07a38ad3-5d02-4f8d-abaa-0f4aa36fc772.png)
+- SystemA, SystemB 각각 데이터 쌓인 것을 Data Lake로 보내는 파이프라인을 각각 만들어줘야 함.
+
+
+### 전통적인 아키텍처의 문제점 
+![image](https://user-images.githubusercontent.com/28394879/183271727-69bfc548-8064-4298-be33-8144ae8ed022.png)
+- 시스템을 더할수록 기하급수적으로 복잡해진다.
+- 여러가지 통신 프로토콜을 지원해야 한다 (HTTP, GRPC, TCP, MQ)
+- 데이터 포멧도 다르다 (CSV, JSON, XML)
+- Point-of-failure 가 많다 
+  - 시스템 A,B,C,D,E,F 각각의 신뢰도가 99% 라고 했을 때
+  - 시스템 A,B,C,D,E,F를 묶었을 때의 신뢰도 = 99% ^6 = 94.1%
+- 각각의 연결고리 어디서 에러가 나고 있는지 모니터링 하기도 힘들다
+
+### Kafka 소개 1 
+- LinkedIn에서 개발
+- Apache Software로 넘어가 2011년 오픈소스화
+- Apple, eBay, Uber, ArBnB, Netflix 등에서 사용중
+
+### Kafka 소개 2
+- 분산 스트리밍 플랫폼
+- Source 시스템은 Kafka로 메시지를 보내고
+- Destination 시스템은 Kafka로 부터 메시지를 받는다
+- 확장성이 있고, 장애 허용 (fault tolerant)을 하며, 성능이 좋다.
+
+### Kafka를 이용한 아키텍쳐 
+![image](https://user-images.githubusercontent.com/28394879/183271891-7186501d-d580-4198-992a-6f1bf2645288.png)
+- 시스템간 의존성을 간접적으로 만든다
+- 확장성: 새 시스템을 더할 때 마다 복잡도가 선형적으로 올라간다
+- Kafka를 이용해 통신 프로토콜을 통합하기 쉽다 
+
+### Kafka의 장점들
+- 확장성: 하루에 1조개의 메시지를 처리할 수 있고, Petabyte의 데이터를 처리 가능
+- 메시지 처리 속도: 2MS
+- 가용성(availability): 클러스터 환경에서 작동
+- 데이터 저장 성능: 분산 처리, 내구성, 장애 허용 (fault tolerant)
+
+### Kafka 사용 예
+- 시스템간 메시지 큐
+- 로그 수집
+- 스트림 프로세싱
+- 이벤트 드리븐 기능들 
+- Netflix: 실시간 모니터링
+- Expedia: 이벤트 드리븐 아키텍처
+- Uber: 실시간 가격 조정, 실시간 수요 예측
+
