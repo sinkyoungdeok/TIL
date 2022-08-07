@@ -221,6 +221,7 @@
   - [Key 에 따른 Message 전송](#key-에-따른-message-전송)
   - [Replication Factor](#replication-factor)
   - [파티션 리더](#파티션-리더)
+  - [Consumer Group & Partition & Producer](#consumer-group--partition--producer)
 
 
 
@@ -2128,3 +2129,10 @@ airflow tasks test spark-example submit_job 2021-01-01
 - 각 브로커는 복제된 파티션중 대표를 하는 파티션 리더를 가지게 된다.
 - 모든 Read/Write는 파티션 리더를 통해서 이루어지게 됨 
 - 다른 파티션들은 파티션 리더를 복제 
+
+
+### Consumer Group & Partition & Producer
+- Partition을 1개로 만들어놓고 Consumer Group안에 Consumer를 2개로 만든다면
+  - Producer에서 데이터를 아무리 보내도 Consumer1 로만 데이터를 보내게된다.
+- Partition을 2개로 만들어놓고 Consumer Group안에 Consumer를 2개로 만든다면
+  - Producer에서 데이터를 보내면, Consumer1,2 각각에 균등하게 보내게 된다.
