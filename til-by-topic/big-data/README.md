@@ -209,10 +209,11 @@
   - [Kafka 구성](#kafka-구성)
   - [Kafka를 이용한 아키텍처 - 상세](#kafka를-이용한-아키텍처---상세)
   - [Kafka Topic](#kafka-topic)
+  - [Kafka Partition](#kafka-partition)
+  - [Kafka Message](#kafka-message)
+  - [Kafka Offset](#kafka-offset)
   - [Kafka Broker](#kafka-broker)
   - [Kafka Producer & Consumer](#kafka-producer--consumer)
-  - [Kafka Partition](#kafka-partition)
-  - [Kafka Message & Offset](#kafka-message--offset)
   - [Kafka Consumer Group](#kafka-consumer-group)
   - [Zookeeper](#zookeeper)
 
@@ -2040,6 +2041,34 @@ airflow tasks test spark-example submit_job 2021-01-01
 
 ### Kafka Topic 
 - Producer 와 Consumer가 소통을 하는 하나의 채널 
+- 데이터 스트림이 어디에 Publish 될지 정하는데 쓰임
+  - 토픽은 파일 시스템의 폴더의 개념과 유사하다.
+- Producer는 토픽을 지정하고 메시지를 게시 (Post)
+- Consumer는 토픽으로부터 메시지를 받아옴
+- 카프카의 메시지는 디스크에 정렬되어 저장 되며, 새로운 메시지가 도착하면 지속적으로 로그에 기록 
+
+### Kafka Partition
+- Kafka Topic이 Partition으로 나뉜다.
+- Partition은 디스크에 어떻게 저장이 되는지 가르는 기준이 된다.
+- 카프카의 토픽은 파티션의 그룹이라고 할 수 있다.
+- 디스크에는 파티션 단위로 저장
+- 파티션마다 commit Log 가 쌓이게 된다
+- 파티션에 쌓이는 기록들은 정렬이 되어 있고 불변(immutable)하다
+- 파티션의 모든 기록들은 Offset이라는 ID를 부여받는다.
+
+### Kafka Message
+- 카프카의 메시지는 Byte의 배열
+- 흔히 단순 String, JSON이나 Avro 사용 
+- 크기에는 제한이 없지만, 성능을 위해서는 작게 유지하는것이 좋다
+- 데이터는 사용자가 지정한 시간만큼 저장한다 (Retention Period), topic 별로 지정도 가능
+- Consumer가 데이터를 받아가고 나서도 데이터는 저장된다
+- Retention Period가 지나면 데이터는 자동으로 삭제 
+  - 장애가 있을 경우, Retention Period 기간 안에 해결을 해야 한다.
+  - Retention Period 지난 후에 문제가 생겼을 경우, Data Lake 까지 내려가서 데이터를 읽어와서 프로세싱 해야 한다
+
+### Kafka Offset
+- 보내는 메시지는 Offset을 가지게된다.
+- Offset은 Partition안에 메시지가 순서대로 정렬되는데, 정렬된 순서 및 값을 의미한다.
 
 ### Kafka Broker
 - 카프카의 서버로도 불린다.
@@ -2048,14 +2077,6 @@ airflow tasks test spark-example submit_job 2021-01-01
 ### Kafka Producer & Consumer
 - Producer: 메시지를 전달하는 주체
 - Consumer: 메시지를 전달받는 주체 
-
-### Kafka Partition
-- Kafka Topic이 Partition으로 나뉜다.
-- Partition은 디스크에 어떻게 저장이 되는지 가르는 기준이 된다.
-
-### Kafka Message & Offset
-- 보내는 메시지는 Offset을 가지게된다.
-- Offset은 Partition안에 메시지가 순서대로 정렬되는데, 정렬된 순서 및 값을 의미한다.
 
 ### Kafka Consumer Group
 - Consumer를 묶어서 Consumer Group이라고 한다.
