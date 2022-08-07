@@ -222,6 +222,8 @@
   - [Replication Factor](#replication-factor)
   - [파티션 리더](#파티션-리더)
   - [Consumer Group & Partition & Producer](#consumer-group--partition--producer)
+  - [Kafka python 설치](#kafka-python-설치)
+  - [Kafka pyhton Consumer Producer 간단예제](#kafka-pyhton-consumer-producer-간단예제)
 
 
 
@@ -2136,3 +2138,16 @@ airflow tasks test spark-example submit_job 2021-01-01
   - Producer에서 데이터를 아무리 보내도 Consumer1 로만 데이터를 보내게된다.
 - Partition을 2개로 만들어놓고 Consumer Group안에 Consumer를 2개로 만든다면
   - Producer에서 데이터를 보내면, Consumer1,2 각각에 균등하게 보내게 된다.
+
+
+
+### Kafka python 설치 
+```
+pip install kafka-python
+```
+
+### Kafka pyhton Consumer Producer 간단예제 
+```
+./3-kafka/consumer.py
+./3-kafka/producer.py
+```
