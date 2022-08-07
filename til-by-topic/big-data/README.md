@@ -212,10 +212,14 @@
   - [Kafka Partition](#kafka-partition)
   - [Kafka Message](#kafka-message)
   - [Kafka Offset](#kafka-offset)
+  - [Kafka Cluster](#kafka-cluster)
   - [Kafka Broker](#kafka-broker)
   - [Kafka Producer & Consumer](#kafka-producer--consumer)
   - [Kafka Consumer Group](#kafka-consumer-group)
   - [Zookeeper](#zookeeper)
+  - [Key 에 따른 Message 전송](#key-에-따른-message-전송)
+  - [Replication Factor](#replication-factor)
+  - [파티션 리더](#파티션-리더)
 
 
 
@@ -2070,6 +2074,11 @@ airflow tasks test spark-example submit_job 2021-01-01
 - 보내는 메시지는 Offset을 가지게된다.
 - Offset은 Partition안에 메시지가 순서대로 정렬되는데, 정렬된 순서 및 값을 의미한다.
 
+### Kafka Cluster
+- 카프카 클러스터는 여러개의 카프카 브로커(서버)를 가질 수 있따
+- 카프카 토픽을 생성하면 모든 카프카 브로커에 생성된다
+- 카프카 파티션은 여러 브로커에 걸쳐서 생성된다 
+
 ### Kafka Broker
 - 카프카의 서버로도 불린다.
 - Topic을 전달하는 역할을 한다.
@@ -2084,4 +2093,16 @@ airflow tasks test spark-example submit_job 2021-01-01
 
 ### Zookeeper
 - 카프카 클러스터의 여러 요소들을 설정하는데 사용됨
-- 메타데이터 설정, 토픽 설정, Application Factor들을 조절하는데 사용
+- 메타데이터 설정, 토픽 설정, Replication Factor 등을 조절하는데 사용
+
+### Key 에 따른 Message 전송 
+- Key 없이 전송: Producer가 메시지를 게시하면 Round-Robin 방식으로 파티션에 분배한다.
+- Key 와함께 전송: 같은 Key를 가진 메시지들은 같은 파티션에게 보내진다
+
+### Replication Factor
+![image](https://user-images.githubusercontent.com/28394879/183272852-b46e82c5-1d9f-42a6-a9cd-d0ddb9d4cad7.png)
+
+### 파티션 리더 
+- 각 브로커는 복제된 파티션중 대표를 하는 파티션 리더를 가지게 된다.
+- 모든 Read/Write는 파티션 리더를 통해서 이루어지게 됨 
+- 다른 파티션들은 파티션 리더를 복제 
