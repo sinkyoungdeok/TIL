@@ -206,6 +206,15 @@
   - [Kafka를 이용한 아키텍쳐](#kafka를-이용한-아키텍쳐)
   - [Kafka의 장점들](#kafka의-장점들)
   - [Kafka 사용 예](#kafka-사용-예)
+  - [Kafka 구성](#kafka-구성)
+  - [Kafka를 이용한 아키텍처 - 상세](#kafka를-이용한-아키텍처---상세)
+  - [Kafka Topic](#kafka-topic)
+  - [Kafka Broker](#kafka-broker)
+  - [Kafka Producer & Consumer](#kafka-producer--consumer)
+  - [Kafka Partition](#kafka-partition)
+  - [Kafka Message & Offset](#kafka-message--offset)
+  - [Kafka Consumer Group](#kafka-consumer-group)
+  - [Zookeeper](#zookeeper)
 
 
 
@@ -2013,3 +2022,45 @@ airflow tasks test spark-example submit_job 2021-01-01
 - Expedia: 이벤트 드리븐 아키텍처
 - Uber: 실시간 가격 조정, 실시간 수요 예측
 
+### Kafka 구성 
+- Topic
+- Kafka Broker
+- Kafka Producer
+- Kafka Consumer
+- Kafka Partition
+- Kafka Message
+- Kafka Offset
+- Kafka Consumer Group
+- Kafka Cluster
+- Zookeeper
+
+### Kafka를 이용한 아키텍처 - 상세 
+![image](https://user-images.githubusercontent.com/28394879/183272010-59834043-48dc-4b72-b7e7-089ffa52c541.png)
+
+
+### Kafka Topic 
+- Producer 와 Consumer가 소통을 하는 하나의 채널 
+
+### Kafka Broker
+- 카프카의 서버로도 불린다.
+- Topic을 전달하는 역할을 한다.
+
+### Kafka Producer & Consumer
+- Producer: 메시지를 전달하는 주체
+- Consumer: 메시지를 전달받는 주체 
+
+### Kafka Partition
+- Kafka Topic이 Partition으로 나뉜다.
+- Partition은 디스크에 어떻게 저장이 되는지 가르는 기준이 된다.
+
+### Kafka Message & Offset
+- 보내는 메시지는 Offset을 가지게된다.
+- Offset은 Partition안에 메시지가 순서대로 정렬되는데, 정렬된 순서 및 값을 의미한다.
+
+### Kafka Consumer Group
+- Consumer를 묶어서 Consumer Group이라고 한다.
+- Consumer 1개가 Consumer Group이 될 수 있고, 여러개가 될 수 도 있다.
+
+### Zookeeper
+- 카프카 클러스터의 여러 요소들을 설정하는데 사용됨
+- 메타데이터 설정, 토픽 설정, Application Factor들을 조절하는데 사용
