@@ -224,6 +224,7 @@
   - [Consumer Group & Partition & Producer](#consumer-group--partition--producer)
   - [Kafka python 설치](#kafka-python-설치)
   - [Kafka pyhton Consumer Producer 간단예제](#kafka-pyhton-consumer-producer-간단예제)
+  - [zookeper docker로 실행하기](#zookeper-docker로-실행하기)
 
 
 
@@ -2150,4 +2151,9 @@ pip install kafka-python
 ```
 ./3-kafka/consumer.py
 ./3-kafka/producer.py
+```
+
+### zookeper docker로 실행하기 
+```
+./3-kafka/docker-compose.yml
 ```
