@@ -216,6 +216,7 @@
   - [Kafka Broker](#kafka-broker)
   - [Kafka Producer & Consumer](#kafka-producer--consumer)
   - [Kafka Consumer Group](#kafka-consumer-group)
+  - [Rebalancing](#rebalancing)
   - [Zookeeper](#zookeeper)
   - [Key 에 따른 Message 전송](#key-에-따른-message-전송)
   - [Replication Factor](#replication-factor)
@@ -2085,11 +2086,23 @@ airflow tasks test spark-example submit_job 2021-01-01
 
 ### Kafka Producer & Consumer
 - Producer: 메시지를 전달하는 주체
+  - 카프카 토픽으로 메시지를 게시(post)하는 클라어인트 애플리케이션 
+  - 메시지를 어느 파티션에 넣을지 결정 (key)
 - Consumer: 메시지를 전달받는 주체 
 
 ### Kafka Consumer Group
 - Consumer를 묶어서 Consumer Group이라고 한다.
 - Consumer 1개가 Consumer Group이 될 수 있고, 여러개가 될 수 도 있다.
+- Consumer Group을 별도로 지정안하면, Consumer 1개당 Group1개씩 지정된다.
+- 각 Consumer Group은 모든 파티션으로부터 데이터를 받을 수 있다.
+  - Consumer는 지정된 파티션으로부터 데이터를 받을 수 있다.
+  - Consumer1,2가 Consumer Group으로 이루어져 있는 경우, 각 Consumer마다 특정 지정된 파티션에 대해서만 데이털르 전달 받게 된다.
+
+### Rebalancing
+- Partition 4개, Consumer Group안에 Consumer가 3개 있는경우, 3개 각 파티션마다 Consumer에 할당되고 남은 1개의 파티션은 Consumer중에 랜덤으로 배정된다.
+- 근데 여기에서 Consumer Group안에 Consumer가 1개가 추가되는 경우 Rebalancing이 일어난다.
+- 남은 1개의 파티션이 새로 추가된 Consumer로 전달되도록 Rebalancing이 일어난다.
+- Consumer가 제거되거나 추가될 때 rebalancing이 이루어 진다.
 
 ### Zookeeper
 - 카프카 클러스터의 여러 요소들을 설정하는데 사용됨
