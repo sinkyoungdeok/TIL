@@ -85,6 +85,7 @@
   - [컨테이너 레이어 수 줄이기](#컨테이너-레이어-수-줄이기)
   - [경량 베이스 이미지 선택](#경량-베이스-이미지-선택)
   - [멀티 스테이지 빌드 사용](#멀티-스테이지-빌드-사용)
+  - [python 멀티 스테이지 빌드 예시](#python-멀티-스테이지-빌드-예시)
 - [14. 도커 데몬 디버깅](#14-도커-데몬-디버깅)
   - [도커 데몬의 이벤트 보기](#도커-데몬의-이벤트-보기)
   - [도커 시스크 사용량 보기](#도커-시스크-사용량-보기)
@@ -805,6 +806,20 @@ COPY . .
 EXPOSE 8080
 CMD [ "node", "server.js" ]
 ``` 
+
+
+### python 멀티 스테이지 빌드 예시 
+- 다른 언어는 예시가 많은데, python은 찾는데 시간이 오래걸렸어서, 이참에 정리한다.
+```
+FROM python:3.8.2-slim-buster AS pip
+RUN apt-get update
+RUN apt-get install -y --no-install-recommends build-essential gcc
+RUN pip install --user --no-warn-script-location 패키지명1 패키지명2
+
+FROM python:3.8.2-alpine3.11
+COPY --from=pip /root/.local /root/.local
+ENV PATH=/root/.local/bin:$PATH
+```
 
 
 ## 14. 도커 데몬 디버깅
