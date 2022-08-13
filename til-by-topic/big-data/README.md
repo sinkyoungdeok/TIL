@@ -227,6 +227,7 @@
   - [zookeeper, kafka, kafdrop 를 docker-compose로 실행하기](#zookeeper-kafka-kafdrop-를-docker-compose로-실행하기)
   - [kafka topic 생성](#kafka-topic-생성)
   - [CSV를 스트림으로 바꿔주는 Producer](#csv를-스트림으로-바꿔주는-producer)
+  - [비정상 데이터 탐지](#비정상-데이터-탐지)
 
 
 
@@ -2173,4 +2174,13 @@ docker exec -it 03-kafka_kafka1_1 kafka-topics --bootstrap-server=localhost:1909
 ```
 ./3-kafka/trips_producer.py
 ./3-kafka/trips_consumer.py
+```
+
+### 비정상 데이터 탐지 
+- payment_producer에서 랜덤 payment 데이터들을 kafka payment 토픽으로 전송 한다. (producer)
+- fraud_detector에서 payment 토픽에서 데이터를 전달받아 비트코인 데이터면 fraud_payments(사기) 토픽으로 전송하고 정상 데이터면 legit_payments 토픽으로 데이터를 전송한다. 즉, consumer와 producer가 둘다 공존하고 있다.
+- legit_processor는 정상 데이터들을 전달받아 처리하는 consumer이다.
+- fraud_processor는 비정상 데이터들을 전달받아 처리하는 consumer이다.
+```
+./3-kafka/fraud_detection/*
 ```
