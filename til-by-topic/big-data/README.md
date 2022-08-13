@@ -234,6 +234,12 @@
   - [Stream Processing은 언제 쓰일까](#stream-processing은-언제-쓰일까)
   - [Batch Processing vs Stream Processing](#batch-processing-vs-stream-processing)
   - [Flink의 기본적인 처리 구조](#flink의-기본적인-처리-구조)
+  - [Hadoop vs Spark vs Flink 특징 비교](#hadoop-vs-spark-vs-flink-특징-비교)
+  - [Hadoop vs Spark vs Flink 데이터 처리 방식 비교](#hadoop-vs-spark-vs-flink-데이터-처리-방식-비교)
+  - [Hadoop vs Spark vs Flink 개발 편의성 비교](#hadoop-vs-spark-vs-flink-개발-편의성-비교)
+  - [Spark vs Flink 비교](#spark-vs-flink-비교)
+  - [마이크로 배치 vs Window](#마이크로-배치-vs-window)
+  - [Spark vs Flink 개발 비교](#spark-vs-flink-개발-비교)
 
 
 
@@ -2234,3 +2240,69 @@ docker exec -it 03-kafka_kafka1_1 kafka-topics --bootstrap-server=localhost:1909
   - Operators: 데이터를 변환 (transformation)
   - Sink: 데이터플로우의 마지막 부분 
 - 여러 데이터 소스로 부터 읽어와서, Sink를 통해 여러 데이터 소스로 보낼 수 있다. 
+
+
+### Hadoop vs Spark vs Flink 특징 비교
+- Hadoop
+  - Batch Processing
+  - Disk에서 데이터를 읽고 처리
+- Spark
+  - Hadoop에서 개선해서 만든 프로젝트 
+  - Hadoop에 비해 속도가 빠르다 
+  - Batch Processing
+  - (Batch based Streaming) -> micro batch로 streaming을 할 수 있는 라이브러리가 있다 
+  - In-Memory 데이터 처리 
+- Flink
+  - Stream Processing
+  - In-Memory 데이터 처리 
+
+### Hadoop vs Spark vs Flink 데이터 처리 방식 비교 
+- Hadoop
+  - Input ---Mapper--> 상태1 ---Mapper(Disk)--> Reducer --> Output
+  - Mapper를 통해서 Reducer에 전달이 될 때 Disk를 거치기 때문에 고성능을 내기 힘들다 (Disk를 거치는게 시간 소요가 많이 된다)
+- Spark
+  - Input --> 상태1 --Transformation(in-memory)--> 상태2 --> Output
+  - in-memory tranformation을 통해서 Hadoop에 비해 훨씬 성능이 빠르다. 
+- Flink
+  - Input --> 상태1 --Transformation(in-memory)--> 상태2 --> Output
+  - Flow자체는 Spark와 매우 유사한데, Batch Processing이냐 Stream Processing이냐 차이가 있다.
+
+### Hadoop vs Spark vs Flink 개발 편의성 비교 
+- Hadoop
+  - 데이터 처리 방법을 손수 코딩해줘야 한다
+  - 낮은 단계의 추상화
+- Spark
+  - 높은 단계의 추상화
+  - 쉬운 프로그래밍
+  - RDD
+- Flink
+  - 높은 단계의 추상화
+  - 쉬운 프로그래밍
+  - Dataflows
+- Spark & Flink 모두 개발 커뮤니티가 활성화 되어 있고, API 라이브러리가 개발이 잘 되어 있다 
+  - 예) Spark - MLlib, Flink - FlinkML 
+
+### Spark vs Flink 비교 
+- Spark
+  - Spark는 진정한 실시간 데이터 처리가 아니다
+  - 스파크의 엔진은 배치 프로세싱 기준
+  - 마이크로 배칭
+- Flink
+  - 실시간 데이터 처리
+  - 플링크의 엔진은 스트림 프로세싱 기준 
+
+### 마이크로 배치 vs Window
+- 마이크로 배치: 데이터 중 일부분 떼와서 배치 프로세싱
+- Window: 시간을 정한 후, 그 시간부터 10초 사이의 데이터를 window로 묶어 사용 
+
+### Spark vs Flink 개발 비교 
+- Spark
+  - Scala로 개발되어 있음
+  - 효율적인 메모리 관리가 어렵다
+  - Out of Memory 에러가 자주 발생
+  - 의존성 관리로 DAG 사용
+- Flink
+  - Java로 개발되어 있음
+  - 내장 메모리 매니저
+  - Out of Memory 에러가 자주 안난다
+  - Controlled cyclic dependency graph (ML 같이 반복적인 작업에 최적화)
