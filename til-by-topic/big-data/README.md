@@ -231,6 +231,9 @@
 - [13. Flink와 스트리밍 프로세싱](#13-flink와-스트리밍-프로세싱)
   - [Apache Flink 란](#apache-flink-란)
   - [Flink 소개](#flink-소개)
+  - [Stream Processing은 언제 쓰일까](#stream-processing은-언제-쓰일까)
+  - [Batch Processing vs Stream Processing](#batch-processing-vs-stream-processing)
+  - [Flink의 기본적인 처리 구조](#flink의-기본적인-처리-구조)
 
 
 
@@ -2204,3 +2207,30 @@ docker exec -it 03-kafka_kafka1_1 kafka-topics --bootstrap-server=localhost:1909
 - Fault-tolerance: 시스템 장애시 장애 직전으로 돌아가서 다시 시작할 수 있다
 - 활발한 개발 - 그래프 프로세싱, 머신러닝, 텍스트 처리, 등 라이브러리와 여러가지 라이브러리 / 프레임워크와 연동
 - Rescalability: 실행 도중 리소스 추가 가능 
+
+### Stream Processing은 언제 쓰일까 
+- 배치 프로세싱은 한정된 데이터를 가지고 다뤘다면, 스트림 프로세싱은 무한하게 데이터가 들어올 수 있을 때 다룬다. 
+- 주식 거래소 
+- 웹 서버
+- 센서 데이터 처리
+- 이벤트 드리븐 어플리케이션
+- 비정상 거래 탐지 
+
+### Batch Processing vs Stream Processing
+- Batch 
+  - 한정된 데이터를 다룰 때 사용
+  - 모든 데이터셋을 읽은 후 처리 가능
+  - 주기적으로 실행되는 작업
+  - 처리속도보다는 처리량에 포커스 
+- Stream
+  - 데이터가 무한이라고 가정
+  - 데이터가 도착할 때 마다 처리
+  - 실시간으로 실행되는 작업
+  - 처리량보다 처리속도에 포커스
+
+### Flink의 기본적인 처리 구조 
+- Streaming Dataflow:
+  - Sources: 한개 혹은 여러개의 데이터 소스가 있을 수 있다
+  - Operators: 데이터를 변환 (transformation)
+  - Sink: 데이터플로우의 마지막 부분 
+- 여러 데이터 소스로 부터 읽어와서, Sink를 통해 여러 데이터 소스로 보낼 수 있다. 
