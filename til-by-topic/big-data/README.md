@@ -226,6 +226,7 @@
   - [Kafka pyhton Consumer Producer 간단예제](#kafka-pyhton-consumer-producer-간단예제)
   - [zookeeper, kafka, kafdrop 를 docker-compose로 실행하기](#zookeeper-kafka-kafdrop-를-docker-compose로-실행하기)
   - [kafka topic 생성](#kafka-topic-생성)
+  - [CSV를 스트림으로 바꿔주는 Producer](#csv를-스트림으로-바꿔주는-producer)
 
 
 
@@ -2166,4 +2167,10 @@ pip install kafka-python
 docker exec -it 03-kafka_kafka1_1 kafka-topics --bootstrap-server=localhost:19091 --create --topic first-cluster-topic --partitions 3 --replication-factor 1
 
 # kafdrop 에서도 ui로 topic 생성 가능
+```
+
+### CSV를 스트림으로 바꿔주는 Producer 
+```
+./3-kafka/trips_producer.py
+./3-kafka/trips_consumer.py
 ```
