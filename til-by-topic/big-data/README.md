@@ -228,6 +228,9 @@
   - [kafka topic 생성](#kafka-topic-생성)
   - [CSV를 스트림으로 바꿔주는 Producer](#csv를-스트림으로-바꿔주는-producer)
   - [비정상 데이터 탐지](#비정상-데이터-탐지)
+- [13. Flink와 스트리밍 프로세싱](#13-flink와-스트리밍-프로세싱)
+  - [Apache Flink 란](#apache-flink-란)
+  - [Flink 소개](#flink-소개)
 
 
 
@@ -2184,3 +2187,20 @@ docker exec -it 03-kafka_kafka1_1 kafka-topics --bootstrap-server=localhost:1909
 ```
 ./3-kafka/fraud_detection/*
 ```
+
+
+## 13. Flink와 스트리밍 프로세싱
+
+### Apache Flink 란 
+- Spark: 배치 프로세싱을 위한 프레임워크 
+- Flink: 스트림 프로세싱을 위한 프레임워크
+- 2009년 개발 시작 ~ 2016년 첫 stable 버전 공개 
+
+### Flink 소개 
+- 오픈소스 스트림 프로세싱 프레임워크
+- 분산처리 / 고성능 / 고가용성
+- 배치 프로세싱 또한 지원한다 
+- Spark보다 빠른 속도
+- Fault-tolerance: 시스템 장애시 장애 직전으로 돌아가서 다시 시작할 수 있다
+- 활발한 개발 - 그래프 프로세싱, 머신러닝, 텍스트 처리, 등 라이브러리와 여러가지 라이브러리 / 프레임워크와 연동
+- Rescalability: 실행 도중 리소스 추가 가능 
