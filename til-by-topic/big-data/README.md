@@ -240,6 +240,13 @@
   - [Spark vs Flink 비교](#spark-vs-flink-비교)
   - [마이크로 배치 vs Window](#마이크로-배치-vs-window)
   - [Spark vs Flink 개발 비교](#spark-vs-flink-개발-비교)
+  - [Flink의 대단한 점](#flink의-대단한-점)
+  - [Flink 구성](#flink-구성)
+  - [Flink Storage Streaming](#flink-storage-streaming)
+  - [Flink Deployment](#flink-deployment)
+  - [Flink 내부 구조](#flink-내부-구조)
+  - [Flink의 Connectors](#flink의-connectors)
+  - [Flink의 써드파티 프로젝트](#flink의-써드파티-프로젝트)
 
 
 
@@ -2306,3 +2313,68 @@ docker exec -it 03-kafka_kafka1_1 kafka-topics --bootstrap-server=localhost:1909
   - 내장 메모리 매니저
   - Out of Memory 에러가 자주 안난다
   - Controlled cyclic dependency graph (ML 같이 반복적인 작업에 최적화)
+
+
+### Flink의 대단한 점 
+- Flink는 아래 스펙들을 갖고 있는 첫번째 오픈소스 프레임워크
+- 클러스터를 이루고 100만 단위의 이벤트를 처리
+- Latency 가 1초 이하(sub-second)
+- Exactly-once: 1번 이상의 처리를 보장 -> 보통 다른 시스템들은 at least once가 대부분이다 (한 번 이상의 처리를 하거나 보장을 못하고 중복으로 처리할 수 도 있고 데이터를 잃어버릴수도 있음)
+- 정확한 결과를 보장 
+
+### Flink 구성 
+![image](https://user-images.githubusercontent.com/28394879/184519698-f4ef8581-8073-4e45-8011-d859c065557b.png)
+- Storage
+- Deployment/Environment
+- Engine
+
+
+### Flink Storage Streaming
+- Flink는 Spark와 마찬가지로 데이터를 처리만 하는 시스템이다.
+- 따라서, 각종 저장 시스템들과 연동이 가능하도록 설계
+  - HDFS
+  - Local File System
+  - Mongo DB
+  - RDBMS (MySQL, Postgres)
+  - S3
+  - Rabbit MQ
+
+### Flink Deployment
+- 리소스 관리도 여러 시스템과 연동하여 이용 가능하다.
+  - Local
+  - Standalone 클러스터
+  - YARN
+  - Mesos
+  - AWS / GCP 
+
+### Flink 내부 구조 
+1. SQL: High-level Language
+2. Table API: Declarative DSL
+3. Data Stream / DataSet API: Core APIs
+4. Stateful Stream Processing: Low-level building block (streams, state, [event] time)
+
+- 4번을 그대로 쓸수도 있지만, 보통은 이 파트를 쓰지 않는다.
+- 실제로는 3번을 사용하게 되는데, Data Stream은 스트림 프로세싱할 때 사용하고, Dataset API는 배치 프로세싱할 때 사용하는데 
+- Data Set API는 점점 안쓰는 추세이며 곧 Deprecated 될 수 있다.
+- 2번: SparkSQL과 비슷하게 프로그래밍을 선언적으로 할 수 있도록 해줌. Spark와는 다르게 Table이 Dynamic하게 변경되는점이 다르다.
+- 1번: 가장 높은 단계의 추상화, SQL로 프로그래밍을 할 수 있다.
+
+### Flink의 Connectors
+- Flink는 여러 Connector 들과 연결 가능
+- sink는 데이터를 저장하는 곳, source는 데이터를 입력을 받을 수 있는 곳 
+  - Apache Kafka (sink / source)
+  - Elastic Search (sink)
+  - HDFS (sink)
+  - RabbitMQ (sink, source)
+  - Amazon Kinesis (sink, source)
+  - Twitter Streaming API (source)
+  - Apache Cassandra (sink)
+  - Redis (sink)
+
+### Flink의 써드파티 프로젝트
+- Apache Zepplin - 웹 베이스 노트북
+- Apache Mahout - 머신러닝 라이브러리
+- Cascading - Workflows 매니지먼트
+- Apache Beam - Data pipeline 생성 / 관리 툴 
+
+
