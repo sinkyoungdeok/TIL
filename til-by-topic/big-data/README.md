@@ -273,6 +273,7 @@
   - [Pyflink 역사](#pyflink-역사)
   - [Pyflink 란](#pyflink-란)
   - [Pyflink의 퍼포먼스 최적화](#pyflink의-퍼포먼스-최적화)
+  - [flink 설치](#flink-설치)
 
 
 
@@ -2579,3 +2580,22 @@ docker exec -it 03-kafka_kafka1_1 kafka-topics --bootstrap-server=localhost:1909
 - 빠른 Python UDF
 - CPU utilization
 
+### flink 설치 
+```
+https://www.apache.org/dyn/closer.lua/flink/flink-1.15.1/flink-1.15.1-bin-scala_2.12.tgz # 접속 후 다운로드 
+```
+
+pyflink 설치 
+```
+pip install apache-flink
+```
+
+WordCount java 실행 
+```
+./bin/flink run examples/streaming/WordCount.jar
+```
+
+WordCount python 실행
+```
+./bin/flink run --python examples/python/datastream/word_count.py
+```
