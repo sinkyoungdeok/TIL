@@ -274,6 +274,7 @@
   - [Pyflink 란](#pyflink-란)
   - [Pyflink의 퍼포먼스 최적화](#pyflink의-퍼포먼스-최적화)
   - [flink 설치](#flink-설치)
+  - [flink 클러스터 실행 및 종료](#flink-클러스터-실행-및-종료)
 
 
 
@@ -2593,9 +2594,35 @@ pip install apache-flink
 WordCount java 실행 
 ```
 ./bin/flink run examples/streaming/WordCount.jar
+tail log/flink-*-taskexecutor-*.out
 ```
 
 WordCount python 실행
 ```
 ./bin/flink run --python examples/python/datastream/word_count.py
+# Job has been submitted with JobID cc2541ee4ded7e34d7b12d812134fd96
+```
+
+### flink 클러스터 실행 및 종료
+- 실행 
+```
+$ ./bin/start-cluster.sh
+Starting cluster.
+Starting standalonesession daemon on host.
+Starting taskexecutor daemon on host.
+```
+
+- 실행 확인 
+```
+$ ps aux | grep flink
+```
+
+- 종료 
+```
+$ ./bin/stop-cluster.sh
+``` 
+
+- 웹 ui 확인 
+```
+http://localhost:8081/#/overview
 ```
