@@ -266,6 +266,10 @@
   - [Evemt Time과 Processing Time이 안 맞을 떄](#evemt-time과-processing-time이-안-맞을-떄)
   - [Watermark](#watermark)
   - [병렬 환경에서의 Watermark](#병렬-환경에서의-watermark)
+  - [Flink의 클러스터 매니저](#flink의-클러스터-매니저)
+  - [Flink의 아키텍처 - Job Manager](#flink의-아키텍처---job-manager)
+  - [Flink의 아키텍처 - Task Manager](#flink의-아키텍처---task-manager)
+  - [Flink의 아키텍처 - Task Slots](#flink의-아키텍처---task-slots)
 
 
 
@@ -2524,3 +2528,33 @@ docker exec -it 03-kafka_kafka1_1 kafka-topics --bootstrap-server=localhost:1909
 
 ### 병렬 환경에서의 Watermark
 - 여러 input stream을 받는 operator의 경우 가장 낮은 event time을 사용
+
+
+### Flink의 클러스터 매니저 
+- 분산 시스템으로서 컴퓨팅 리소스 분배가 효율적이어야 한다
+- 리소스 매니저의 종류
+  - YARN
+  - Kubernetes
+
+
+### Flink의 아키텍처 - Job Manager
+- Task 스케줄링 (다음 Task가 언제 실행 될 지)
+- 실패/완료된 Tasks 관리
+- 체크포인트 관리
+- 실패시 Recovery
+- 3가지의 컴포넌트
+  - Resource Manager - task solt 관리
+  - Dispatcher - Flink app을 등록 하는 REST API & web UI
+  - JobMaster - 1개의 JobGraph 관리
+
+### Flink의 아키텍처 - Task Manager
+- aka workers
+- Dataflow의 task를 실행하는 주체
+- Task slot - 테스크 매니저를 스케줄링하는 가장 작은 단위
+- Task slot으로 동시에 실행될 수 있는 tasks 설정 
+
+### Flink의 아키텍처 - Task Slots
+- Task Worker (TaskManager)는 JVM 프로세스
+  - 여러 쓰레드에서 하나 혹은 여러개의 sub task를 실행 가능
+  - 하나의 TaskManager가 가질 수 있는 Task 수는 Task Slot으로 조절 
+
