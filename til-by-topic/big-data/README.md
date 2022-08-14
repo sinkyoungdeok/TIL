@@ -270,6 +270,9 @@
   - [Flink의 아키텍처 - Job Manager](#flink의-아키텍처---job-manager)
   - [Flink의 아키텍처 - Task Manager](#flink의-아키텍처---task-manager)
   - [Flink의 아키텍처 - Task Slots](#flink의-아키텍처---task-slots)
+  - [Pyflink 역사](#pyflink-역사)
+  - [Pyflink 란](#pyflink-란)
+  - [Pyflink의 퍼포먼스 최적화](#pyflink의-퍼포먼스-최적화)
 
 
 
@@ -2557,4 +2560,22 @@ docker exec -it 03-kafka_kafka1_1 kafka-topics --bootstrap-server=localhost:1909
 - Task Worker (TaskManager)는 JVM 프로세스
   - 여러 쓰레드에서 하나 혹은 여러개의 sub task를 실행 가능
   - 하나의 TaskManager가 가질 수 있는 Task 수는 Task Slot으로 조절 
+
+### Pyflink 역사 
+- 2019년 8월 Pyflink (Table API) 베타 버전
+- 2020년 2월 Apache-flink가 pypi에서 다운로드 가능 해짐
+- 2020년 7월 Python UDF, SQL, UDF metrics, Pandas UDFs
+- 파이썬인 이유 
+  - Data Sciencedhk 가장 가까운 언어
+  - 머신러닝 프레이무어크, 판다스 등의 라이브러리 
+
+### Pyflink 란
+- Apache Flink위에 올려진 Python API
+- 파이썬으로 스트림 프로세싱을 할 수 있다 
+
+### Pyflink의 퍼포먼스 최적화
+- Data를 주고 받는 것을 최소화
+- Serialization / Deserialization
+- 빠른 Python UDF
+- CPU utilization
 
