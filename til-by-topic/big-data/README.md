@@ -247,6 +247,7 @@
   - [Flink 내부 구조](#flink-내부-구조)
   - [Flink의 Connectors](#flink의-connectors)
   - [Flink의 써드파티 프로젝트](#flink의-써드파티-프로젝트)
+  - [Flink 프로그램의 일반적인 플로우](#flink-프로그램의-일반적인-플로우)
 
 
 
@@ -2378,3 +2379,7 @@ docker exec -it 03-kafka_kafka1_1 kafka-topics --bootstrap-server=localhost:1909
 - Apache Beam - Data pipeline 생성 / 관리 툴 
 
 
+### Flink 프로그램의 일반적인 플로우 
+- Source -> Operations,Transformations -> Sink
+- Source: RDB, Kafka, Local file
+- Sink: Kafka, HDFS, RDB 등
