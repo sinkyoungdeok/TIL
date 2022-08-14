@@ -259,6 +259,13 @@
   - [Recovery](#recovery)
   - [Savepoints](#savepoints)
   - [Exactly once vs At least once](#exactly-once-vs-at-least-once)
+  - [데이터 처리시 시간 개념이 들어갈 때](#데이터-처리시-시간-개념이-들어갈-때)
+  - [Time의 종류](#time의-종류)
+  - [Processing Time](#processing-time)
+  - [Event Time](#event-time)
+  - [Evemt Time과 Processing Time이 안 맞을 떄](#evemt-time과-processing-time이-안-맞을-떄)
+  - [Watermark](#watermark)
+  - [병렬 환경에서의 Watermark](#병렬-환경에서의-watermark)
 
 
 
@@ -2477,3 +2484,43 @@ docker exec -it 03-kafka_kafka1_1 kafka-topics --bootstrap-server=localhost:1909
 - 분산 환경에서 체크포인트 정렬 여부
 - 속도가 중요할 경우 at least once 사용 
 
+### 데이터 처리시 시간 개념이 들어갈 때 
+- Time Series Analysis할 때
+- Windows쓸 때 
+- Event time이 중요 할 때 
+
+
+### Time의 종류 
+- Event Time
+- Processing Time 
+
+
+### Processing Time
+- 데이터를 처리하는 시스템의 시간
+- Hourly time window
+  - 9:15분 시스템 시작
+  - 9:15 - 10:00
+  - 10:00 - 11:00
+- 가장 빠른 성능과 Low Latency
+- 하지만 분산되고 비동기적인 환경에서는 결정적(deterministic) 이지 못한다
+  - 이벤트가 시스템에 도달하는 속도에 달렸기 때문에 
+
+### Event Time
+- Event가 생성된 곳에서 만들어진 시간
+- Flink에 도달하기 전 이벤트 자체에 기록 보관
+- 시간은 시스템이 아니라 data 자체에 의존
+- 이벤트 타임 프로그램은 Event Time Watermark를 생성해야 된다 
+
+### Evemt Time과 Processing Time이 안 맞을 떄
+- Evnet Time에 의존하는 시스템은 시간의 흐름을 재는 방법이 따로 필요하다
+- 예) 1시간 짜리 window operation이면 1시간이 흘렀다는 것을 알아야 한다 
+- Event Time과 Processing Time은 싱크가 안맞을 수 있다
+- 예) 1주 짜리 데이터를 몇초 만에 계산할 수 있다
+- 그래서 나온것이 watermark
+
+### Watermark
+- Flink가 event time의 흐름을 재는 방법 
+- Watermark(t): timestamp t <= t (적어도 t까진 왔다)
+
+### 병렬 환경에서의 Watermark
+- 여러 input stream을 받는 operator의 경우 가장 낮은 event time을 사용
