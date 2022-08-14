@@ -248,6 +248,17 @@
   - [Flink의 Connectors](#flink의-connectors)
   - [Flink의 써드파티 프로젝트](#flink의-써드파티-프로젝트)
   - [Flink 프로그램의 일반적인 플로우](#flink-프로그램의-일반적인-플로우)
+  - [State](#state)
+  - [State Backend](#state-backend)
+  - [Keyed State](#keyed-state)
+  - [State 저장](#state-저장)
+  - [체크포인팅](#체크포인팅)
+  - [Barriers](#barriers)
+  - [Snapshotting](#snapshotting)
+  - [체크포인트 정렬](#체크포인트-정렬)
+  - [Recovery](#recovery)
+  - [Savepoints](#savepoints)
+  - [Exactly once vs At least once](#exactly-once-vs-at-least-once)
 
 
 
@@ -2383,3 +2394,86 @@ docker exec -it 03-kafka_kafka1_1 kafka-topics --bootstrap-server=localhost:1909
 - Source -> Operations,Transformations -> Sink
 - Source: RDB, Kafka, Local file
 - Sink: Kafka, HDFS, RDB 등
+
+
+### State
+- event 각각을 독립적으로 처리하면 state가 필요 없다
+- 여러 event를 한꺼번에 보려고 할 대 state가 필요하다 - stateful
+- 예
+  - 패턴을 찾는 일
+  - 데이터를 시간별로 합치는 일
+  - 머신러닝 트레이닝
+  - 과거의 데이터를 참고해야하는 일 
+- flink는 따라서 state를 갖고 있다
+- checkpoints와 savepoints로 state를 저장해서 내결함성을 갖도록 설계
+- queryable state를 이용해서 밖에서 state를 관찰할 수도 있다 
+
+### State Backend
+- Data Stream API를 사용할 때 여러가지 경우로 state를 사용하게 된다
+  - Window로 데이터 모아보기
+  - Transformations (key-value state)
+  - CheckpointedFunction으로 로컬 변수를 fault tolerant하게 만들기
+- HashMapStateBackend
+  - Java Heap에 저장
+  - Hash Table에 변수와 Trigger를 저장
+  - 큰 state, 긴 windows, 큰 key/value 쌍을 저장할 때 권장
+  - 고가용성 환경
+  - 메모리 사용으로 빠른 처리 
+- EmbeddedRocksDBStateBackend
+  - RocksDB에 저장
+  - 데이터는 byte array로 시리얼라이즈 되어 저장
+  - 매우 큰 state, 긴 window, 큰 key/value state 저장
+  - 고가용성 환경
+  - Disk와 Serialize 사용으로 성능은 뒤떨어지고 / 처리량이 늘어난다 (tradeoff)
+
+### Keyed State
+- Key-Value store
+- Keyed stream에서만 이용 가능
+- 예를들어 각 이벤트는 id, value 스키마를 갖고
+  - 각 id마다 value를 더하고 싶을 때 keyed state를 이용 
+
+### State 저장 
+- 장애 허용을 가능하게 해주는 기능들
+  - Stream replay
+  - Checkpointing
+- checkpoint를 얼마나 자주 저장해야 하나.
+  - Trade off 존재
+  - 가벼운 state를 가진 프로그램은 자주 저장해주어도 된다 
+- checkpoint를 한 이후에 시스템이 망가질 경우
+  - 플링크는 작동을 멈추고
+  - 체크포인트로 리셋
+
+### 체크포인팅
+- 분산된 데이터 스트림에서 어떻게 snapshot을 만들까
+- Chandy-Lamport 알고리즘.
+- 비동기적으로 실행 
+
+### Barriers
+- 데이터를 시간별로 나누는 barrier를 삽입해 snapshot이 가능하다
+- barrier는 가벼워서 스트림에 방해되지 않도록 설계
+- Sink operator가 barrier를 받아서 새로운 checkpoint를 만든다
+
+### Snapshotting
+- 사이사이에 끼어놓은 barrier를 기록을 하는 과정이다.
+- barrier와 state를 기록한다.
+
+### 체크포인트 정렬 
+- 데이터가 오는대로 받아들여 체크포인트 만들기
+- 빠른 속도를 위한 프로그램을 만들 때 사용 
+- Exactly-once 보다는 at-least-once를 보장한다.
+
+### Recovery
+- 장애가 나면 마지막 체크포인트를 불러온다
+- 시스템은 dataflow 전체를 re-deploy 한다
+- 각 operator에게 체크포인트의 state 정보를 주입한다
+- 입력 stream도 체크포인트일 때로 돌려놓는다 - 입력 스트림 자체가 체크포인트로 돌려놓는 작업을 지원해야 한다(이런점에서 kafka랑 궁합이 잘 맞는다)
+- 재시작 
+
+### Savepoints
+- 사용자가 지정한 체크포인트
+- 다른 체크포인트처럼 자동으로 없어지지 않는다
+
+### Exactly once vs At least once
+- 분산 환경에서 체크포인트 정렬 여부
+- 속도가 중요할 경우 at least once 사용 
+
