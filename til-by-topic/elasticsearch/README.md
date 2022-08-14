@@ -401,3 +401,31 @@ bin/logstash -f 3-elk/logstash-eslog.conf
 ```
 filebeat-7.15.0-darwin-x86_64/filebeat -e -c 3-elk/filebeat-eslog.yml
 ```
+
+
+## 5. elasticsearch 기본
+
+### Directory 구성 
+- bin: 실행 스크립트
+- config: 설정 파일
+- data: index
+- jdk.app: jdk
+- lib: elasticsearch 와 dependency jar
+- logs: elasticsearch 실행 로그
+- modules: elasticsearch 에서 사용하는 모듈 jar
+- plugins: elasticsearch 에서 사용하는 플러그인 jar
+- data와 logs는 path.data, path.logs 설정으로 변경 가능
+- config는 classpath 기본 위치로 사용 
+
+### Configuration
+- Elasticsearch를 구성하기 위한 기본 설정 - elasticsearch.yml
+- 단일 노드로 구성 할 경우 기본 값이 어떻게 되는 지 정도는 알고 있으면 유리하다 
+- cluster.name 과 node.name은 클러스터와 노드를 잘 운영하기 위해 반드시 설정
+- 설정하지 않을 경우 cluster.name은 "elasticsearch"로 지정이 되고 node.name은 hostname으로 설정됨
+- cluster.name
+  - 모든 노드와 클러스터 이름이 공유 되었을 때 연결 가능
+  - 같은 클러스터 이름을 사용하지 않도록 주의해야됨 
+- node.name
+  - 노드의 용도와 목적을 이해하기 위한 사람이 읽을 수 있는 식별자로 작성 해야 함. 
+- 노드의 역할에 대한 설정이 있는데 이 또한 명시적으로 설정하는게 좋다
+- 노드명에 역할을 명시적으로 같이 부여를 해서 가독성을 좋게 구성하는 편
