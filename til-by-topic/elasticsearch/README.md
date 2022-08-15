@@ -1,12 +1,54 @@
 
-
-## 목록 
 - [1. 설치 명령어](#1-설치-명령어)
+  - [관련 오픈소스 클론](#관련-오픈소스-클론)
+  - [JENV 구성](#jenv-구성)
+  - [elastic search 다운로드](#elastic-search-다운로드)
 - [2. lucene](#2-lucene)
+  - [lucene의 핵심 4가지](#lucene의-핵심-4가지)
+  - [lucene이란](#lucene이란)
+  - [lucene 기본 개념](#lucene-기본-개념)
+  - [역색인 파일](#역색인-파일)
+  - [예시](#예시)
+  - [index file 란](#index-file-란)
+  - [index 란](#index-란)
+  - [index 과정](#index-과정)
+  - [index searcher 란](#index-searcher-란)
+  - [형태소 분석이란](#형태소-분석이란)
+  - [입력 문자열에 대한 분석 과정](#입력-문자열에-대한-분석-과정)
 - [3. elasticsearch 기본 개념](#3-elasticsearch-기본-개념)
+  - [elasticsearch vs DBMS](#elasticsearch-vs-dbms)
+  - [elasticsearch 설치](#elasticsearch-설치)
+  - [elasticsearch Single Node 구성 - local](#elasticsearch-single-node-구성---local)
+  - [elasticsearch Single Node 구성 - docker compose](#elasticsearch-single-node-구성---docker-compose)
+  - [elasticsearch Cluster 구성 - local](#elasticsearch-cluster-구성---local)
+  - [node roles 종류](#node-roles-종류)
+  - [elasticsearch Cluster 구성 - docker compose](#elasticsearch-cluster-구성---docker-compose)
+  - [elasticsearch Single node VS Cluster node](#elasticsearch-single-node-vs-cluster-node)
 - [4. elk 구성](#4-elk-구성)
-
-
+  - [kibana 기본 개념](#kibana-기본-개념)
+  - [kiana 구성 - local](#kiana-구성---local)
+  - [kibana 구성 - docker compose](#kibana-구성---docker-compose)
+  - [Logstash 기본 개념](#logstash-기본-개념)
+  - [Logstash 구성 - local](#logstash-구성---local)
+  - [Filebeat 기본 개념](#filebeat-기본-개념)
+  - [Filebeat 구성 - local](#filebeat-구성---local)
+- [5. elasticsearch 기본 설정 및 구성](#5-elasticsearch-기본-설정-및-구성)
+  - [Directory 구성](#directory-구성)
+  - [Configuration](#configuration)
+  - [노드의 역할 12가지](#노드의-역할-12가지)
+  - [노드의 역할별 특징](#노드의-역할별-특징)
+  - [node.roles 설정 및 확인](#noderoles-설정-및-확인)
+  - [elasticsearch에서 잦은 오류 중 하나) disk full로 인한 오류](#elasticsearch에서-잦은-오류-중-하나-disk-full로-인한-오류)
+  - [Cluster 구성 시 노드 노출](#cluster-구성-시-노드-노출)
+  - [Cluster 환경 구성 시 묶어야 하는 노드들을 발견하기 위한 설정](#cluster-환경-구성-시-묶어야-하는-노드들을-발견하기-위한-설정)
+  - [Heap 설정](#heap-설정)
+  - [HTTP 통신 설정](#http-통신-설정)
+  - [Transport 통신 설정](#transport-통신-설정)
+  - [Discovery 설정](#discovery-설정)
+  - [Gateway 설정](#gateway-설정)
+  - [인덱스 생성 및 삭제에 대한 기본 설정](#인덱스-생성-및-삭제에-대한-기본-설정)
+  - [x-pack 설정](#x-pack-설정)
+  - [각종 설정 샘플](#각종-설정-샘플)
 
 
 ## 1. 설치 명령어 
@@ -403,7 +445,7 @@ filebeat-7.15.0-darwin-x86_64/filebeat -e -c 3-elk/filebeat-eslog.yml
 ```
 
 
-## 5. elasticsearch 기본
+## 5. elasticsearch 기본 설정 및 구성
 
 ### Directory 구성 
 - bin: 실행 스크립트
@@ -429,3 +471,207 @@ filebeat-7.15.0-darwin-x86_64/filebeat -e -c 3-elk/filebeat-eslog.yml
   - 노드의 용도와 목적을 이해하기 위한 사람이 읽을 수 있는 식별자로 작성 해야 함. 
 - 노드의 역할에 대한 설정이 있는데 이 또한 명시적으로 설정하는게 좋다
 - 노드명에 역할을 명시적으로 같이 부여를 해서 가독성을 좋게 구성하는 편
+
+### 노드의 역할 12가지
+1. master
+   - 클러스터의 상태를 변경
+   - 클러스터의 상태를 모든 노드에 게시
+   - 전역 클러스터 상태를 유지
+   - 샤드에 대한 할당과 클러스터 상태 변화 게시 
+2. data
+   - 문서의 색인 및 저장
+   - 문서의 검색 및 분석 
+   - 코디네이팅
+3. data_content
+   - 색인과 검색 요청이 많은 경우     
+4. data_hot
+   - 색인에 대한 요청이 많으며 자주 검색 요청을 하게 되는 경우
+   - time series 데이터 (logs, metrics 등) 
+5. data_warm
+   - time series 데이터를 유지하고 있는 노드로 업데이트가 거의 없고 드물게 요청하는 경우 
+6. data_cold
+   - time series 데이터를 유지하고 있는 노드로 업데이트가 되지 않고 거의 요청을 하지 않는 데이터를 보유 
+7. data_frozen
+   - time series 데이터로 요청도 업데이트도 없는 경우  
+8. ingest
+   - 클러스터 내 적어도 하나 이상의 ingest 역할을 하는 노드 필요 (ingest pipeline 기능을 사용하기 위해서 필요)
+   - master와 data 노드와 같이 사용 하지 않는 것을 추천
+   - 색인 전에 데이터에 대한 변환하여 색인 되도록 함 
+9. ml
+   - xpack 에서 제공 하는 machine learning 기능을 사용하기 위해서는 최소 하나 이상의 노드 역할을 구성 해야함 
+10. remote_cluster_client
+   - 원격으로 구성된 cluster에 연결 하여 원격 client 노드 역할을 수행     
+11. transform
+   - 색인된 데이터로부터 데이터에 대한 pivot이나 latest 정보를 별도 데이터로 변환 해서 tranform index로 저장
+12. voting_only 
+   - 마스터 노드를 선축하기 위한 전용 노드 
+   - note.roles: [master, voting_only] 로 선언은 하며 마스터 노드의 역할은 수행 
+   - 마스터 노드로 선출은 되지 않는다 (다른 역할을 부여 할 수도 있다)
+   - voting_only노드로 사용하기 위해서는 최소 master노드 역할을 부여해야함
+- 추가적인 역할로 coordinating node가 있다. node.roles에 아무것도 선언하지 않으면 이것으로 선언됨
+- coordinating node는 주로 search request 용도로 사용하거나 bulk indexing request 용도로 사용한다.
+- 어떤 노드던간에 기본적으로 coordinating node의 역할은 수행한다.
+
+### 노드의 역할별 특징
+- 노드의 역할을 많이 나누어 놓았지만, elasticsearch에서 자동으로 되는건 없다.
+- 기본 역할을 제외 하고 보면 Data tier개념이 들어 간 것이다.
+- 각 tier 별로 hardware 스펙을 동일하게 해야 된다.
+- 각 노드별 표시 
+  - master(m)
+  - data(d)
+  - data_content(s)
+  - data_hot(h)
+  - data_warm(w)
+  - data_cold(c)
+  - data_frozen(f)
+  - ingest(i)
+  - remote_cluster_client(r)
+  - ml(l)
+  - transform(t)
+  - voring_only(v)
+- 노드의 역할 정의는 shard allocation awareness에서 사용된다. 설정으로는 아래 내용이 추가가 되었기 때문에 사용이 가능하다.
+```
+index.routing.allocation.include_tier
+            _tier
+            Match nodes bythe node's data tier role
+``` 
+
+
+### node.roles 설정 및 확인
+- 아무런 설정을 하지 않은 경우 
+```
+node.master: true
+node.data: true
+node.ingest: true
+node.transform: true
+node.ml: false
+node.voting_only: false
+node.remote_cluster_client: true
+``` 
+
+### elasticsearch에서 잦은 오류 중 하나) disk full로 인한 오류
+- 오류 막는 방법: 저장 공간이 충분한 경로에 색인 데이터와 로그를 기록하고 저장할 수 있도록 경로를 설정한다
+- path.data: 다중 data path 구성이 가능 하다 
+
+```
+path: 
+  data: /var/lib/elasticsearch
+  logs: /var/log/elasticsearch
+  path.data: var/lib/elasticsearch
+  path.logs: var/log/elasticsearch
+```
+
+```
+path:
+  data:
+    - /mnt/elasticsearch_1
+    - /mnt/elasticsearch_2
+    - /mnt/elasticsearch_3
+
+
+path.data: ["/mnt/elasticsearch_1","/mnt/elasticsearch_2", "/mnt/elasticsearch_3"]
+```
+
+- Data에 대한 tier 구성을 따로 하지 않을 경우 -> Data 노드에 대한 Disk 성능과 기타 다른 리소스의 성능은 동일하게 맞춰서 사용해야 함 
+  - 특정 disk는 ssd를 쓰는데, 특정 disk는 hdd를 사용할 경우 색인 질의 포퍼먼스에 대한 차이가 발생해 병목 발생 및 시스템이 죽는 현상이 발생할 수 있다.
+
+
+
+### Cluster 구성 시 노드 노출 
+- Cluster 구성 시 네트워크 상의 노드들을 노출 시키기 위해 network.host 설정 
+  - 인스턴스에 부여된 IP 주소를 작성하면 된다
+- Docker로 클러스터 구성시: network.host 와 network.publish_host 설정
+  - Single node 구성 시: network.host: "0.0.0.0" 으로 구성 
+
+### Cluster 환경 구성 시 묶어야 하는 노드들을 발견하기 위한 설정 
+- `discovery.type`
+  - cluster.initial_master_nodes 와 함께 사용할 수 없음
+  - 이 설정이 등록 되어 있으면 single-node 라는 값으로 지정이 되고 단일 노드 구성이 이루어짐
+- `discovery.seed_hosts`
+  - Clustering을 위한 노드 목록 작성
+  - 이전 unicast 설정과 유사 
+- `cluster.initial_master_nodes`
+  - master 역할을 가진 노드 목록 작성
+  - master 구성은 최소 3개 이상의 쿼럼 구성을 추천
+- 예) data노드를 하나 더 추가해야 하는 경우
+  - discovery.seed_hosts에는 추가할 수 없다.
+  - 신규 추가하려는 노드는 cluster.initial_master_nodes에 설정하면 자동으로 추가된 노드는 master노드로 ping request 보내게 되고, 
+  - 이렇게 추가된 노드는 master노드가 이미 실행중인 다른 노드들에게 broadcast을 해서 통신이 가능하도록 설정을 하게 된다 
+
+### Heap 설정
+- `bootstrap.memory_lock: true`
+  - 보통 시스템 인스턴스 메모리사이즈의 절반을 사용한다.
+  - 최대 31GB이상은 설정하지 않는다.
+  - elasticsearch는 JVM 위에서 동작하기 때문에 실행시 heap 설정을 해야됨
+  - 이 경우, 시스템 메모리를 전용으로 안정적으로 사용하기 위해 memory_lock을 설정 해야 된다
+
+### HTTP 통신 설정
+- HTTP 는 클라이언트간의 통신, Transport는 노드간 통신 설정
+- `http.port`
+  - 기본 9200 포트로 선언 되며, 지정된 값으로 할당
+  - elasticsearch는 HTTP 통신과 Transport 통신 둘다 지원
+  - 노드 간 통신은 transport로 이루어지며, 통신을 위한 port 설정과 content 전송에 따른 compression 설정 등이 가능함
+- `http.max_content_length`
+  - RESTful API 요청 시 실제 저장된 문서의 크기가 클 경우 -> 크기를 적당히 조절
+  - 100MB (HTTP Request Body Size)를 넘어가는 경우 -> 크기를 적당히 조절
+  - 주의: 네트워크의 bandwidth를 많이 사용하지 않기(네트워크 병목으로 성능 저하)
+- `http.max_initial_line_length`
+  - HTTP URL의 최대 크기 (기본 값 4KB)
+- `http.max_header_size`
+  - 허용 하는 최대 Header 크기 (기본 값 8KB)
+- `http.compression`
+  - 기본 false 이지만 true로 설정하는 것을 추천
+  - B2C 형 서비스 인 경우 API Gateway를 별도로 두기 때문에 true로 설정 해서 network 병목을 최소화 할 수 있음
+- `http.compression_level`
+  - 기본 3 설정, CPU 자원에 대한 소비가 많을 수 있기 떄문에 그대로 사용 권장
+  - 최소 1부터 최대 9까지 설정 가능 
+- `http.cors.enabled`
+  - 기본 false로 설정
+  - 이 설정을 통해서 elasticsearch 로의 요청에 대한 origin 점검 가능
+  - true로 설정 시 허용할 origin 을 등록한다
+- `http.cors.allow-origin`
+  - 요청에 대해 허용할 origin 등록 (정규 표현식으로 등록 가능)
+  - 요청 시 header에 origin 정보를 담아서 요청해야 함 
+  - 위 두 설정은 Reqeust시 Header값으로 `"origin:http://localhost:9200"`을 설정해서 요청에 대한 유효성 검사를 함
+  - elasticsearch.yml 에 설정한 값과 client에서 요청시 header에 실어 보내는 값이 같아야 요청이 허용됨 
+
+### Transport 통신 설정 
+- `transport.port`: 기본 9300으로 설정이 되며, 노드간 통신에 사용
+- `transport.compress`: 기본 false이며, local 통신이 기본이라 false로 설정해서 사용하는 것을 추천 
+
+### Discovery 설정 
+- 클러스터 구성 시, 각 노드를 발견하고 합류 시키기 위한 설정 
+
+### Gateway 설정
+- `discovery.seed_hosts`, `cluster.initial_master_nodes`와 같이 노드를 발견하는 과정이 있었다면 이번엔 실행 이후 혹은 재시작시 운영에 필요한 설정이다.
+- 실행 이후 또는 클러스터 재시작 시 운영 해야 하는 설정 
+- `gateway.expected_data_nodes`
+  - 클러스터가 재시작 될 때 in-service 전에 확인 하기 위해 활용
+  - 기본 값은 0 이지만 in-service를 위해 최소 실행 된 data.node의 수를 지정하여 사용
+- `gateway.recover_after_data_nodes`
+  - 클러스탁 재시작 될 때 최소 xx개의 data node가 실행 된 후에 recover가 될 수 있도록 하는 설정이다.
+  - 재시작 시 문제점: 모든 master, data 노드가 클러스터에 join 되면서 동시에 recovery 작업을 수행 하게 되면 리소스를 많이 사용하게 되면서 hang이 걸릴 수도 있음
+  - 최소 규모의 데이터 노드가 실행 된 후에 recovery를 수행 하도록 명시적으로 선언 하는것
+
+### 인덱스 생성 및 삭제에 대한 기본 설정
+- `action.auto_create_index`
+  - 기본 true이기 떄문에 신경 쓰지 않아도 되지만,
+  - 불필요한 index의 생성을 방지하고 싶다면 이 설정을 확인 하고 false로 설정 
+- `action.destructive_requires_name`
+  - 기본 false이기 때문에 누구나 생성된 index 삭제 가능 
+  - wildcard(i)로 삭제 요청 시 전체 index가 삭제 될 수 있음
+  - 명시적으로 인덱스 이름으로 삭제 요청을 하도록 하고 싶다면, 이 설정을 확인 하고 true로 설정
+
+
+### x-pack 설정 
+- `xpack.monitoring.collection.enabled`
+  - 기본 false로 설정
+  - elasticsearch에 대한 모니터링을 하고자 한다면 true로 설정
+  - ture로 설정 시 아래와 같은 시스템 index가 설정됨 
+  - `monitoring-es-${monitoring.template.version}-{%yyy.MM.dd}
+
+
+### 각종 설정 샘플
+```
+./elasticsearch.yml.template
+```

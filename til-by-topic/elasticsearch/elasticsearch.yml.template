@@ -1,0 +1,31 @@
+cluster.name:
+node.name:
+node.roles:
+node.attr.size:
+bootstrap.memory_lock: true
+path.data:
+path.logs:
+
+discovery.seed_hosts:
+discovery.type: 
+cluster.initial_master_nodes:
+cluster.routing.allocation.awareness.attributes: size
+
+network.host:
+http.port:
+http.compression: true
+http.compression_level: 3
+http.cors.enabled: false
+http.cors.allow-origin: /https?:\/\/127\.0\.0\.1(:[0-9]+)?/
+transport.port:
+transport.compress: false
+
+gateway.expected_data_nodes:
+gateway.recover_after_data_nodes:
+action.auto_create_index: true
+action.destructive_requires_name: true
+xpack.security.enabled: false
+xpack.monitoring.enabled: false
+xpack.ml.enabled: false
+
+
