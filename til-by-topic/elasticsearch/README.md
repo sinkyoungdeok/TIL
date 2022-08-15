@@ -49,6 +49,8 @@
   - [인덱스 생성 및 삭제에 대한 기본 설정](#인덱스-생성-및-삭제에-대한-기본-설정)
   - [x-pack 설정](#x-pack-설정)
   - [각종 설정 샘플](#각종-설정-샘플)
+  - [elasticsearch Components](#elasticsearch-components)
+  - [elasticsearch Components - Clsuter](#elasticsearch-components---clsuter)
 
 
 ## 1. 설치 명령어 
@@ -675,3 +677,16 @@ path.data: ["/mnt/elasticsearch_1","/mnt/elasticsearch_2", "/mnt/elasticsearch_3
 ```
 ./elasticsearch.yml.template
 ```
+
+
+### elasticsearch Components
+- lucene과 비슷하다.
+- Cluster > Node > Index > Shard > Document
+
+### elasticsearch Components - Clsuter
+- cluster.name 설정이 가장 중요
+- 기본 값은 elasticsearch
+- cluster 구성 시 node 역할에 따른 구성 필수
+- master.node 에 대한 quorum 구성 필수 
+  - split brain 에 대한 오류를 예방할 수 있기 때문에
+  - 클러스터 구성 시 가장 중요한 설정 
