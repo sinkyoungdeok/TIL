@@ -51,6 +51,9 @@
   - [각종 설정 샘플](#각종-설정-샘플)
   - [elasticsearch Components](#elasticsearch-components)
   - [elasticsearch Components - Clsuter](#elasticsearch-components---clsuter)
+  - [elasticsearch Components - Node](#elasticsearch-components---node)
+  - [elasticsearch Components - Index](#elasticsearch-components---index)
+  - [elasticsearch Components - Shard](#elasticsearch-components---shard)
 
 
 ## 1. 설치 명령어 
@@ -687,6 +690,62 @@ path.data: ["/mnt/elasticsearch_1","/mnt/elasticsearch_2", "/mnt/elasticsearch_3
 - cluster.name 설정이 가장 중요
 - 기본 값은 elasticsearch
 - cluster 구성 시 node 역할에 따른 구성 필수
-- master.node 에 대한 quorum 구성 필수 
+- master node 에 대한 quorum 구성 필수 
   - split brain 에 대한 오류를 예방할 수 있기 때문에
   - 클러스터 구성 시 가장 중요한 설정 
+
+```
+cluster.name
+discovery.type # 싱글노드를 위한 설정
+discovery.seed_hosts # 클러스터를 위한 설정
+cluster.initial_master_nodes # 클러스터를 위한 설정
+
+# discovery.type, cluster.initial_master_nodes 는 같이 설정 할 수 없다 
+```
+
+
+### elasticsearch Components - Node
+- elasticsearch 인스턴스가 시작 될 때 마다 실행
+- 노드들의 모음이 Cluster
+- 단일 노드로도 실행가능 (= 단일노드 클러스터)
+- 설정 기본: node.name 과 node.roles
+- 노드의 이름을 지정하고 역할을 정의 해서 용도와 목적에 따라 운영 
+- 가장 많이 사용하는 노드의 역할: master노드, data노드, coordinating 노드 
+- master노드
+  - 개별 노드와 인덱스에 대한 상태 관리와 메타 관리를 담당
+  - 특성에 맞춰 CPU, MEM에 대한 시스템 자원이 충분해야함
+- data노드
+  - 색인한 문서의 shard가 저장되어 있는 노드
+  - 문서에 대한 CRUD와 검색, 집계와 같은 데이터 작업처리
+  - Disk I/O, CPU, MEM 등에 대한 자원이 충분해야함
+- coordinating 노드
+  - 검색 요청이나 대량 색인 요청에 대한 라우팅 역할 (불필요한 요청을 master나 data노드에서 처리할 필요가 없고 부하를 생성할 필요가 없기 떄문)
+  - master노드와 유사하게 CPU, MEM에 대한 자원이 충분하면 좋음
+
+### elasticsearch Components - Index
+- 분산된 Shard 에 저장된 문서들의 논리적 집합 
+- 물리적으로는 Shard 하나가 하나의 독립된 Index로 동작하며, 루씬에서 보면 IndexWriter가 Shard당 하나씩 생성
+- Primary shard와 Replica shard로 구성되며, Data Node에만 위치한다
+- 데이터 유형에 따라 Hot, Warm, Cold, Frozen 과 같이 분리해서 ILM을 이용해서 용량에 따른 rolling 도 가능
+- Lucene기준의 Index를 Elasticsearch 에서는 Shard라고 함
+
+### elasticsearch Components - Shard
+- 물리적인 데이터가 저장 되어 있는 단위
+- Indexing 요청이 있을 때 분산된 노드에 위치한 shard로 문서를 색인
+- Index의 shard는 특정 node의 역할에 맞춰 배치 가능, 이런 기능이 shard allocation awareness 설정으로 적용이 가능하며, index setting 정보를 통해서 사용
+- health status 정의는 shard의 상태를 가지고 정의 내림 
+- 그린: 모든 샤드가 정상적으로 할당 되었을 때 상태
+- 옐로우: Primary shard는 정상적으로 할당이 되었으나 replica shard중 일부라도 할당이 되지 않았을 경우의 상태 (서비스는 정상적으로 동작 O)
+- 레드: Primary shard중 하나 이상이 할당 되지 않았을 경우의 상태 (서비스 정상저긍로 동작 X)
+- Primary Shard
+  - 색인 요청이 들어오면 가장 먼저 생성해서 문서를 저장하게 되는 Shard (=원본 데이터)
+  - 이를 기반으로 데이터를 복제하여 활용
+  - 색인 성능을 개선하기 위한 포인트로 활용
+  - Primary shard가 하나 밖에 없으면, index writer가 하나의 shard에만 계속 색인하기 때문에 분산 검색 엔진의 특징을 제대로 활용할 수 없다. 
+  - 그래서, Data 노드의 크기와 CPU 코어 크기를 고려해서 primary shard 크기를 설정
+  - 동적으로 크기를 변경할 수 없다, 초기 index 생성시 한번 정의된 설정으로 결정됨
+- Replica Shard
+  - Primary shard를 기준으로 복제 하는 shard
+  - 검색 성능을 개선하기 위한 용도로 활용 
+  - 동적으로 크기를 변경할 수 있다. 
+
