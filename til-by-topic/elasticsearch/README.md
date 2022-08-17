@@ -54,6 +54,14 @@
   - [elasticsearch Components - Node](#elasticsearch-components---node)
   - [elasticsearch Components - Index](#elasticsearch-components---index)
   - [elasticsearch Components - Shard](#elasticsearch-components---shard)
+- [6. elasticsearch 고급 설정](#6-elasticsearch-고급-설정)
+  - [Setting의 우선순위](#setting의-우선순위)
+  - [Settings - IndexScope](#settings---indexscope)
+  - [Settings - NodeScope](#settings---nodescope)
+  - [주요 Settings](#주요-settings)
+  - [Circuit Breaker Settings (NodeScope)](#circuit-breaker-settings-nodescope)
+  - [Cluster-level shard allocation and routing settings](#cluster-level-shard-allocation-and-routing-settings)
+  - [exclude 설정 및 테스트](#exclude-설정-및-테스트)
 
 
 ## 1. 설치 명령어 
@@ -748,4 +756,137 @@ cluster.initial_master_nodes # 클러스터를 위한 설정
   - Primary shard를 기준으로 복제 하는 shard
   - 검색 성능을 개선하기 위한 용도로 활용 
   - 동적으로 크기를 변경할 수 있다. 
+
+## 6. elasticsearch 고급 설정 
+
+### Setting의 우선순위
+- 기본 setting 정보를 그대로 사용하는 것도 좋으나, 알아두면 좋은 Setting 정보 
+
+1. Transient
+   - 1회성 설정으로 cluster 재시작 시 리셋
+2. Persistent
+   - 영구 설정으로 cluster 재시작이 되어도 유지
+3. elasticsearch.yml
+   - 이 설정은 로컬 구성으로만 사용하는 것을 추천
+   - dynamic setting을 통해서 클러스터 설정을 관리
+   - 각 노드 별 설정이 다르면 문제 발생
+4. Default
+   - 코드 상에 정의 되어 있음 
+
+- static 설정은 elasticsearch.yml 에 구성하며, 클러스터가 시작 전에 설정 되어야 한다  
+- 그리고 모든 Settings 은 Static 이거나 Dynamic 속성을 가진다
+
+### Settings - IndexScope
+```
+PUT /my-index-000001/_settings
+{
+  ...
+}
+```
+
+### Settings - NodeScope
+```
+PUT _cluster/settings
+{
+  "transient": {
+    ...
+  }
+}
+```
+
+```
+PUT _cluster/settings
+{
+  "persistent": {
+    ...
+  }
+}
+```
+
+
+### 주요 Settings
+- Path settings 
+  - path.data
+  - path.logs
+  - 위 설정은 인덱스 데이터와 로그 데이터에 대한 저장소 설정을 하게 된다
+- Cluster name setting
+- Node name setting
+- Network host settings
+  - network.host
+  - 위 설정은 개발과 테스트 환경에서는 127.0.0.1 과 같은 루프백 주소만 바인딩 되지만
+  - 운영 환경에서는 일반적인 네트워크 설정으로 구성 한다.
+- Discovery setting
+  - discovery.seed_hosts
+  - cluster_initial_master_nodes
+  - 운영 환경으로 넘어 갈 때 중요 한 설정
+  - 클러스터의 노드들을 검색 할 수 있는 정보와 마스터 노드를 선택할 수 있는 정보를 구성한다
+- jvm.options settings
+  - Heap size setting
+    - System 리소스의 50%로 설정
+    - 31GB가 넘어가지 않도록 구성
+    - 설정은 환경변수로 set을 하거나 jvm.options 파일을 수정 (ES_JAVA_OPTS="-Xms5g-Xmx2g")
+  - JVM heap dump path setting
+    - Heap OutOfMemory 에러 발생 시 heap dump 로그를 남기기 위한 경로 설정
+    - 기본 값을 그대로 사용 하며 수정은 많지 하지 않음
+  - GC logging settings
+    - 기본 설정은 GC 옵션이 enable되어 있다
+    - 기본 값을 그대로 사용하며 수정을 많이 하지 않는다
+  - Temporary directory settings
+    - JVM에서 사용 하기 위한 tmp 경로 설정
+    - ES_TMPDIR환경 변수로 설정 하거나 jvm.options에서 설정
+    - 설정 하지 않을 경우 Elasticsearch 내 TempDirectory 클래스를 이용해서 생성
+    - 기본 값을 그대로 사용하며 수정을 많이 하지 않는다
+- Cluster backups
+  - 장애 발생시 데이터 유시실을 예방하기 위한 설정으로 SLM(Snapshot Lifecycle Management)을 통해서 백업
+
+
+
+### Circuit Breaker Settings (NodeScope)
+- OutOfMemory 에러가 발생 하지 않도록 안전장치를 걸어 두는 것
+- 검증된 설정 값이 기본적으로 구성 되어 있지만, 문제 발생 시 설정 튜닝 (메모리 사용량 제한)
+- Parent circuit breaker
+  - 전체 heap size에 대한 total limit설정
+  - indices.breaker.total.use_real_memory (s): 기본 true 이다, 설정이 false 이면 70%로 설정 되고, true이면 95%로 설정 된다
+  - indices.breaker.total.limit
+- Field data circuit breaker
+  - Field data cache (aggregation, sorting에 활용)를 상요 시 과도한 heap memory 사용 방지 목적
+  - indices.breaker.fielddata.limit: 기본 JVM Heap size의 40%로 설정
+  - indices.breaker.fielddata.overhead 
+    - 기본 40%로 설정하지만, 실제 도달하면 heap memory가 부족할 수 있기 떄문에 overhead 설정을 통해서 미리 차단
+    - 기본 값은 1.03 (fielddata 크기가 1이면 1.03으로 집계됨)
+- Request circuit breaker
+  - Aggregation과 같은 요청에서 메모리 사용량 초과 방지
+    - indices.breaker.request.limit: 기본 JVM Heap 크기의 60% 로 설정
+    - indices.breaker.total.limit: 기본 값은 1 
+
+### Cluster-level shard allocation and routing settings
+- shard를 노드에 어떻게 할당 할 것인지에 대해 정의하는 설정
+- recovery, replica allocation, rebalancing 등이 클러스터 내 노드가 추가/삭제 될 때 발생
+- 마스터 노드는 이와 같이 클러스터를 운영/관리 하기 위해 샤드들을 어떤 노드에 할당하고 이동시킬지를 결정 
+- 실제상황 
+  - 클러스터에 대한 재시작 시 shard recovery와 rebalancing 때문에 재시작이 되지 못하고 빈번하게 죽거나 재시작 되는 현상이 발생 할 수 있다.
+  - 따라서 재시작 할 때는 환경에 맞는 절차를 만들어 놓고 실행하기
+  - 이런 문제가 발생하지않도록 할 수 있는것: gateway설정(gateway.expected.nodes )을 하면 예방할 수 있다. 
+
+### exclude 설정 및 테스트 
+- shard allocation: 설정을 위한 기능, 장애 발생시 문제가 있는 노드에 shard 할당 되는 것 방지 
+- ex) 특정 노드가 장애 발생했을 때, 해당 노드를 exclude시켜 신규 생성 인덱스에 대한 shard 할당 방지
+```
+PUT _cluster/settings
+{
+  "transient": {
+    "cluster.routing.allocation.exclude._ip": "장애발생노드 IP"
+  }
+}
+```
+- Cluster shard limit 설정을 통해 노드 별 shard 수를 제한하고 문제 발생 예방 할 수 있다. 
+  - cluster.max_shards_per_node
+  - 기본 data 노드 당 1000개의 shard를 가질 수 있다
+  - Open된 모든 shard를 포함 한다
+- Shard routing allocation 설정은 생성 시 지정된 설정이 우선 하기 때문에 교차 설정 불가능 (상호배타적인 구성X)
+- Shard allocation 설정은 4가지 형태로 제공
+  - Cluster-level shard allocation settings: 방금 위에서 살펴본 설정
+  - Disk-based shard allocation settings: disk 사용에 따라서 shard를 배치시키는 설정
+  - Shard allocation awareness and Forced awareness: 노드 자체에 attribute설정을 이용해서 특정 index의 shard들이 배치되도록 하는 설정
+  - Cluster-level shard allocation filtering: exclude 설정과 유사
 
