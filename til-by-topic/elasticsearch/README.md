@@ -62,6 +62,10 @@
   - [Circuit Breaker Settings (NodeScope)](#circuit-breaker-settings-nodescope)
   - [Cluster-level shard allocation and routing settings](#cluster-level-shard-allocation-and-routing-settings)
   - [exclude 설정 및 테스트](#exclude-설정-및-테스트)
+  - [Cluster level shard allocation settings](#cluster-level-shard-allocation-settings)
+  - [Shard rebalancing settings](#shard-rebalancing-settings)
+  - [Disk based shard allocation settings](#disk-based-shard-allocation-settings)
+  - [Shard allocation awareness](#shard-allocation-awareness)
 
 
 ## 1. 설치 명령어 
@@ -889,4 +893,66 @@ PUT _cluster/settings
   - Disk-based shard allocation settings: disk 사용에 따라서 shard를 배치시키는 설정
   - Shard allocation awareness and Forced awareness: 노드 자체에 attribute설정을 이용해서 특정 index의 shard들이 배치되도록 하는 설정
   - Cluster-level shard allocation filtering: exclude 설정과 유사
+
+
+### Cluster level shard allocation settings
+- `cluster.routing.allocation.enable`
+  - 노드가 재시작 될 때 local primary shard에 대한 recovery에 영향을 주지 않으며, 할당 되지 않은 replica shard에 대한 primary shard를 즉시 recovery 함
+  - all(기본설정) / primaries / new_primaries (신규 인덱스의 primary shard) / none
+- `cluster.routing.allocation.concurrent_incoming_recovieries: 2` : 동시 incoming recovery가능한 노드 수 
+- `cluster.routing.allocation.concurrent_outcoming_recovieries: 2` : 동시 coutcoming recovery가능한 노드 수
+- `cluster.routing.allocation.node_concurrent_recoveries`
+  - 위 두개의 설정을 한번에 구성
+- `cluster.routing.allocation.node_initial_primaries_recoveries: 4`: primary shard의 recovery 설정
+- `cluster.routing.allocation.same_shard.host`
+  - 하나의 장비에 여러개의 elasticsearch 인스턴스를 구성 할 때 같은 shard 가 위치 할 수 있도록 설정함 
+  - (기본 false로 같은 샤드는 배치 불가능)
+
+### Shard rebalancing settings
+특정 노드에 인덱스의 샤드가 집중적으로 위치 하지 않도록 하여 균형을 이루게 하는 설정 
+- `cluster.routing.rebalance.enable`
+  - rebalance 를 적용할 대상 지정
+  - all(기본) / primaries / replicas / none
+- `cluster.routing.allocation.allow_rebalance`
+  - rebalance 에 대한 동작을 허용할 대상을 지정
+  - always / indices_primaries_active / indices_all_active (기본)
+- `cluster.routing.allocation.cluster_concurrent_rebalance`
+  - 클러스터 기준으로 동시에 rebalancing 할 shard의 수를 설정 (기본 2개)
+- 위 설정들은 기본 설정으로 해도 하는것을 추천 
+
+
+### Disk based shard allocation settings
+노드에 있는 disk의 용량에 따라 shard를 배치 시키는 설정  
+elasticsearch의 경우 가장 많이 경험하는 오류가 disk full에 따른 장애  
+elasticsearch애 log를 모니터링 해서 watermark 오류 에러나 경고 발생시 바로 대응하거나, 상시 disk usage를 모니터링해서 예방해야함 
+- `cluster.routing.allocation.disk.threshold_enabled`: 기본 true이며, disk allocation decider를 사용 
+- `cluster.routing.allocation.disk.watermark.low`
+  - 기본 disk usage 85%로 구성
+  - 85$가 되면 shard가 더 이상 할당 되지 않지만
+  - 이 설정은 새로 만들어지는 primary shard에 대해서는 적용이 되지 않고 replica shard에 대해서만 적용 
+  - usage가 아닌 남아 있는 여유 공간 설정으로도 가능 
+- `cluster.routing.allocation.disk.watermark.high`
+  - 기본 disk usage 90% 이며, 초과 시 노드에 있는 샤드 재배치 시도 
+  - usage가 아닌 남아 있는 여유 공간 설정으로도 가능 
+- `cluster.routing.allocation.disk.watermark.flood_stage`
+  - 기본 95%로 설정 되어 있으며, disk usage가 설정을 넘은 노드가 있으면 
+  - 읽기 전용으로 자동 전환 되고, disk usage가 떨어지게 되면 자동으로 해제 
+- `cluster.info.update.internal`
+  - 30초 간격으로 disk usage를 점검 
+
+### Shard allocation awareness
+Elasticsearch는 shard를 할당 할 때 물리적 하드웨어 구성 적용 가능  
+같은 rack 에 구성하거나 같은 zone에 구성 되도록 지정 가능   
+node.attr.* 설정을 이용해서 적용 
+
+- `rack_id`
+  - node.attr.rack_id: rack_onde
+  - bin/elasticsearch -Enode.attr.rack_id=rack_one
+- `attributes`
+  - cluster.routing.allocation.awareness.attributes: rack_id
+  - master 역할을 수행 하는 모든 노드의 elasticsearch.yml에 정의하거나 cluster update settings를 이용해서 적용 
+- `force`
+  - 노드가 사용 가능 할 때 까지 replica shard의 할당이 되지 않도록 설정 가능 
+  - `cluster.routing.allocation.awareness.attributes: zone`
+  - `cluster.routing.allocation.awareness.force.zone.values: zone1, zone2`
 
