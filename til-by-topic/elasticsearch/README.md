@@ -66,6 +66,7 @@
   - [Shard rebalancing settings](#shard-rebalancing-settings)
   - [Disk based shard allocation settings](#disk-based-shard-allocation-settings)
   - [Shard allocation awareness](#shard-allocation-awareness)
+  - [Shard allocation awareness 실습](#shard-allocation-awareness-실습)
 
 
 ## 1. 설치 명령어 
@@ -956,3 +957,65 @@ node.attr.* 설정을 이용해서 적용
   - `cluster.routing.allocation.awareness.attributes: zone`
   - `cluster.routing.allocation.awareness.force.zone.values: zone1, zone2`
 
+
+
+### Shard allocation awareness 실습 
+- elasticsearch instance를 두개 준비
+- attribute 설정과 data tier 설정 두가지로 진행 
+
+
+1. es 2개 준비
+```
+cp -rf elasticsearch-8.3.1 es1
+cp -rf elasticsearch-8.3.1 es2
+```
+
+2. es1 설정
+```
+vi es1/config/elasticsearch.yml
+
+cluster.name: kd.sin-data-tier
+node.name: data-hot
+node.roles: ["master", "data_hot"]
+node.attr.tier: hot
+
+# 밑의 설정이 빠지면 에러뜸
+xpack.security.enabled: false
+xpack.security.enrollment.enabled: false
+xpack.security.http.ssl:
+  enabled: false
+  keystore.path: certs/http.p12
+xpack.security.transport.ssl:
+  enabled: false
+  verification_mode: certificate
+  keystore.path: certs/transport.p12
+  truststore.path: certs/transport.p12
+```
+
+3. es2 설정 
+```
+vi es2/config/elasticsearch.yml
+
+cluster.name: kd.sin-data-tier
+node.name: data-cold
+node.roles: ["master", "data_cold"]
+node.attr.tier: cold 
+
+# 밑의 설정이 빠지면 에러뜸
+xpack.security.enabled: false
+xpack.security.enrollment.enabled: false
+xpack.security.http.ssl:
+  enabled: false
+  keystore.path: certs/http.p12
+xpack.security.transport.ssl:
+  enabled: false
+  verification_mode: certificate
+  keystore.path: certs/transport.p12
+  truststore.path: certs/transport.p12
+```
+
+4. es 실행 
+```
+es1/bin/elasticsearch -d -p PID
+es2/bin/elasticsearch -d -p PID
+```
