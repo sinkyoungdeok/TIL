@@ -73,6 +73,22 @@
   - [Search settings](#search-settings)
   - [Thread pools](#thread-pools)
   - [주요 System 설정](#주요-system-설정)
+  - [Closed Index 설정 변경](#closed-index-설정-변경)
+  - [Static Index Settings - 1. index.number_of_shards](#static-index-settings---1-indexnumber_of_shards)
+  - [Static Index Settings - 2. index.number_of_routing_shards](#static-index-settings---2-indexnumber_of_routing_shards)
+  - [Static Index Settings - 3. index.codec](#static-index-settings---3-indexcodec)
+  - [Static Index Settings - 4. index.hidden](#static-index-settings---4-indexhidden)
+  - [Dynamic Index Settings - 1. index.number_of_replicas](#dynamic-index-settings---1-indexnumber_of_replicas)
+  - [Dynamic Index Settings - 2. index.refresh_interval](#dynamic-index-settings---2-indexrefresh_interval)
+  - [Dynamic Index Settings - 3. index.max_result_window](#dynamic-index-settings---3-indexmax_result_window)
+  - [Elasticsearch에서 검색을 실행하는 방법](#elasticsearch에서-검색을-실행하는-방법)
+  - [scroll](#scroll)
+  - [search_after 기능](#search_after-기능)
+  - [Dynamic Index Settings - 4. index.max_inner_result_window](#dynamic-index-settings---4-indexmax_inner_result_window)
+  - [Dynamic Index Settings - 5. index.analyze.max_token_count](#dynamic-index-settings---5-indexanalyzemax_token_count)
+  - [Dynamic Index Settings - 6. index.max_terms_count](#dynamic-index-settings---6-indexmax_terms_count)
+  - [Dynamic Index Settings - 7. index.routing.allocation.enable](#dynamic-index-settings---7-indexroutingallocationenable)
+  - [Dynamic Index Settings - 8. index.routing.rebalance.enable](#dynamic-index-settings---8-indexroutingrebalanceenable)
 
 
 ## 1. 설치 명령어 
@@ -1130,3 +1146,178 @@ node.processors
   - Elastic 사에서 가지고 있는 경험을 기반으로
   - 중요한 설정에 대해서 점검을 해주는 기능 
 
+### Closed Index 설정 변경 
+
+- 개별 인덱스에 적용 되는 설정 - static 설정, dynamic 설정 
+- static설정: 인덱스 생성 되는 시점에 적용
+- dynamic설정: 동작중인 인덱스에 update index settings 를 통해서 적용 
+- Closed Index에 설정 변경을 하는 것은 예기치 않은 결과를 유발 할 수 있기 때문에 사용하지 않는다.
+
+
+
+1. shard close
+```
+POST http://localhost:9200/shard-allocation-00001/_close
+```
+
+2. shard replica 수 변경
+```
+PUT http://localhost:9200/shard-allocation-00001/_settings
+Content-Type: application/json
+
+{
+    "index.number_of_replicas": 1
+}
+```
+
+3. shard open
+```
+POST http://localhost:9200/shard-allocation-00001/_open
+```
+
+4. 확인 
+```
+http://localhost:9200/_cat/shards/shard-allocation-00001?v
+```
+
+- replicas들은 unassigned되어 있는 것을 확인할 수 있다.
+- 왜냐하면, 같은 노드에 같은 인덱스(shard)가 존재할 수 없기 때문에 그렇다.
+
+5. setting 변경
+```
+PUT http://localhost:9200/shard-allocation-00001/_settings
+
+{
+    "index.routing.allocation.require.tier": "", 
+    "index.routing.allocation.include.tier": "hot, cold" 
+}
+```
+- `"index.routing.allocation.include.tier": "hot, cold"`: hot 혹은 cold 두 타입에 대한 노드에 할당 되도록 설정
+
+6. unassigned로 되어있던 replicas들 확인 
+```
+http://localhost:9200/_cat/shards/shard-allocation-00001?v
+```
+
+- replicas들이 unassigned에서 data-cold node로 변경된 것을 확인할 수 있다.
+
+
+### Static Index Settings - 1. index.number_of_shards
+- 인덱스의 primary shard 에 대한 크기 설정 
+- 기본 1로 설정 되어 있으며 인덱스 생성 시점에만 적용이 가능 
+- primary shard는 색인 성능에 영향을 주는 요소로, 크기 설정 시 색인에 대한 성능 검토 필수
+- 인덱스당 생성 가능한 최대 primary shard의 크기는 1024
+  - 논외로 노드당 생성 가능한 최대 shard의 크기는 1000
+- 하지만 너무 많은 shard의 생성으로 자원을 낭비 하게 되면 OOM와 같은 오류 발생 가능
+- 오류 방지를 위해 클러스터 내 모든 노드에 아래와 같은 설정을 통해서 제한 할 수 있음
+  - ES_JAVA_OPTS="-Des.index.max_number_of_shards=128"
+
+### Static Index Settings - 2. index.number_of_routing_shards
+- 인덱스 생성 시 정의한 primary shard를 설정한 크기 만큼 늘리는 설정
+- 문서가 shard에 분산 저장 되는 즉, routing에 영향을 주기 떄문에 이미 데이터를 가지고 있거나
+- 색인 중인 인덱스에 적용하는 것은 추천 하지 않음 
+
+### Static Index Settings - 3. index.codec
+- 저장 데이터에 대한 압축 옵션을 지정하는 설정
+- 기본 값은 LZ4 이며, 좀 더 좋은 압축 비율로 설정 하고 싶다면 DEFLATE로 설정 
+- 저장 성능은 떨어지게 되지만, Disk usage에 대한 utilization은 개선 될 수 있음
+
+### Static Index Settings - 4. index.hidden
+- elasticsearch 에서 system 인덱스나 meta 정보를 저장 하기 위한 인덱스로 주로 하는 설정 
+  - 기본 False
+- wildcard를 이용 시 해당 index는 매칭 되지 않으며, 정확한 index 명으로는 질의 시 매칭 
+
+실습 해보기
+
+1. 인덱스 목록 조회 
+```
+GET http://localhost:9200/_cat/indices
+```
+
+2. 특정 인덱스를 hidden 으로 설정
+```
+PUT http://localhost:9200/kibana-event-log-7.15.0-000001/_settings
+
+{
+  "index.hidden": true
+}
+```
+
+3. 인덱스 목록 조회 - hidden시킨 인덱스 안보이는 것을 확인
+```
+GET http://localhost:9200/_cat/indices
+
+# 혹은
+
+GET http://localhost:9200/*/_search
+```
+
+4. hidden 되어 있는 index 조회 
+```
+GET http://localhost:9200/kibana-event-log-7.15.0-000001/_search
+```
+
+
+### Dynamic Index Settings - 1. index.number_of_replicas
+- primary shard에 대한 복제 shard의 크기를 설정 (기본 값은 1)
+- replica shard는 검색 질의 성능에 영향을 주는 요소이며, 운영 중 복제 샤드의 크기를 동적으로 조정 가능
+- 운영 중 조정을 할 경우 트래픽이 적은 시간에 진행 하는 것을 추천하며,
+- 늘리거나 줄일 경우 실제 물리적인 복사를 하거나 삭제가 되기 떄문에 서비스 영향도 점검 필요 
+
+### Dynamic Index Settings - 2. index.refresh_interval
+- 색인 시 변경 사항을 검색에 표시 하기 위한 작업 주기를 시간으로 설정
+- 기본 값은 1초 이며, -1로 설정 시 해당 기능은 disable
+- disable 할 때는 bulk 색인 요청 작업을 수행할 때 설정하게 됨
+- 주의) 
+  - index에 해당하는 meta 정보 즉, mapping, field에 대한 정보 변경 금지 
+  - 변경 되면 자동으로 refresh operationdl 발생 -> 의미가 사라짐
+- refresh 가 실행 되게 되면 신규 segment file이 생성 되면서 가장 최근까지 색인 작업이 수행 되던 segment info 정보를 업데이트
+- 최근 색인 데이터에 대한 IndexWriter에서 IndexReader를 가져오고 이 Reader를 IndexSearcher로 전달 하여 최근 색인 작업된 문서를 조회 
+
+### Dynamic Index Settings - 3. index.max_result_window
+- 인덱스 별 검색 질의에 대한 최대 결과 크기를 설정
+  - from + size 의 최대 값으로 기본은 10000
+  - from 은 offset 정보이며, size는 return 크기 
+- 이 설정 값을 크게 잡을 경우 Heap usage가 증가하게 되어 OOM과 같은 오류 발생 가능
+  - Deep pagination은 검색 성능이 떨어지는 원인이기도 함 
+
+
+### Elasticsearch에서 검색을 실행하는 방법 
+1. 모든 Shard로 질의 요청이 전달 되고 매칭된 document id가 리턴
+2. from, size에 맞는 결과를 정렬 
+3. 해당 document id 로 2차 document value를 요청
+4. return
+
+
+### scroll
+- slice: 하나의 요청을 slice 수 만큼 나누어서 요청하는 것
+  - 모든 slice 요청의 결과를 합치면 하나의 scroll 요청의 결과와 동일하게 된다
+- scroll: RDBMS에서 cursor와 유사한 기능
+- Sort: Score sort와 Field sort 두 가지 방식 존재
+  - field sort 사용 시 default 가 _doc로 정렬을 합니다 (Field sort 방식이 기본 정렬)
+  - index order 방식을 사용하면 _shard_doc을 사용한다
+
+### search_after 기능
+- from을 사용하지 못하고 현재 페이지의 마지막 문서의 _doc 값을 이용해서 결과 도출
+- from 과 같은 offset 지정이 아닌 이전, 다음과 같은 기능 구현에서 사용 추천
+- scroll과 같이 현재의 상태를 저장하지 않기 떄문에 변경된 정보에 대해서도 결과 반영 
+
+
+### Dynamic Index Settings - 4. index.max_inner_result_window
+- nested document에 대한 inner hit 크기에 대한 제한 (기본 100개)
+- Heap 사용을 많이 하게 되기 떄문에 제한
+
+### Dynamic Index Settings - 5. index.analyze.max_token_count
+- 단일 field에 대한 token 추출 시 최대 추출 크기를 제한 (기본 10000개)
+
+### Dynamic Index Settings - 6. index.max_terms_count
+- index에 질의 시 terms query에서 사용하는 최대 term 크기를 제한 (기본 65536개)
+
+### Dynamic Index Settings - 7. index.routing.allocation.enable
+- index의 shard에 대한 allocation 여부를 설정
+  - all, primaries, new_primaries, none
+
+### Dynamic Index Settings - 8. index.routing.rebalance.enable
+- index의 shard에 대한 rebalance 여부를 설정
+  - all, primaries, replicas, none
+- 해당 index에 대한 shard가 특정 노드에 배치 되었을 때, 해당 노드에 디스크 사용량이 높을 때 다시 다른 디스크 사용량이 낮은 노드로 재할당을 할 수 있는데, 그러한 경우에 어떠한 shard들만 재할당 할 것인지 설정
