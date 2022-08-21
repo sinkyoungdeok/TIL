@@ -67,6 +67,12 @@
   - [Disk based shard allocation settings](#disk-based-shard-allocation-settings)
   - [Shard allocation awareness](#shard-allocation-awareness)
   - [Shard allocation awareness 실습](#shard-allocation-awareness-실습)
+  - [Index Recovery Settings](#index-recovery-settings)
+  - [Indexing buffer settings](#indexing-buffer-settings)
+  - [Node query cache settings](#node-query-cache-settings)
+  - [Search settings](#search-settings)
+  - [Thread pools](#thread-pools)
+  - [주요 System 설정](#주요-system-설정)
 
 
 ## 1. 설치 명령어 
@@ -984,12 +990,6 @@ xpack.security.enabled: false
 xpack.security.enrollment.enabled: false
 xpack.security.http.ssl:
   enabled: false
-  keystore.path: certs/http.p12
-xpack.security.transport.ssl:
-  enabled: false
-  verification_mode: certificate
-  keystore.path: certs/transport.p12
-  truststore.path: certs/transport.p12
 ```
 
 3. es2 설정 
@@ -1006,12 +1006,6 @@ xpack.security.enabled: false
 xpack.security.enrollment.enabled: false
 xpack.security.http.ssl:
   enabled: false
-  keystore.path: certs/http.p12
-xpack.security.transport.ssl:
-  enabled: false
-  verification_mode: certificate
-  keystore.path: certs/transport.p12
-  truststore.path: certs/transport.p12
 ```
 
 4. es 실행 
@@ -1019,3 +1013,120 @@ xpack.security.transport.ssl:
 es1/bin/elasticsearch -d -p PID
 es2/bin/elasticsearch -d -p PID
 ```
+
+5. es 확인 
+```
+http://localhost:9200/_cat/nodes?v
+
+# ip        heap.percent ram.percent cpu load_1m load_5m load_15m node.role master name
+# 127.0.0.1            2         100   7    2.31                  hm        *      data-hot
+# 127.0.0.1            1         100   2    2.31                  cm        -      data-cold
+```
+
+6. shard를 특정 노드로 생성
+```
+PUT http://localhost:9200/shard-allocation-00001
+Content-Type: application/json
+
+{
+    "settings": {
+        "index.number_of_shards":2, # shard 의 갯수
+        "index.number_of_replicas": 0, 
+        "index.routing.allocation.require.tier": "hot" # hot 노드로 배치
+    }
+}
+```
+
+```
+# 생성된 shard 확인 
+http://localhost:9200/_cat/shards/shard-allocation-00001?v
+```
+
+7. shard를 hot에서 cold로 변경 
+```
+PUT http://localhost:9200/shard-allocation-00001/_settings
+Content-Type: application/json
+
+{
+  "index.routing.allocation.require.tier": "cold"
+}
+```
+
+```
+# 변경된 shard 확인 
+http://localhost:9200/_cat/shards/shard-allocation-00001?v
+```
+
+
+- 이러한 방법으로 색인 노드와, serving 노드를 분리해서 사용할 수도 있다.
+  - 색인 전용 노드는 service request는 들어오지 않도록 하는것.
+  - 색인이 완료되면 serving 노드에 shard를 재할당 시켜서 service reqeust를 받을 수 있도록 구성 
+
+### Index Recovery Settings
+- 이 설정은 샤드를 다시 생성 하거나 재할당 하는 경우 primary shard를 기준으로 복구하며
+- 개별 노드로의 in/out bound 크기의 총량으로 설정한다 
+- `indices.recovery.max_bytes_per_sec`
+  - 기본 크기는 40 MB/s
+
+### Indexing buffer settings
+- 이 설정은 색인 요청 문서를 in-memory로 담아서 빠르게 처리 하기 위해 사용
+- memory buffer에 꽉 차면 segment 파일로 내려 씀
+- 대량으로 색인 또는 빈번한 색인 요청이 많을 경우 색인 성능이 나오지 않을 때 살펴 보면 도움됨
+- 대부분의 색인 성능은 Disk I/O 영향을 가장 많이 받는다.
+- `indices.memory.index_buffer_size`
+  - 기본 크기는 노드에 할당 된 heap size의 10% 이며 모든 샤드에서 buffer를 공유해서 사용 
+  - 너무 buffer size 작게하면, 색인 성능이 작아지고 
+  - 너무 buffer size를 크게 잡으면 out of memory에러가 등장할 수 있다.
+- 설정을 하면, 모든 shard가 공유해서 사용한다 보면 된다.
+- 최소 48MB 설정가능
+- 보통 128MB 또는 256MB 사용하는게 좋다.
+
+
+### Node query cache settings
+- 질의시 filter context를 이용해서 질의 결과를 cache 하도록 하는 설정
+- 노드 당 하나씩 존재하며, LRU 정책으로 사용 
+- cache 설정
+  - 세그먼트 당 10000개의 문서 
+  - 또는 heap size의 10%를 사용 
+  - 세그먼트가 merge 되면 캐시된 결과가 유효하지 않는다
+- Elasticsearch에서는
+  - Field data cache도 제공
+  - field data circuit breaker 설정 영향을 받는다
+  - 기본 field data cache 크기 설정은 무제한
+- `indices.queries.cache.size`
+  - 기본 head size의 10%이다.
+
+### Search settings
+- 검색에 대한 전역 설정과 arregation 에 대한 제한을 구성하는 설정 
+- `indices.query.bool.max_clause_count`
+  - 루씬 기준의 boolean query절에 포함 될 수 있는 최대 절 수
+  - 기본 1024 절(매우 높은 수준)
+  - 설정이 너무 커지면 CPU, MEM에 대한 자원 소모 증가, 성능 저하
+- `search.max_buckets`
+  - 단일 응답을 허용하는 최대 aggregation bucekt의 수 (65535개)
+- `indices.query.bool.max_nested_depth`
+  - bool query에서 사용하는 최대 nested 깊이를 정의 (기본20)
+
+### Thread pools
+- 보통은 기본 설정 수정하지 않으나,
+- 단일 instance 의 사양이 너무 좋아서 단일 instance에다가 elasticsearch를 여러개 실행 시킬 경우 processor의 크기를 나눠서 설정하는 것을 추천 
+```
+thread_pool.*
+node.processors
+  보통은 자동으로 설정 된다 
+```
+
+### 주요 System 설정 
+- 시스템의 자원 사용 제한 조정 
+  - 1회성 설정으로 cluster 재시작 시 리셋
+- Virtual memory
+  - elasticsearch에서는 mmapfs 구조를 사용하기 때문에
+  - shard 색인 정보를 메모리에 저장해서 효과적으로 사용 
+  - (vm.max_map_count=262144) 으롤 설정해주면 좋다.
+- Disable swapping
+  - 설정 해놓으면 좋다
+  - heap을 사용하기 때문에 스왑을 사용할 필요가 없음
+- Bootstrap Checks
+  - Elastic 사에서 가지고 있는 경험을 기반으로
+  - 중요한 설정에 대해서 점검을 해주는 기능 
+
