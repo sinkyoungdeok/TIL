@@ -1,7 +1,7 @@
 version: "3.7"
 services:
   docker-kibana:
-    image: docker.elastic.co/kibana/kibana:7.16.1
+    image: docker.elastic.co/kibana/kibana:7.15.0
     container_name: docker-kibana
     environment:
       ELASTICSEARCH_HOSTS: '["http://host.docker.internal:9200"]'

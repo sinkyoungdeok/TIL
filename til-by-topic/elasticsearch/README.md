@@ -89,6 +89,7 @@
   - [Dynamic Index Settings - 6. index.max_terms_count](#dynamic-index-settings---6-indexmax_terms_count)
   - [Dynamic Index Settings - 7. index.routing.allocation.enable](#dynamic-index-settings---7-indexroutingallocationenable)
   - [Dynamic Index Settings - 8. index.routing.rebalance.enable](#dynamic-index-settings---8-indexroutingrebalanceenable)
+  - [Scroll 실습](#scroll-실습)
 
 
 ## 1. 설치 명령어 
@@ -1321,3 +1322,40 @@ GET http://localhost:9200/kibana-event-log-7.15.0-000001/_search
 - index의 shard에 대한 rebalance 여부를 설정
   - all, primaries, replicas, none
 - 해당 index에 대한 shard가 특정 노드에 배치 되었을 때, 해당 노드에 디스크 사용량이 높을 때 다시 다른 디스크 사용량이 낮은 노드로 재할당을 할 수 있는데, 그러한 경우에 어떠한 shard들만 재할당 할 것인지 설정
+
+
+### Scroll 실습 
+
+1. Kibana 대시보드 접속 
+2. Try Sample data
+3. 3개다 Add data 
+4. Dev Tools 접속 
+
+5. 10분동안 유효한 scroll api 조회 
+```
+POST /kibana_sample_data_logs/_search?scroll=10m
+{
+  "size": 2000,
+  "query": {
+    "match_all": {
+    }
+  }
+}
+```
+
+6. scrol API를 통한 데이터 2000개씩 가져오기 (조회를 할 때 마다 다음 2000개를 가져옴)
+```
+POST /_search/scroll
+{
+  "scroll": "10m",
+  "scroll_id": "FGluY2x1ZGVfY29udGV4dF91dWlkDXF1ZXJ5QW5kRmV0Y2gBFlBoVl9uWXl5UWpPYmh1VHYtU0hHcXcAAAAAAAABUBZtbGZtRkI2elJhV2hmdDJnOEcySlJR"
+}
+```
+
+7. 스크롤 제거 
+```
+DELETE /_search/scroll
+{
+  "scroll_id": "FGluY2x1ZGVfY29udGV4dF91dWlkDXF1ZXJ5QW5kRmV0Y2gBFlBoVl9uWXl5UWpPYmh1VHYtU0hHcXcAAAAAAAABUBZtbGZtRkI2elJhV2hmdDJnOEcySlJR"
+}
+```
