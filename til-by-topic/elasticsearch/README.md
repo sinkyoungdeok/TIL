@@ -74,6 +74,7 @@
   - [Thread pools](#thread-pools)
   - [주요 System 설정](#주요-system-설정)
   - [Closed Index 설정 변경](#closed-index-설정-변경)
+- [7. Index Modules](#7-index-modules)
   - [Static Index Settings - 1. index.number_of_shards](#static-index-settings---1-indexnumber_of_shards)
   - [Static Index Settings - 2. index.number_of_routing_shards](#static-index-settings---2-indexnumber_of_routing_shards)
   - [Static Index Settings - 3. index.codec](#static-index-settings---3-indexcodec)
@@ -90,6 +91,11 @@
   - [Dynamic Index Settings - 7. index.routing.allocation.enable](#dynamic-index-settings---7-indexroutingallocationenable)
   - [Dynamic Index Settings - 8. index.routing.rebalance.enable](#dynamic-index-settings---8-indexroutingrebalanceenable)
   - [Scroll 실습](#scroll-실습)
+  - [Analysis](#analysis)
+  - [Text Analysis](#text-analysis)
+  - [Analyzer란](#analyzer란)
+  - [Analyzer 종류](#analyzer-종류)
+  - [Analyzer의 구성 항목](#analyzer의-구성-항목)
 
 
 ## 1. 설치 명령어 
@@ -1202,6 +1208,7 @@ http://localhost:9200/_cat/shards/shard-allocation-00001?v
 
 - replicas들이 unassigned에서 data-cold node로 변경된 것을 확인할 수 있다.
 
+## 7. Index Modules 
 
 ### Static Index Settings - 1. index.number_of_shards
 - 인덱스의 primary shard 에 대한 크기 설정 
@@ -1359,3 +1366,47 @@ DELETE /_search/scroll
   "scroll_id": "FGluY2x1ZGVfY29udGV4dF91dWlkDXF1ZXJ5QW5kRmV0Y2gBFlBoVl9uWXl5UWpPYmh1VHYtU0hHcXcAAAAAAAABUBZtbGZtRkI2elJhV2hmdDJnOEcySlJR"
 }
 ```
+
+
+### Analysis
+- 구조화 되지 않은 텍스트를 검색에 최적화 된 구조의 형식으로 변환 하는 과정 
+- 텍스드필드 -> 색인 + 텍스트 분석 
+
+
+### Text Analysis
+- full text 검색을 수행 하게 된다.
+- Exact matching이 아니기 때문에 관련된 모든 결과를 반환한다.
+- Full text 검색 수해을 위한 분석 과정
+  - Tokenization
+    -  텍스트를 토큰 이라는 작은 단위로 분할
+    -  분할된 토큰은 개별 단어를 의미 
+  - Normalization
+    - 문자에 대한 변형과 필터를 적용하는 것 (토큰을 표준형식으로 정규화)
+    - 대소문자 적용 / 동의어 처리 / 불용어 제거 등의 작업 
+
+### Analyzer란
+- Text를 검색엔진에서 검색 가능한 구조화 된 형식으로 만들어 주는 것 
+- Analyzer는 하나의 Tokenizer와 다수의 Filter로 구성 하고, Filter 사용을 하지 않더라도 Tokenizer는 무조건 선언이 되어야 함 
+
+### Analyzer 종류 
+- Lucene 에서 제공 하는 내장 analyzer
+- 사용자가 만들어서 제공하는 custom analyzer
+
+
+### Analyzer의 구성 항목 
+- Characterfilters
+  - 원본 텍스트에서 불필요한 문자들을 제거/추가/변경 등 원본 텍스트를
+  - 변형해서 Tokenizer로 전달하여 token 추출
+- Tokenizers: 토큰 단위로 생성하는 과정
+  - 문자 스트림을 수신 해서 개별 토큰으로 나누고 
+  - 나눠진 토큰 스트림을 출력 
+  - 나눠진 토큰의 순서, position, 단어의 시작과 끝의 문자 offset정보를 기록 
+  - (기록된 정보는 term vector 정보로 사용)
+- Token Filters: 토큰을 필터하는 과정
+  - Tokenizer에서 넘겨 준 토큰 스트림을 받아서 토큰을 제거/추가/변경
+  - 토큰을 소문자로 변환, 불용어 제거, 동의어 추가 등의 작업 수행
+  - 선언 된 순서대로 적용 되며, 0개 이상 사용 가능 
+
+
+
+
