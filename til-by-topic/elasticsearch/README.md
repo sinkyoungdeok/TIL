@@ -96,6 +96,11 @@
   - [Analyzer란](#analyzer란)
   - [Analyzer 종류](#analyzer-종류)
   - [Analyzer의 구성 항목](#analyzer의-구성-항목)
+  - [_analyze API 구조](#_analyze-api-구조)
+  - [_analyze API Parameters](#_analyze-api-parameters)
+  - [nori_tokenizer](#nori_tokenizer)
+  - [nori_part_of_speech token filter](#nori_part_of_speech-token-filter)
+  - [_analyze API를 이용한 NoriAnalyzer 테스트](#_analyze-api를-이용한-norianalyzer-테스트)
 
 
 ## 1. 설치 명령어 
@@ -1408,5 +1413,98 @@ DELETE /_search/scroll
   - 선언 된 순서대로 적용 되며, 0개 이상 사용 가능 
 
 
+### _analyze API 구조
+```
+GET /_analyze
+{
+  "analyzer": "standard",
+  "text": "Quick Brown Foxes!"
+}
+
+
+```
+request
+- `GET /_analyze`
+- `POST /_analyze`
+- `GET /<index>/_analyze`
+- `POST /<index>/_analyze`
+
+JSON 구조
+```
+{
+  "analyzer": "",
+  "char_filter": [""],
+  "tokenizer": {...},
+  "filter": [{...}],
+  "field": "",
+  "normalizer": "",
+  "text": ["..."],
+  "explain": true
+}
+```
+
+### _analyze API Parameters
+- analyzer: built-in analyzer 설정 
+- char_filter: tokenizer 로 전달 하기 이전에 입력 된 text를 전처리 하기 위한 filter를 설정 (array)
+- explain: 기본 false 이며, 분석 결과에 대한 상세 정보를 포함하도록 함
+- field: field에 정의 된 analyzer 를 이용해서 분석하도록 함
+- filter: tokenizer 이후에 사용할 filter 설정 (array)
+- normalizer: 
+  - analyzer와 유사하지만, 단일 토큰으로 분석 결과를 만들어 낸다는 차이점이 있음
+  - tokenizer를 사용 하지 않음
+  - 모든 filter 적용이 가능 한 것이 아닌 문자 단위로 동작하는 필터만 사용 가능 
+- text: 형태소 분석할 대상 text (array or string)
+- tokenizer: 사용할 tokenizer 설정 
+
+### nori_tokenizer
+- decompound_mode
+  - 복잡 토큰에 대한 처리 방법을 설정
+  - none: 처리 하지 않음 (가거도항, 가곡역)
+  - discard: 복합 토큰을 분해 하고 분석 대상 토큰을 버림 (가곡역 => 가곡, 역)
+  - mixed: 분석 대상 토큰을 유지 하면서 복합 토큰을 분해 (가굑역 => 가곡역, 가곡, 역)
+- discard_punctuation
+  - 기본 true 이며, punctuation character를 제거 
+- tokenizer
+  - 사용할 tokenizer 설정
+- user_dictionary
+  - 사용자 정의 사전 파일을 설정 
+  - 기본 위치는 $ES_HOME/config/userdict_ko.txt 와 같이 위치 시키며,
+  - 사전 파일에 사전은 한 줄에 하나씩 정의
+  - (정의 하는 사전은 simple noun, compound noun 을 작성)
+- user_dictionary_rules
+  - 사전 파일에 작성하는 내용을 설정으로 직정 등록 하는 방식
+  - 한 줄로 작성 하는 내용을 배열로 작성
+
+### nori_part_of_speech token filter
+- 품사 태그 집합과 일치 하는 토큰을 제거 
+- stoptags: 제거 해야 하는 품사 태그를 설정 한다(아래가 기본 설정)
+
+```
+"stoptags": [
+  "E",
+  "IC",
+  "J",
+  "MAG", "MAJ", "MM",
+  "SP","SSC","SSO","SC","SE",
+  "XPN","XSA","XSN","XSV",
+  "UNA","NA","VSV"
+]
+```
+
+
+### _analyze API를 이용한 NoriAnalyzer 테스트 
+- analyzer: 한국어 형태소 분석기 (은전한닢 또는 MeCab), 기본 사전 목록은 세종 말뭉치를 사용 
+- nori_readingfrom token filter: 한자를 한글로 변환 한다
+- nori_number token filter
+  - 한국어 숫자를 half-width 문자의 일반 아랍어 십진수로 정규화 한다
+  - 이 필터는 숫자 정보에 해당 하는 field에 사용 하면 좋다 
+
+
+
+설치 및 제거 
+```
+bin/elasticsearch-plugin install analysis-nori
+bin/elasticsearch-plugin remove analysis-nori
+```
 
 
