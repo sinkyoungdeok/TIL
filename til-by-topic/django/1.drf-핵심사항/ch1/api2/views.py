@@ -18,18 +18,18 @@
 #     serializer_class = CommentSerializer
 from rest_framework.generics import ListAPIView, RetrieveAPIView, CreateAPIView
 
-from api2.serializers import PostSerializer, CommentSerializer
+from api2.serializers import CommentSerializer, PostListSerializer, PostRetrieveSerializer
 from blog.models import Post, Comment
 
 
 class PostListAPIView(ListAPIView):
     queryset = Post.objects.all()
-    serializer_class = PostSerializer
+    serializer_class = PostListSerializer
 
 
 class PostRetrieveAPIView(RetrieveAPIView):
     queryset = Post.objects.all()
-    serializer_class = PostSerializer
+    serializer_class = PostRetrieveSerializer
 
 
 class CommentCreateAPIView(CreateAPIView):

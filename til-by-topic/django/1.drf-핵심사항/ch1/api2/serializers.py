@@ -9,11 +9,17 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
         model = User
         fields = ['url', 'username', 'email', 'is_staff']
 
-class PostSerializer(serializers.ModelSerializer):
+class PostListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
         # fields = '__all__'
         fields = ['id', 'title', 'image', 'like', 'category']
+
+class PostRetrieveSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Post
+        # fields = '__all__'
+        exclude = ['create_dt']
 
 class CommentSerializer(serializers.ModelSerializer):
     class Meta:
