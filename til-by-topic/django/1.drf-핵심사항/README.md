@@ -12,6 +12,7 @@
   - [django app 추가 명령](#django-app-추가-명령)
   - [django router](#django-router)
   - [DefaultRouter vs SimpleRouter](#defaultrouter-vs-simplerouter)
+  - [ViewSet](#viewset)
 
 ## ch0
 - CBV (Class Based View)로 되어 있는 프로젝트
@@ -152,3 +153,33 @@ DefaultRouter와 SimpleRouter가 만들어주는 url
 DefaultRouter만 만들어주는 것들
 - API Root (api2/)
 - format suffix (users.json, users.api, users/99.json, users/99.api)
+
+### ViewSet
+```python
+class UserViewSet(viewsets.ModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+```
+
+DRF 관련 문서: cdrf.co
+CBV 관련 문서: ccbv.co.uk
+
+- MIXINS 클래스를 모아서, GENERICS 클래스를 만들었다
+- GENERICS 클래스를 모아서, VIEWSETS 클래스를 만들었다.
+- View 클래스를 상속받아서 APIView 클래스를 만들고, APIView 클래스를 상속 받아서 GenericAPIView를 만들었다.
+- GenericAPIView 에다가 CreateModelMixin(MIXINS) 을 추가해서 CreateAPIView(GENERICS)를 만들었다. 
+- GenericAPIView 에다가 DestryModelMixin(MIXINS) 을 추가해서 DestryAPIView(GENERICS)를 만들었다.
+  - Create: CreateAPIView (POST)
+  - Read: ListAPIView, RetrieveAPIView (GET)
+  - Update: UpdateAPIView (UPDATE, PATCH)
+  - Delete: DestroyAPIView (DELETE)
+- APIView들을 조합해서 새로운 APIView 들을 만든다.
+  - ListCreateAPIView = ListAPIView + CreateAPIView
+  - RetrieveUpdateDestroyAPIView =  RetrieveAPIView + UpdateAPIView + DestroyAPIView
+
+ModelViewSet는 5개의 APIView로 만들었다. 
+- Create: CreateAPIView (POST)
+- Read: ListAPIView, RetrieveAPIView (GET)
+- Update: UpdateAPIView (UPDATE, PATCH)
+- Delete: DestroyAPIView (DELETE)
+
