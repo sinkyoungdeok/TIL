@@ -11,6 +11,7 @@
   - [url / view / serializer 구조 잡기](#url--view--serializer-구조-잡기)
   - [django app 추가 명령](#django-app-추가-명령)
   - [django router](#django-router)
+  - [DefaultRouter vs SimpleRouter](#defaultrouter-vs-simplerouter)
 
 ## ch0
 - CBV (Class Based View)로 되어 있는 프로젝트
@@ -136,3 +137,18 @@ python manage.py startapp api2
 
 ### django router
 - router 관련된 코드는 root (여기서는 /mysite)에서만 있어야 된다고 생각하는 사람들이 있긴 한데, 그렇지 않다. 하위 url에 넣어도 됨
+
+
+### DefaultRouter vs SimpleRouter
+```python
+router = routers.DefaultRouter()
+router.register(r'users', UserViewSet)
+```
+
+DefaultRouter와 SimpleRouter가 만들어주는 url  
+- users/ GET(list), POST(create)
+- users/pk/ GET(retrieve), PUT(update), DELETE(destroy), PATCH(partial_update)
+
+DefaultRouter만 만들어주는 것들
+- API Root (api2/)
+- format suffix (users.json, users.api, users/99.json, users/99.api)
