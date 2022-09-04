@@ -14,6 +14,7 @@
   - [DefaultRouter vs SimpleRouter](#defaultrouter-vs-simplerouter)
   - [ViewSet](#viewset)
   - [Serialize](#serialize)
+  - [Generic Views 활용](#generic-views-활용)
 
 ## ch0
 - CBV (Class Based View)로 되어 있는 프로젝트
@@ -190,3 +191,38 @@ ModelViewSet는 5개의 APIView로 만들었다.
 - /api2/post/ 와 /api2/post/99/ 의 serialize 다르게 설정해주어야 한다.
   - PostViewSet하나로 처리가 가능하지만, 클라이언트의 다양한 요구사항을 맞추기 위해서는 복잡할 수 있고
   - ListApiView와 같이 개별로 처리하는게 편하다.
+
+
+### Generic Views 활용 
+- ViewSet으로 처리하게 되면, /api2/post/ 와 /api2/post/api/ 구현에 있어 serialize 설정이 복잡해질 수 있으므로, Generic Views를 활용해야 한다.
+- `/api2/post/ (GET)` --> ListAPIView
+- `/api2/post/99 (GET)` --> RetrieveAPIView
+- `/api2/comment/ (POST)` --> CreateAPIView
+
+Generic View의 로직 
+1. db로부터 data를 읽어옴
+2. data를 serialize
+3. response
+
+
+Serialize 차이
+```python
+class PostListAPIView(ListAPIView): # (many=True)
+    queryset = Post.objects.all()
+    serializer_class = PostSerializer
+
+
+class PostRetrieveAPIView(RetrieveAPIView): # (many=False)
+    queryset = Post.objects.all()
+    serializer_class = PostSerializer
+```
+
+- 두개의 코드는 같지만, List와 Detail을 각각 구현 한 것이다.
+- Serialize를 같은것을 사용하지만, Generic View의 차이 떄문에 `many=` 옵션이 추가되서 serialize가 달라진다.
+  - many=True: 여러개 serialize
+  - many=False: 한개만 serialize
+
+결과
+- 기존에 `viewsets.ModelViewSet`로 구현했을 때에는 serialize가 List API에는 적용되었지만, detail에는 적용이 안된것을 확인할 수 있었고
+- ListAPIView, RetrieveAPIView 로 구현한 결과 List, Detail 모두 serialize가 잘 된 것을 확인할 수 있다. 
+
