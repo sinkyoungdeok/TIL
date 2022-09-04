@@ -111,3 +111,21 @@ urlpatterns = [
 ```
 - api-auth 기능 대신, 로그인 기능이 필요할 시에 admin으로 직접 접근하는 방법.
 - http://localhost:8000/admin 으로 접근하면 어드민 기능을 활용할 수 있다. 
+
+### url / view / serializer 구조 잡기 
+- MVT패턴 
+  - sMuVT 
+  - settings.py
+  - Model
+  - urls.py
+  - Views.py
+  - Template
+
+### django app 추가 명령 
+```shell
+python manage.py startapp api2
+```
+
+
+### django router
+- router 관련된 코드는 root (여기서는 /mysite)에서만 있어야 된다고 생각하는 사람들이 있긴 한데, 그렇지 않다. 하위 url에 넣어도 됨
