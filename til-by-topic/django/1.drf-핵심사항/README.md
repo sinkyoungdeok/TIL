@@ -63,3 +63,8 @@ ch0 API URL
 
 ### DRF 공식 홈페이지 
 - django-rest-framework.org
+
+### DRF default mode
+- browser에서의 요청: api
+- client에서의 요청: json
+- curl / httppie / postman / vue.js / react.js 에서의 요청: json
