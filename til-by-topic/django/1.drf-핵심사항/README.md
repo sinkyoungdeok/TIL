@@ -15,6 +15,7 @@
   - [ViewSet](#viewset)
   - [Serialize](#serialize)
   - [Generic Views 활용](#generic-views-활용)
+  - [PUT vs PATCH](#put-vs-patch)
 
 ## ch0
 - CBV (Class Based View)로 되어 있는 프로젝트
@@ -226,3 +227,12 @@ class PostRetrieveAPIView(RetrieveAPIView): # (many=False)
 - 기존에 `viewsets.ModelViewSet`로 구현했을 때에는 serialize가 List API에는 적용되었지만, detail에는 적용이 안된것을 확인할 수 있었고
 - ListAPIView, RetrieveAPIView 로 구현한 결과 List, Detail 모두 serialize가 잘 된 것을 확인할 수 있다. 
 
+### PUT vs PATCH
+- PUT은 필수 항목을 체크한다 (모델에서 blank 값의 여부에 따라 체크한다)
+- PATCH는 필수 항목을 체크하지 않는다. (어느값이던 필수값이 아님)
+
+```shell
+python manage.py shell
+from api2.serializers import *
+PostListSerializer() # 이 명령어를 통해서 어떤 값이 필수 값인지 확인 할 수 있음
+```
