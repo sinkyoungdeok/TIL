@@ -68,3 +68,46 @@ ch0 API URL
 - browser에서의 요청: api
 - client에서의 요청: json
 - curl / httppie / postman / vue.js / react.js 에서의 요청: json
+
+### DRF admin
+
+```python
+# mysite/settings.py
+
+REST_FRAMEWORK = {
+    # Use Django's standard `django.contrib.auth` permissions,
+    # or allow read-only access for unauthenticated users.
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
+    ]
+}
+```
+
+- 위 코드로 설정 하면, admin혹은 허용된 유저만 CUD에 접근 가능 하고, 익명 유저는 R만 접근 가능하다.
+- 허용된 유저에 대한 설정은 로컬 DRF에서 admin으로 로그인하면 유저를 추가할 수 있다.
+
+```python
+# mysite/settings.py
+
+REST_FRAMEWORK = {
+}
+```
+
+- 위 코드로 설정하면, 익명 유저가 CRUD 모두 접근 가능 하다.
+
+### DRF login 기능 
+```python
+urlpatterns = [
+    path('api-auth/', include('rest_framework.urls', namespace='rest_framework'))
+]
+```
+- http://localhost:8000 화면에 로그인 버튼이 보이냐 안보이냐 차이이다.
+- 이 코드를 주석 처리 하면, DRF에서 로그인 버튼이 보이지 않는다.
+
+```python
+urlpatterns = [
+    path('admin/', admin.site.urls),
+]
+```
+- api-auth 기능 대신, 로그인 기능이 필요할 시에 admin으로 직접 접근하는 방법.
+- http://localhost:8000/admin 으로 접근하면 어드민 기능을 활용할 수 있다. 
