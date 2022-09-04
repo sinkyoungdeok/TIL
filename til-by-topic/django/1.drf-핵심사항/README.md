@@ -53,4 +53,13 @@ ch0 API URL
   - ApiView나, GenericAPIView 를 상속받아서 처리한다 
   - Serializer를 사용하지 않는다.
 
-## ch1 
+## ch1
+- project version
+  - python: 3.10
+  - django: 4.1
+- pip installation
+  - `pip install --upgrade pip setuptools wheel`
+  - `pip install djangorestframework`
+
+### DRF 공식 홈페이지 
+- django-rest-framework.org
