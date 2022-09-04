@@ -1,10 +1,9 @@
 
-- [챕터별 간략 설명](#챕터별-간략-설명)
-  - [ch0](#ch0)
-    - [ch0 API URL vs 장고 권장 URL](#ch0-api-url-vs-장고-권장-url)
-    - [장고 URL vs DRF URL](#장고-url-vs-drf-url)
-
-# 챕터별 간략 설명
+- [ch0](#ch0)
+  - [ch0 API URL vs 장고 권장 URL](#ch0-api-url-vs-장고-권장-url)
+  - [장고 URL vs DRF URL](#장고-url-vs-drf-url)
+  - [장고 serialize](#장고-serialize)
+- [ch1](#ch1)
 
 ## ch0
 - CBV (Class Based View)로 되어 있는 프로젝트
@@ -45,3 +44,13 @@ ch0 API URL
 | /api/post/99/delete | D | DELETE | /api/post/99/ | delete 
 | | | PATCH | /api/post/99 | partial_update
 
+
+### 장고 serialize
+- CBV에서는 
+  - serialize를 직접 처리 한다.
+  - DRF에서 Serialize사용이 어렵다고 느껴지면, 간단한 API들은 CBV로 만들어도 좋다. 
+- DRF에서는 
+  - ApiView나, GenericAPIView 를 상속받아서 처리한다 
+  - Serializer를 사용하지 않는다.
+
+## ch1 

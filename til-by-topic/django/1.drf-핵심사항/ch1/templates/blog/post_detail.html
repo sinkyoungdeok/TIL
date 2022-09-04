@@ -1,0 +1,135 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block title %}post_detail.html{% endblock %}
+
+{% block extra-style %}
+{{ block.super }}
+<style>
+    .my-img-h300 {
+        width: 100%;
+        height: 300px;
+        object-fit: cover;
+    }
+    .my-content {
+        white-space: pre-wrap;
+    }
+    .my-link:hover {
+        cursor: pointer;
+        font-style: italic;
+    }
+    .my-comment-icon {
+        font-size: 3em;
+        color: darkgray;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Post Detail Grid-->
+<section class="page-section" id="post">
+    <div class="container">
+        <div class="row">
+            <!-- Post title-->
+            <h1 class="fw-bolder mb-1">[[ post.title ]]</h1>
+            <hr>
+            <p>
+                <span>[[ post.update_dt ]]</span> &emsp;
+
+                <i class="fas fa-copyright"></i> &nbsp;
+                <span class="text-success my-link" @click="serverPage(post.category, '')">[[ post.category ]]</span> &emsp;
+                
+                <i class="fas fa-tag"></i> &nbsp;
+                <span v-for="(tag, index) in post.tags" :key="index">
+                    <span v-if="index !== 0">, </span>
+                    <span class="text-success my-link" @click="serverPage('', tag)">[[ tag ]]</span>
+                </span> &emsp;
+                
+                <i class="fas fa-heart"></i> &nbsp;
+                <span class="text-success my-link" @click="likeCount(post.id)">[[ post.like ]]</span> &emsp;
+            </p>
+            <hr>
+        </div>
+        <div class="row">
+            <div class="col-lg-8">
+                <!-- Post content-->
+                <article>
+                    <!-- Preview image figure-->
+                    <figure class="mb-4"><img class="img-fluid rounded my-img-h300"
+                            :src="post.image" alt="..." /></figure>
+                    <!-- Post content-->
+                    <div class="mb-5">
+                        <p class="fs-5 mb-4 my-content">[[ post.content ]]</p>
+                    </div>
+                </article>
+                <!-- Comments section-->
+                <div class="mb-5">
+                    <div class="card bg-light">
+                        <div class="card-body">
+                            <!-- Comment Form -->
+                            <form id="comment-form" ref="commentForm" class="mb-4">
+                                <textarea name="content" class="form-control" rows="3"
+                                    placeholder="Join the discussion and leave a comment!"></textarea>
+                                <div class="d-flex justify-content-end mt-1">
+                                    <div @click="resetForm" class="btn btn-outline-secondary btn-sm me-2">RESET</div>
+                                    <div @click="submitForm" class="btn btn-primary btn-sm">SUBMIT</div>
+                                </div>
+                            </form>
+                            
+                            <!-- Comment List -->
+                            <div v-for="comment in commentList" :key="comment.id" class="d-flex mb-4">
+                                <div class="flex-shrink-0 my-comment-icon">
+                                    <i class="fas fa-user-circle"></i>
+                                </div>
+                                <div class="ms-3">
+                                    <div class="fw-bold">[[ comment.update_dt ]]</div>
+                                    <div class="my-content">[[ comment.content ]]</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Side widgets-->
+            <div class="col-lg-4">
+                <div class="card mb-4">
+                    <div class="card-header">Prev Post</div>
+                    <div class="card-body">
+                        <h5 class="text-primary my-link" @click="fetchPostDetail(prevPost.id)">[[ prevPost.title ]]</h5>
+                    </div>
+                </div>
+                <div class="card mb-4">
+                    <div class="card-header">Next Post</div>
+                    <div class="card-body">
+                        <h5 class="text-primary my-link" @click="fetchPostDetail(nextPost.id)">[[ nextPost.title ]]</h5>
+                    </div>
+                </div>                
+                <!-- Categories widget-->
+                <div class="card mb-4">
+                    <div class="card-header">Categories</div>
+                    <div class="card-body">
+                        <span v-for="(category, index) in cateList" :key="category.id">
+                            <span v-if="index !== 0">&emsp;</span>
+                            <span class="text-success my-link" @click="serverPage(category, '')">[[ category ]]</span>
+                        </span>
+                    </div>
+                </div>
+                <div class="card mb-4">
+                    <div class="card-header">Tag Cloud</div>
+                    <div class="card-body">
+                        <span v-for="(tag, index) in tagList" :key="tag.id">
+                            <span v-if="index !== 0">&emsp;</span>
+                            <span class="text-success my-link" @click="serverPage('', tag)">[[ tag ]]</span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra-script %}
+    {% include 'include/post_detail_vue.html' %}
+{% endblock %}
