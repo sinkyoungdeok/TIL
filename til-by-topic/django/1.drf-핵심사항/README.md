@@ -4,6 +4,13 @@
   - [장고 URL vs DRF URL](#장고-url-vs-drf-url)
   - [장고 serialize](#장고-serialize)
 - [ch1](#ch1)
+  - [DRF 공식 홈페이지](#drf-공식-홈페이지)
+  - [DRF default mode](#drf-default-mode)
+  - [DRF admin](#drf-admin)
+  - [DRF login 기능](#drf-login-기능)
+  - [url / view / serializer 구조 잡기](#url--view--serializer-구조-잡기)
+  - [django app 추가 명령](#django-app-추가-명령)
+  - [django router](#django-router)
 
 ## ch0
 - CBV (Class Based View)로 되어 있는 프로젝트
