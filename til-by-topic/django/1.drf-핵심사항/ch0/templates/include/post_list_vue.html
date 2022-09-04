@@ -1,0 +1,120 @@
+<script src="https://unpkg.com/vue@next"></script>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+<script>
+    const PostListApp = {
+        delimiters: ['[[', ']]'],
+
+        data() {
+            return {
+                postList: [],
+                category: '',
+                tag: '',
+                pageCnt: 1,
+                curPage: 1,
+                currentYear: new Date().getFullYear(),
+            }
+        },
+
+        computed: {
+            pages() {
+                console.log("pages()...");
+                let pages3 = [];
+                if (this.pageCnt === 1) pages3 = [1];
+                else if (this.pageCnt === 2) pages3 = [1, 2];
+                else if (this.pageCnt >= 3) {
+                    if (this.curPage === 1) pages3 = [1, 2, 3];
+                    else if (this.curPage === this.pageCnt) pages3 = [this.pageCnt-2, this.pageCnt-1, this.pageCnt];
+                    else pages3 = [this.curPage-1, this.curPage, this.curPage+1];
+                }
+                return pages3
+            },
+
+            prevClass() {
+                console.log("prevClass()...");
+                if (this.curPage === 1) return 'page-item disabled';
+                else return 'page-item my-link';
+            },
+
+            nextClass() {
+                console.log("nextClass()...");
+                if (this.curPage === this.pageCnt) return 'page-item disabled';
+                else return 'page-item my-link';                
+            },
+
+            // pageClass(page) {},
+        },
+
+        created() {
+            console.log("created()...");
+            const params = new URL(location).searchParams;
+            this.category = params.get('category');
+            this.tag = params.get('tag');
+            this.fetchPostList();
+        },
+
+        methods: {
+            fetchPostList(page=1) {
+                console.log("fetchPostList()...", page, this.category, this.tag);
+                let getUrl = '';
+                if (this.category) getUrl = `/api/post/list/?page=${page}&category=${this.category}`;
+                else if (this.tag) getUrl = `/api/post/list/?page=${page}&tag=${this.tag}`;
+                else getUrl = `/api/post/list/?page=${page}`;
+
+                axios.get(getUrl)
+                    .then(res => {
+                        console.log("FETCH POSTLIST GET RES", res);
+                        this.postList = res.data.postList;
+                        this.pageCnt = res.data.pageCnt;
+                        this.curPage = res.data.curPage;
+                    })
+                    .catch(err => {
+                        console.log("FETCH POSTLIST GET ERR.RESPONSE", err.response);
+                        alert(`${err.response.status} ${err.response.statusText}`);
+                    });
+            },
+
+            pageChanged(page) {
+                console.log("pageChanged()...", page);
+                this.curPage = page;
+                this.fetchPostList(this.curPage);
+            },
+
+            prevPage() {
+                console.log("prevPage()...", this.curPage);
+                if (this.curPage <= 1) return;
+                else this.curPage = this.curPage - 1;
+                this.fetchPostList(this.curPage);
+            },
+
+            nextPage() {
+                console.log("nextPage()...", this.curPage);
+                if (this.curPage >= this.pageCnt) return;
+                else this.curPage = this.curPage + 1;
+                this.fetchPostList(this.curPage);
+            },
+
+            firstPage() {
+                console.log("firstPage()", this.curPage);
+                if (this.curPage <= 1) return;
+                else this.curPage = 1;
+                this.fetchPostList(this.curPage);
+            },
+            
+            lastPage() {
+                console.log("lastPage()", this.curPage);
+                if (this.curPage >= this.pageCnt) return;
+                else this.curPage = this.pageCnt;
+                this.fetchPostList(this.curPage);
+            },            
+
+            pageClass(page) {
+                console.log("pageClass()...", page);
+                if (this.curPage === page) return 'page-item my-link active';
+                else return 'page-item my-link';                
+            },
+        },
+    }
+
+    Vue.createApp(PostListApp).mount('#page-top')
+</script>

@@ -11,6 +11,7 @@
 - [Kotlin](./til-by-topic/kotlin)
 - [elasticsearch](./til-by-topic/elasticsearch/)
 - [big data](./til-by-topic/big-data)
+- [django](./til-by-topic/django)
 
 # 년도별 들은 강의&책
 
