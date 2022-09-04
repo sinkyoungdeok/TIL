@@ -16,6 +16,7 @@
   - [Serialize](#serialize)
   - [Generic Views 활용](#generic-views-활용)
   - [PUT vs PATCH](#put-vs-patch)
+  - [좋아요 API 구현](#좋아요-api-구현)
 
 ## ch0
 - CBV (Class Based View)로 되어 있는 프로젝트
@@ -236,3 +237,29 @@ python manage.py shell
 from api2.serializers import *
 PostListSerializer() # 이 명령어를 통해서 어떤 값이 필수 값인지 확인 할 수 있음
 ```
+
+
+### 좋아요 API 구현 
+- 좋아요는 Post의 like 정보만을 수정하는 것이지만, 이거는 직접적인 PUT 또는 UPDATE 메소드에서 구현된 것이 없다.
+- 우리가 직접 커스터마이징을 해야되는데 어떻게 해야 할까?
+
+```python
+class PostLikeAPIView(UpdateAPIView):
+    queryset = Post.objects.all()
+    serializer_class = PostLikeSerializer
+
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        data = {'like': instance.like + 1} # patch 명령이 오면 like+1
+        serializer = self.get_serializer(instance, data=data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+
+        if getattr(instance, '_prefetched_objects_cache', None):
+            instance._prefetched_objects_cache = {}
+
+        return Response(data['like']) # response에 좋아요의 수만 보여주기
+```
+- 위와 같이 update 메서드를 https://www.cdrf.co/3.13/rest_framework.generics/UpdateAPIView.html 홈페이지에서 가져온 뒤, 수정을 하였다.
+
