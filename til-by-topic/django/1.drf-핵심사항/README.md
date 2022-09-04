@@ -13,6 +13,7 @@
   - [django router](#django-router)
   - [DefaultRouter vs SimpleRouter](#defaultrouter-vs-simplerouter)
   - [ViewSet](#viewset)
+  - [Serialize](#serialize)
 
 ## ch0
 - CBV (Class Based View)로 되어 있는 프로젝트
@@ -183,3 +184,9 @@ ModelViewSet는 5개의 APIView로 만들었다.
 - Update: UpdateAPIView (UPDATE, PATCH)
 - Delete: DestroyAPIView (DELETE)
 
+
+### Serialize
+- 클라이언트에게 보낼 필드를 지정
+- /api2/post/ 와 /api2/post/99/ 의 serialize 다르게 설정해주어야 한다.
+  - PostViewSet하나로 처리가 가능하지만, 클라이언트의 다양한 요구사항을 맞추기 위해서는 복잡할 수 있고
+  - ListApiView와 같이 개별로 처리하는게 편하다.
