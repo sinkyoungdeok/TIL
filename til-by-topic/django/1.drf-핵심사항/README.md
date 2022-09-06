@@ -17,6 +17,8 @@
   - [Generic Views 활용](#generic-views-활용)
   - [PUT vs PATCH](#put-vs-patch)
   - [좋아요 API 구현](#좋아요-api-구현)
+  - [python console에서 자동완성 기능 활용 방법](#python-console에서-자동완성-기능-활용-방법)
+  - [직렬화, 역직렬화 과정](#직렬화-역직렬화-과정)
 
 ## ch0
 - CBV (Class Based View)로 되어 있는 프로젝트
@@ -263,3 +265,39 @@ class PostLikeAPIView(UpdateAPIView):
 ```
 - 위와 같이 update 메서드를 https://www.cdrf.co/3.13/rest_framework.generics/UpdateAPIView.html 홈페이지에서 가져온 뒤, 수정을 하였다.
 
+### python console에서 자동완성 기능 활용 방법 
+```shell
+python manage.py shell
+import os, django
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'mysite.settings')
+django.setup()
+```
+
+
+### 직렬화, 역직렬화 과정 
+```python
+# 직렬화
+from rest_framework.renderers import JSONRenderer
+c0 = Comment(...) # class 
+sr = CommentSerializer(instance=c0) # dictionary
+json0 = JSONRenderer().render(sr.data) # byte string (json 형태)
+```
+
+```python
+# 역직렬화
+from rest_framework.parsers import JSONParser
+from io import BytesIO
+json = ... # json data 
+ddata0 = JSONParser().parse(BytesIO(json0)) # dictionary
+dsr = CommentSerializer(data=ddata0) 
+dsr.is_valid() # 유효성 검사 (필수)
+instance = Comment(**dsr.validated_data) # class
+instance.save() # db애 저장
+```
+
+- Serialize
+  - read opeartion 사용 
+  - GET
+- DeSerialize
+  - write operation 사용 
+  - POST, UPDATE, DELETE, PATCH
