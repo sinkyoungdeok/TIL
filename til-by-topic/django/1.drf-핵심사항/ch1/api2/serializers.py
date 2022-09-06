@@ -17,6 +17,8 @@ class PostListSerializer(serializers.ModelSerializer):
         fields = ['id', 'title', 'image', 'like', 'category']
 
 class PostRetrieveSerializer(serializers.ModelSerializer):
+    category = serializers.StringRelatedField()
+    tags = serializers.StringRelatedField(many=True)
     class Meta:
         model = Post
         # fields = '__all__'

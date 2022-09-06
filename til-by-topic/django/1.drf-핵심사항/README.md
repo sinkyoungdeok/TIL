@@ -359,3 +359,21 @@ class CateTagAPIView(APIView):
         serializer = CateTagSerializer(instance=data)
         return Response(serializer.data)
 ```
+
+코드 - __str__ 방법 
+```python
+# models.py
+class Tag(models.Model):
+    name = models.CharField(max_length=50)
+
+    def __str__(self):
+        return self.name
+
+class PostRetrieveSerializer(serializers.ModelSerializer):
+    category = serializers.StringRelatedField() # __str__ 활용
+    tags = serializers.StringRelatedField(many=True)
+    class Meta:
+        model = Post
+        # fields = '__all__'
+        exclude = ['create_dt']
+```
