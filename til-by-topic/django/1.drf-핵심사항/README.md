@@ -19,6 +19,7 @@
   - [좋아요 API 구현](#좋아요-api-구현)
   - [python console에서 자동완성 기능 활용 방법](#python-console에서-자동완성-기능-활용-방법)
   - [직렬화, 역직렬화 과정](#직렬화-역직렬화-과정)
+  - [카테고리/태그 API 만들기](#카테고리태그-api-만들기)
 
 ## ch0
 - CBV (Class Based View)로 되어 있는 프로젝트
@@ -301,3 +302,60 @@ instance.save() # db애 저장
 - DeSerialize
   - write operation 사용 
   - POST, UPDATE, DELETE, PATCH
+
+
+### 카테고리/태그 API 만들기
+원하는 결과 - /api/catetag 
+```json
+{
+  "cateList": [
+    "IT",
+    "Django",
+    "일상생활"
+  ],
+  "tagList": [
+    "django",
+    "technical board",
+    "파리",
+    "개선문",
+    "노트북",
+    "여행",
+    "그랜드캐니언",
+    "운동"
+  ]
+}
+```
+
+코드
+```python
+class CategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = ['name']
+
+class TagSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Tag
+        fields = ['name']
+
+# 이 코드를 사용하게 되면, name="IT" 로 전송됨
+# class CateTagSerializer(serializers.Serializer): 
+#     cateList = CategorySerializer(many=True)
+#     tagList = TagSerializer(many=True) 
+
+class CateTagSerializer(serializers.Serializer):
+    cateList = serializers.ListField(child=serializers.CharField())
+    tagList = serializers.ListField(child=serializers.CharField())
+
+class CateTagAPIView(APIView):
+    def get(self, request, *args, **kwargs):
+        cateList = Category.objects.all()
+        tagList = Tag.objects.all()
+        data = {
+            'cateList': cateList,
+            'tagList': tagList,
+        }
+
+        serializer = CateTagSerializer(instance=data)
+        return Response(serializer.data)
+```
