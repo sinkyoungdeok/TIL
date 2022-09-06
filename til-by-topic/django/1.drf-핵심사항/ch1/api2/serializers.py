@@ -10,6 +10,7 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
         fields = ['url', 'username', 'email', 'is_staff']
 
 class PostListSerializer(serializers.ModelSerializer):
+    category = serializers.CharField(source='category.name')
     class Meta:
         model = Post
         # fields = '__all__'
