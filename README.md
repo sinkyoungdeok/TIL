@@ -12,6 +12,7 @@
 - [elasticsearch](./til-by-topic/elasticsearch/)
 - [big data](./til-by-topic/big-data)
 - [django](./til-by-topic/django)
+- [design-pattern](./til-by-topic/design-pattern/)
 
 # 년도별 들은 강의&책
 
@@ -59,5 +60,6 @@
 12. 강의) 패캠 - Kubernetes 입문 / 권윤정님 (2022.6.24 ~ 2022.7.13)
 13. 강의) 패캠 - 실시간 빅데이터 처리를 위한 Spark & Flink 올인원 패키지 / Spark, Airflow, Kafka 까지 / 김건우님 (2022.7.23 ~ 2022.8.14)
 14. 강의) The Red : 검색 엔진 구축을 위한 Elasticsearch 마스터 클래스 / 정호욱님 (2022.8.14 ~ )
+15. 책) 만들면서 배우는 클린 아키텍처 / 책 (2022.09.06 ~ )
 
 </details>
