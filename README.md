@@ -13,6 +13,7 @@
 - [big data](./til-by-topic/big-data)
 - [django](./til-by-topic/django)
 - [design-pattern](./til-by-topic/design-pattern/)
+- [TDD](./til-by-topic/tdd)
 
 # 년도별 들은 강의&책
 
@@ -62,5 +63,6 @@
 14. 강의) The Red : 검색 엔진 구축을 위한 Elasticsearch 마스터 클래스 / 정호욱님 (2022.8.14 ~ )
 15. 강의) 인프런 - Django REST Framework 핵심사항 / 김석훈님 (2022.9.4 ~ 2022.9.7) 
 16. 책) 만들면서 배우는 클린 아키텍처 / 책 (2022.09.06 ~ )
+17. 강의) The Red : 이규원의 현실 세상의 TDD : 안정감을 주는 코드 작성 방법 / 이규원님 (2022.09.07 ~ )
 
 </details>
