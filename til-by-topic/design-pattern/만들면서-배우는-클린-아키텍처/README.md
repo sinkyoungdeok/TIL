@@ -585,6 +585,72 @@ buckpal
 
 ## a. 도메인 모델 구현하기 
 
+- 한 계좌에서 다른 계좌로 송금하는 유스케이스를 구현해보자.
+  - 이를 객체지향적인 방식으로 모델링 하는 한 가지 방법은 
+  - 입금과 출금을 할 수 있는 Account 엔티티를 만들고 
+  - 출금계좌에서 돈을 출금해서 입금 계좌로 돈을 입금하는 것이다.
+
+```java
+package buckpal.domain;
+
+public class Account {
+
+  private AccountId id;
+  private Money baselineBalance;
+  private ActivityWindow activityWindow;
+
+  public Money calculateBalance() {
+    return Money.add(
+      this.baselineBalance,
+      this.activityWindow.calculateBalance(this.id));
+    )
+  }
+
+  public boolean withdraw(Money money, AccountId targetAccountId) {
+    if (!mayWithdraw(money)) {
+      return false;
+    }
+
+    Activity withdrawal = new Activity(
+      this.id,
+      this.id,
+      targetAccountId,
+      LocalDateTime.now(),
+      money);
+    )
+    this.activityWindow.addActivity(withdrawal);
+    return true;
+  }
+
+  private boolean mayWithdraw(Money money) {
+    return Money.add(
+      this.calculateBalance(),
+      money.negate())
+      .isPositive();
+  }
+
+  public boolean deposit(Money money, AccountId sourceAccountId) {
+		Activity deposit = new Activity(
+				this.id,
+				sourceAccountId,
+				this.id,
+				LocalDateTime.now(),
+				money);
+		this.activityWindow.addActivity(deposit);
+		return true;
+	}
+}
+```
+- Account 엔티티는 실제 계좌의 현재 스냅샷을 제공한다.
+  - 계좌에 대한 모든 입금과 출금은 Activity 엔티티에 포착된다.
+  - 한 계좌에 대한 모든 활동들을 항상 메모리에 한꺼번에 올리는 것은 현명한 방법이 아니기 때문에 
+  - Account 엔티티는 ActivityWindow 값 객체에서 포착한 지난 며칠 혹은 몇 주간의 범위에 해당하는 활동만 보유한다.
+- 계좌의 현재 잔고를 계산하기 위해서 Account 엔티티는 활동창(activity window)의 첫번째 활동 바로 전의 잔고를 baselineBalance 속성을 가지고 있다.
+  - 현재 총 잔고는 기준 잔고(baselineBalance)에 활동창의 모든 활동들의 잔고를 합한 값이 된다.
+- 이 모델 덕분에 계좌에서 일어나는 입금과 출금은 각각 `withdraw()`와 `deposit()` 메서드에서처럼 새로운 활동을 활동창에 추가하는 것에 불과하다.
+  - 출금하기 전에는 잔고를 초과하는 금액은 출금할 수 없도록 하는 비즈니스 규칙을 검사한다.
+- 이제 입금과 출금을 할 수 있는 Account 엔티티가 있으므로 이를 중심으로 유스케이스를 구현해보자.
+
 ## b. 유스케이스 둘러보기
 
 ## c. 입력 유효성 검증
