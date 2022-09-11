@@ -53,6 +53,8 @@
     - [일반적인 유스케이스](#일반적인-유스케이스)
     - [유스케이스 구현](#유스케이스-구현)
   - [c. 입력 유효성 검증](#c-입력-유효성-검증)
+    - [Bean Validation 활용](#bean-validation-활용)
+    - [SelfValidating 구현](#selfvalidating-구현)
   - [d. 생성자의 힘](#d-생성자의-힘)
   - [e. 유스케이스마다 다른 입력 모델](#e-유스케이스마다-다른-입력-모델)
   - [f. 비즈니스 규칙 검증하기](#f-비즈니스-규칙-검증하기)
@@ -706,6 +708,111 @@ public class SendMoneyService implements SendMoneyUseCase {
 
 
 ## c. 입력 유효성 검증
+
+- 입력 유효성 검증은 유스케이스 클래스의 책임은 아니지만, 여전히 이 작업은 애플리케이션 계층의 책임에 해당하기 때문에 여기에서 구현을 해보자.
+- 호출하는 어댑터가 유스케이스에 입력을 전달하기 전에 입력 유효성을 검증하면 어떨까?
+  - 유스케이스에서 필요로 하는 것을 호출자(caller)가 모두 검증했다고 믿을 수 있을까?
+  - 또, 유스케이스는 하나 이상의 어댑터에서 호출될 텐데, 유효성 검증을 각 어댑터에서 전부 구현해야 한다.
+  - 그럼 그 과정에서 실수할 수도 있고, 유효성 검증을 해야 한다는 사실을 잊어 버리게 될 수도 있다.
+- 애플리케이션 계층에서 입력 유효성을 검증해야 하는 이유는 
+  - 그렇게 하지 안흥ㄹ 경우 애플리케이션 코어의 바깥쪽으로부터 유효하지 않은 입력값을 받게 되고, 모델의 상태를 해칠 수 있기 때문이다.
+- 유스케이스 클래스가 아니라면 어디에서 입력 유효성을 검증해야 할까?
+- 입력 모델(input model)이 이 문제를 다루도록 해보자.
+  - '송금하기' 유스케이스에서 입력 모델은 예제 코드에서 본 SendMoneyCommand 클래스다.
+  - 더 정확히 말하면 생성자 내에서 입력 유효성을 검증할 것이다.
+
+
+```java
+package buckpal.application.port.in;
+
+@Getter
+public class SendMoneyCommand {
+
+  private final AccountId sourceAccountId;
+  private final AccountId targetAccountId;
+  private final Money money;
+
+  public SendMoneyCommand(
+    AccountId sourceAccountId,
+    AccountId targetAccountId,
+    Money money) {
+      this.sourceAccountId = sourceAccountId;
+      this.targetAccountId = targetAccountId;
+      this.money = money;
+
+      requireNonNull(sourceAccountId);
+      requireNonNull(targetAccountId);
+      requireNonNull(money);
+      requireGreaterThan(money, 0);
+    }
+}
+``` 
+- 송금을 위해서는 출금 계좌와 입금 계좌의 ID, 송금할 금액이 필요하다.
+  - 모든 파라미터가 null이 아니어야 하고 송금액은 0보다 커야 한다.
+  - 이러한 조건 중 하나라도 위배되면 예외를 던져서 객체 생성을 막으면 된다.
+- SendMoneyCommand의 필드에 final을 지정해 불변 필드로 만들었다.
+  - 따라서 생성에 성공하고 나면 상태를 유효하고 이후에 잘못된 상태로 변경할 수 없다
+- SendMoneyCommand는 유스케이스 API의 일부이기 떄문에 인커밍 포트 패키지에 위치한다.
+  - 그러므로 유효성 검증이 애플리케이션의 코어에 남아있지만 신성한 유스케이스 코드를 오염시키지 않는다.
+- 그런데 이런 귀찮은 작업들을 대신해 줄 수 있는 도구가 있는데 굳이 모든 유효성 검증을 직접 구현해야 할까?
+  - 자바에는 Bean VAlidation API가 이러한 작업을 위한 표준 라이브러리이다.
+
+### Bean Validation 활용
+```java
+package buckpal.application.port.in;
+
+@Getter
+public class SendMoneyCommand {
+
+  @NotNull
+  private final AccountId sourceAccountId;
+  @NotNull
+  private final AccountId targetAccountId;
+  @NotNull
+  private final Money money;
+
+  public SendMoneyCommand(
+    AccountId sourceAccountId,
+    AccountId targetAccountId,
+    Money money) {
+      this.sourceAccountId = sourceAccountId;
+      this.targetAccountId = targetAccountId;
+      this.money = money;
+      requireGreaterThan(money, 0);
+      this.validateSelf();
+    }
+}
+```
+- SelfValidating 추상 클래스는 validateSelf() 메서드를 제공하며, 생성자 코드의 마지막 문장에서 이 메서드를 호출하고 있다.
+  - 이 메서드가 필드에 지정된 @Notnull과 같은 애너테이션 검증을 하고, 규칙을 위배한 경우 예외를 던진다.
+  - Bean Validation이 특정 유효성 검증 규칙을 표현하기에 충분하지 않다면 직접 구현할 수도 있다.
+
+
+### SelfValidating 구현 
+```java
+package shared;
+
+public abstract class SelfValidating<T> {
+
+  private Validator;
+
+  public SelfValidating() {
+    ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+    validator = factory.getValidator();
+  }
+
+  protected void validateSelf() {
+    Set<ConstraintViolation<T>> violations = validator.validate((T) this);
+    if (!violations.isEmpty()) {
+      throw new ConstraintViolationException(violations);
+    }
+  }
+}
+```
+- 입력 모델에 있는 유효성 검증 코드를 통해 유스케이스 구현체 주위에 사실상 오류 방지 계층(anti corruption layer)를 만들었다.
+  - 여기서 말하는 계층은 하위 계층을 호출하는 계층형 아키텍처의 계층이 아니라 
+  - 잘못된 입력을 호출자에게 돌려주는 유스케이스 보호막을 의미한다.
+
 
 ## d. 생성자의 힘
 
