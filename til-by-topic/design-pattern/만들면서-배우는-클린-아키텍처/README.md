@@ -50,6 +50,8 @@
 - [4. 유스케이스 구현하기](#4-유스케이스-구현하기)
   - [a. 도메인 모델 구현하기](#a-도메인-모델-구현하기)
   - [b. 유스케이스 둘러보기](#b-유스케이스-둘러보기)
+    - [일반적인 유스케이스](#일반적인-유스케이스)
+    - [유스케이스 구현](#유스케이스-구현)
   - [c. 입력 유효성 검증](#c-입력-유효성-검증)
   - [d. 생성자의 힘](#d-생성자의-힘)
   - [e. 유스케이스마다 다른 입력 모델](#e-유스케이스마다-다른-입력-모델)
@@ -652,6 +654,56 @@ public class Account {
 - 이제 입금과 출금을 할 수 있는 Account 엔티티가 있으므로 이를 중심으로 유스케이스를 구현해보자.
 
 ## b. 유스케이스 둘러보기
+
+### 일반적인 유스케이스
+1. 입력을 받는다
+2. 비즈니스 규칙을 검증한다
+3. 모델 상태를 조작한다
+4. 출력을 반환한다
+
+- 유스케이스는 인커밍 어댑터로부터 입력을 받는다.
+  - 유스케이스 코드가 도메인 로직에만 신경써야하고 입력 유효성 검증으로 오염되면 안된다.
+  - 입력 유효성은 다른곳에서 처리한다.
+- 유스케이스는 비즈니스 규칙을 검증할 책임이 있다.
+  - 도메인 엔티티와 이 책임을 공유한다.
+  - 입력 유효성 검증과 비즈니스 규칙 검증의 차이점에 대해 이번장의 후반부에서 살펴보자.
+- 비즈니스 규칙을 충족하면 유스케이스는 입력을 기반으로 모델의 상태를 변경한다.
+  - 일반적으로 도메인 객체의 상태를 바꾸고 영속성 어댑터를 통해 구현된 포트로 이 상태를 전달해서 저장될 수 있게 한다.
+  - 유스케이스는 또 다른 아웃고잉 어댑터를 호출할 수도 있다. 
+- 마지막 단계는 아웃고잉 어댑터에서 온 출력값을, 유스케이스를 호출한 어댑터로 반환할 출력 객체로 변환하는 것이다.
+
+
+### 유스케이스 구현
+- 송금하기 유스케이스를 구현해보자.
+- 넓은 서비스 문제를 피하기 위해서 모든 유스케이스를 한 서비스 클래스에 모두 넣지 않고 
+- 각 유스케이스별로 분리된 각각의 서비스로 만들자.
+
+```java
+package buckpal.application.service;
+
+@RequiredArgsConstructor
+@Transactional
+public class SendMoneyService implements SendMoneyUseCase {
+  
+  private final LoadAccountPort loadAccountPort;
+  private final AccountLock accountLock;
+  private final UpdateAccountStatePort updateAccountStatePort;
+
+  @Override
+  public boolean sendMoney(SendMoneyCommand command) {
+    // TODO: 비즈니스 규칙 검증
+    // TODO: 모델 상태 조작 
+    // TODO: 출력 값 반환
+  }
+}
+```
+
+- 서비스는 인커밍 포트 인터페이스인 SendMoneyUseCase를 구현하고 
+- 계좌를 불러오기 위해 아웃고잉 포트 인터페이스인 LoadAccountPort를 호출한다.
+- 그리고 데이터베이스의 계좌상태를 업데이트하기 위해 UpdateAccountStatePort를 호출한다.
+- 아래 그림이 소개한 내용의 그림이다.
+![image](https://user-images.githubusercontent.com/28394879/189508092-c15e2f11-66c1-4515-ad4f-3c323907aa31.png)
+
 
 ## c. 입력 유효성 검증
 
