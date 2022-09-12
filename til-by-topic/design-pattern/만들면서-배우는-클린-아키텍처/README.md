@@ -979,6 +979,35 @@ public class SendMoneyService implements SendMoneyUseCase {
 
 ## i. 읽기 전용 유스케이스는 어떨까?
 
+- 앞에서는 모델의 상태를 변경하는 유스케이스를 어떻게 구현할지 논의했다. 그렇다면 읽기 전용 유스케이스는 어떻게 구현할까?
+- UI에 계좌의 잔액을 표시해야 한다고 가정해보자.
+  - 애플리케이션 코어의 관점에서 이 작업은 간단한 데이터 쿼리다.
+  - 그렇기 때문에 프로젝트 맥락에서 유스케이스로 간주되지 않는다면 실제 유스케이스와 구분하기 위해 쿼리로 구현할 수 있다.
+- 이를 구현하는 한가지 방법은 쿼리를 위한 인커밍 전용 포트를 만들고 이를 '쿼리 서비스'에 구현하는 것이다.
+
+```java
+package buckpal.application.service;
+
+@RequiredArgsConstructor
+class GetAccountBalanceService implements GetAccountBalanceQuery {
+  private final LoadAccountPort loadAccountPort;
+
+  @Override
+  public Money getAccountBalance(AccountId accountId) {
+    return loadAccountPort.loadAccount(accountId, LocalDateTime.now())
+          .calculateBalance();
+  }
+}
+```
+- 쿼리 서비스는 유스케이스 서비스와 동일한 방식으로 동작한다.
+  - GetAccountBalanceQuery라는 인커밍 포트를 구현하고
+  - 데이터베이스로부터 실제로 데이터를 로드하기 위해 LoadAccountPort라는 아웃고잉 포트를 호출한다.
+- 이처럼 읽기 전용 쿼리는 쓰기가 가능한 유스케이스(또는 '커맨드')와 코드 상에서 명확하게 구분된다.
+  - 이런 방식은 CQS(Command-Query Separation) 또는 CQRS(Command-Query Responsibility Segregation) 같은 개념과 아주 잘 맞는다
+- 서비스는 아웃고잉 포트로 쿼리를 전달하는 것 외에 다른 일을 하지 않는다.
+  - 여러 계층에 걸쳐 같은 모델을 사용한다면 지름길을 써서 클라이언트가 아웃고잉 포트를 직접 호출하게 될 수도 있다.
+  - 이 지름길에 대해서는 11장에서 다시보자.
+
 ## j. 유지보수 가능한 소프트웨어를 만드는 데 어떻게 도움이 될까? 
 
 ## k. 의존성 역전
