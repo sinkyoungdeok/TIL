@@ -1093,9 +1093,111 @@ class GetAccountBalanceService implements GetAccountBalanceQuery {
   - 좋은 아키텍처에서는 선택의 여지를 남겨둔다.
 - 웹 어댑터와 애플리케이션 계층 간의 이 같은 경계는 웹 계층에서부터 개발을 시작하는 대신 도메인과 애플리케이션 계층부터 개발하기 시작하면 자연스럽게 생긴다.
   - 특정 인커밍 어댑터를 생각할 필요 없이 유스케이스를 먼저 구현하면 
-  - 경계를 흐리게 만들 유혹에 빠지지 않을 수 있따. 
+  - 경계를 흐리게 만들 유혹에 빠지지 않을 수 있다. 
 
 ## c. 컨트롤러 나누기
+
+- 모든 요청에 응답할 수 있는 하나의 컨트롤러를 만드는 것보다는 여러개의 클래스로 구성하는것이 좋다.
+  - 클래스들이 같은 소속이라는 것을 표현하기 위해 같은 패키지 수준에 놓아야 한다.
+  - 컨트롤러 갯수는 너무 적은 것 보다는 너무 많은 것이 낫다.
+  - 각 컨트롤러 가능한 한 좁고 다른 컨트롤러와 가능한 한 적게 공유하는 웹 어댑터 조각을 구현해야 한다
+- Buckpal 애플리케이션의 Account 엔티티의 연산들을 예로 들어보자.
+  - 자주 사용되는 방식은 AccountController를 하나 만들어서 계좌와 관련된 모든 요청을 받는 것이다.
+
+```java
+package buckpal.adapter.web;
+
+@RestController
+@RequiredArgsConstructor
+class AccountController {
+  private final GetAccountBalanceQuery getAccountBalanceQuery;
+  private final ListAccountsQuery listAccountsQuery;
+  private final LoadAccountQuery loadAccountQuery;
+
+  private final SendMoneyUseCase sendMoneyUseCase;
+  private final CreateAccountUseCase createAccountUseCase;
+
+  @GetMapping("/accounts")
+  List<AccountResource> listAccounts() {
+    ...
+  }
+
+  @GetMapping("/accounts/{accountId}")
+  AccountResource getAccount(@PathVariable("accountId") Long accountId) {
+    ...
+  }
+
+  @GetMapping("/accounts/{accountId}/balance")
+  long getAccountBalance(@PathVariable("accountId") Long accountId) {
+    ...
+  }
+
+  @PostMapping("/accounts")
+  AccountResource createAccount(@RequestBody AccountResource account) {
+    ...
+  }
+
+  @PostMapping("/accounts/send/{sourceAccountId}/{targetAccountId}/{amount}")
+  void sendMoney(
+    ...
+  ) {
+    ...
+  }
+}
+```
+
+- 계좌 리소스와 관련된 모든 것이 하나의 클래스에 모여 있어서 괜찮아 보인다. 하지만 이 방식의 단점을 살펴보자.
+- 클래스마다 코드는 적을수록 좋다.
+  - 어느 팀의 의도적인 아키텍처였는데, 가장 큰 클래스가 30,000줄이었던 레거시 프로젝트가 있었다.
+  - 시스템을 재배포 없이 런타임에 변경하기 위해 컴파일된 자바 바이트코드를 하나의 .class 파일로 올려야 했던 것이다.
+  - 단 하나의 파일만 올릴 수 있기 때문에 이 파일에 모든 코드가 들어 있어야 했다. 
+- 시간이 지나면서 컨트롤러에 200줄만 늘어나도 50줄을 파악하는 것에 비해 난이도가 높아진다. 아무리 메서드로 깔끔하게 분리돼 있어도 쉽지 않다.
+- 테스트 코드도 마찬가지다. 
+  - 컨트롤러에 코드가 많으면 그에 해당하는 테스트 코드도 많을 것이다.
+  - 그리고 보통 테스트 코드는 더 추상적이라서 프로덕션 코드에 비해 파악하기가 어려울 때가 많다.
+  - 따라서 특정 프로덕션 코드에 해당하는 테스트 코드를 찾기 쉽게 만들어야 하는데, 클래스가 작을수록 더 찾기가 쉽다.
+- 모든 연산을 단일 컨트롤러에 넣는 것이 데이터 구조의 재활용을 촉진한다.
+  - 앞의 예제 코드에서 많은 연산들이 AccountResource 모델 클래스를 공유한다.
+  - AccountResource가 모든 연산에서 필요한 모든 데이터를 담고 있는 큰 통인 것이다.
+  - AccountResource에는 id 필드가 있는데, 이 id는 create연산에서는 필요 없기 때문에 도움디 되기보다는 헷갈린다.
+  - Account가 User 객체와 일대다 관계를 맺고 있는 경우, 계좌를 생성하거나 업데이트 할때는 불필요 하게 된다.
+- 그래서 각 연산에 대해 별도의 패키지 안에 별도의 컨트롤러를 만드는 것이 좋다.
+  - 또한 가급적 메서드와 클래스명은 유스케이스를 최대한 반영해서 지어야 한다.
+
+```java
+package buckpal.adapter.web;
+
+@RestController
+@RequiredArgsConstructor
+public class SendMoneyController {
+
+  private final SendMoneyUseCase;
+
+  @PostMapping("/accounts/send/{sourceAccountId}/{targetAccountId}/{amount}")
+  void sendMoney(
+    @PathVariable("sourceAccountId") Long sourceAccountId,
+    @PathVariable("targetAccountId") Long targetAccountId,
+    @PathVariable("amount") Long amount) {
+      SendMoneyCommand command = new SendMoneyCommand(
+        new AccountId(sourceAccountId),
+        new AccountId(targetAccountId),
+        Money.of(amount));
+
+        sendMoneyUseCase.sendMoney(command);
+    }
+  )
+}
+```
+- 각 컨트롤러가 CreateAccountResource나 UpdateAccountResource같은 컨트롤러 자체의 모델을 가지고 있거나, 원시값을 받아도 된다.
+- 이러한 전용 모델 클래스들은 컨트롤러의 패키지에 대해 private으로 선언할 수 있기 때문에 실수로 다른곳에서 재사용될 일이 없다.
+  - 컨트롤러끼리는 모델을 공유 할 수 있지만 다른 패키지에 있는 덕분에 공유해서 사용하기 전에 다시 한번 생각해볼 수 있고,
+  - 다시 생각해봤을 때, 필드의 절반은 사실 필요없다는 걸 깨달아서 결국 컨트롤러에 맞는 모델을 새로 만들게 될 확률이 높다.
+- 또, 컨트롤러명과 서비스명에 대해서도 잘 생각해봐야 한다.
+  - 예를들어, CreateAccount보다는 RegisterAccount가 더 나은 이름 같지 않은가?
+  - Create..., Update..., Delete... 만으로 충분히 의도를 드러낼 수 있는 유스케이스도 있을 것이다.
+  - 하지만, 실제로 이 단어를 사용하기 전에 한 번 더 숙고 해보는게 좋다.
+- 이렇게 나누는 스타일의 또 다른 장점은 서로 다른 연산에 대한 동시 작업이 쉬워진다.
+  - 두명의 개발자가 서로 다른 연산에 대한 코드를 짜고 있다면 병합 충돌이 일어나지 않을 것이다.
 
 ## d. 유지보수 가능한 소프트웨어를 만드는 데 어떻게 도움이 될까? 
 
