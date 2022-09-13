@@ -86,6 +86,11 @@
     - [도메인 클래스 하나 <--> 영속성 어댑터 하나 구현](#도메인-클래스-하나----영속성-어댑터-하나-구현)
     - [바운디드 컨텍스트의 영속성 요구사항을 분리](#바운디드-컨텍스트의-영속성-요구사항을-분리)
   - [e. 스프링 데이터 JPA 예제](#e-스프링-데이터-jpa-예제)
+    - [Account Entity](#account-entity)
+    - [Account ORM Entity](#account-orm-entity)
+    - [Activity ORM Entity](#activity-orm-entity)
+    - [Account JpaRepository](#account-jparepository)
+    - [Activity JpaRepository](#activity-jparepository)
   - [f. 데이터베이스 트랜잭션은 어떻게 해야 할까?](#f-데이터베이스-트랜잭션은-어떻게-해야-할까)
   - [g. 유지보수 가능한 소프트웨어를 만드는 데 어떻게 도움이 될까?](#g-유지보수-가능한-소프트웨어를-만드는-데-어떻게-도움이-될까)
 - [7. 아키텍처 요소 테스트하기](#7-아키텍처-요소-테스트하기)
@@ -1333,6 +1338,217 @@ public class SendMoneyController {
   - 어떤 맥락이 다른 맥락에 있는 무엇인가를 필요로 한다면 전용 인커밍 포트를 통해 접근해야 한다.
 
 ## e. 스프링 데이터 JPA 예제
+- 바로 앞선 그림의 AccountPersistenceAdapter를 구현한 코드를 살펴보자.
+  - 이 어댑터는 데이터베이스로부터 계좌를 가져오거나 저장할 수 있어야 한다.
+  - 4장에서 Account 엔티티를 이미 보긴 했지만 참고 삼아 골격만 다시 보자.
+
+### Account Entity 
+```java
+package buckpal.domain;
+
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+public class Account {
+
+  @Getter private final AccountId id;
+  @Getter private final ActivityWindow activityWindow;
+  private final Money baselineBalance;
+
+  public static Account withoutId(
+    Money baselineBalance,
+    ActivityWindow activityWindow) {
+      return new Account(null, baselineBalance, activityWindow);
+    }
+  
+  public static Account withId(
+    AcountId accountId,
+    Money baselineBalance,
+    ActivityWindow activityWindow) {
+      return new Account(accountId, baselineBalance, activityWindow);
+    }
+
+  public Money calculateBlance() {
+    // ... 
+  }
+
+  public boolean withdraw(Money money, AccountId targetAccountId) {
+    // ...
+  }
+
+  public boolean deposit(Money money, AccountId sourceAccountId) {
+    // ...
+  }
+}
+```
+- Account 클래스는 getter, setter만 가진 간단한 데이터 클래스가 아니며 최대한 불변성을 유지해야 한다.
+  - 유효한 상태의 Account 엔티티만 생성할 수 있는 팩터리 메서드를 제공하고 
+  - 출금 전에 계좌의 잔고를 확인하는 일과 같은 유효성 검증을 모든 상태 변경 메서드에서 수행하기 때문에
+  - 유효하지 않은 도메인 모델을 생성할 수 없다. 
+- 데이터베이스와의 통신에 스프링 데이터 JPA를 사용할 것이므로 계좌의 데이터베이스 상태를 표현하는 @Entity 애너테이션이 추가된 클래스도 필요하다.
+
+### Account ORM Entity 
+```java
+package buckpal.adapter.persistence;
+
+@Entity
+@Table(name = "account")
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+class AccountJpaEntity {
+
+  @Id
+  @GeneratedValue
+  private Long id;
+}
+```
+
+### Activity ORM Entity
+```java
+package buckpal.adapter.persistence;
+
+@Entity
+@Table(name = "activity")
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+class ActivityJpaEntity {
+
+  @Id
+  @GeneratedValue
+  private Long id;
+
+  @Column private LocalDateTime timestamp;
+  @Column private Long ownerAccountId;
+  @Column private Long sourceAccountId;
+  @Column private Long targetAccountId;
+  @Column private Long amount;
+}
+```
+- 여기에서는 계좌의 상태가 ID 하나만으로 구성돼 있다. 
+  - 나중에 사용자 ID 같은 필드가 추가될 것이다.
+  - JPA의 @ManyToOne 이나 @OneToMany 애너테이션을 이용해 ActivityJpaEntity와 AccountJpaEntity를 연결해서 관계를 표현할 수도 있었지만
+  - 데이터베이스 쿼리에 부수효과가 생길 수 있기 때문에 일단 이부분은 제외하기로 결정했다.
+- 사실 여기에서는 JPA보다는 조금 더 간단한 ORM을 이용하는 편이 영속성 어댑터를 구현하기가 더 쉽지만 
+  - 앞으로 JPA가 제공하는 다른 기능이 필요할 수 있기 떄문에 사용했다.
+  - 사람들이 이런 유형의 문제를 해결하기 위해 선택하는 도구가 JPA이기 때문에 
+  - 우리도 ORM 으로 JPA를 선택했을 것이다.
+  - 하지만 개발을 시작하고 2~3개월이 지나면 즉시로딩/지연로딩, 캐싱 기능을 저주하면서 조금 더 간단한 뭔가를 원하게 될 수도 있다.
+  - JPA는 좋은 도구이긴 하지만 많은 문제에 더 간단한 도구가 있을 수 있다. 
+
+### Account JpaRepository 
+```java
+interface AccountRepository extends JpaRepository<AccountJpaEntity, Long> {
+
+}
+```
+- activity(활동) 들을 로드하기 위한 스프링 데이터 JPA이다.
+
+### Activity JpaRepository
+```java
+interface ActivityRepository extends JpaRepository<ActivityJpaEntity, Long> {
+
+	@Query("select a from ActivityJpaEntity a " +
+			"where a.ownerAccountId = :ownerAccountId " +
+			"and a.timestamp >= :since")
+	List<ActivityJpaEntity> findByOwnerSince(
+			@Param("ownerAccountId") Long ownerAccountId,
+			@Param("since") LocalDateTime since);
+
+	@Query("select sum(a.amount) from ActivityJpaEntity a " +
+			"where a.targetAccountId = :accountId " +
+			"and a.ownerAccountId = :accountId " +
+			"and a.timestamp < :until")
+	Long getDepositBalanceUntil(
+			@Param("accountId") Long accountId,
+			@Param("until") LocalDateTime until);
+
+	@Query("select sum(a.amount) from ActivityJpaEntity a " +
+			"where a.sourceAccountId = :accountId " +
+			"and a.ownerAccountId = :accountId " +
+			"and a.timestamp < :until")
+	Long getWithdrawalBalanceUntil(
+			@Param("accountId") Long accountId,
+			@Param("until") LocalDateTime until);
+
+}
+```
+- 스프링 부트는 이 리포지토리를 자동으로 찾고, 스프링 데이터는 실제로 데이터베이스와 통신하는 리포지토리 인터페이스 구현체를 제공한다.
+- 이제 JPA 엔티티와 리포지토리를 만들었으니 영속성 기능을 제공하는 영속성 어댑터를 구현해보자. 
+
+```java
+@RequiredArgsConstructor
+@Component
+class AccountPersistenceAdapter implements
+		LoadAccountPort,
+		UpdateAccountStatePort {
+
+	private final AccountRepository accountRepository;
+	private final ActivityRepository activityRepository;
+	private final AccountMapper accountMapper;
+
+	@Override
+	public Account loadAccount(
+					AccountId accountId,
+					LocalDateTime baselineDate) {
+
+		AccountJpaEntity account =
+				accountRepository.findById(accountId.getValue())
+						.orElseThrow(EntityNotFoundException::new);
+
+		List<ActivityJpaEntity> activities =
+				activityRepository.findByOwnerSince(
+						accountId.getValue(),
+						baselineDate);
+
+		Long withdrawalBalance = orZero(activityRepository
+				.getWithdrawalBalanceUntil(
+						accountId.getValue(),
+						baselineDate));
+
+		Long depositBalance = orZero(activityRepository
+				.getDepositBalanceUntil(
+						accountId.getValue(),
+						baselineDate));
+
+		return accountMapper.mapToDomainEntity(
+				account,
+				activities,
+				withdrawalBalance,
+				depositBalance);
+
+	}
+
+	private Long orZero(Long value){
+		return value == null ? 0L : value;
+	}
+
+
+	@Override
+	public void updateActivities(Account account) {
+		for (Activity activity : account.getActivityWindow().getActivities()) {
+			if (activity.getId() == null) {
+				activityRepository.save(accountMapper.mapToJpaEntity(activity));
+			}
+		}
+	}
+}
+```
+- 영속성 어댑터는 애플리케이션에 필요한 LoadAccountPort 와 UpdateAccountStatePort라는 2개의 포트를 구현했다.
+- 데이터베이스로부터 계좌를 가져오기 위해 AccountRepository로 계좌를 불러온 다음, ActivityRepository로 해당 계좌의 특정 시간 범위 동안의 활동을 가져온다.
+- 유효한 Account 도메인 엔티티를 생성하기 위해서는 이 활동창 시작 직전의 계좌 잔고가 필요하다.
+  - 그래야 데이터베이스로부터 모든 출금과 입금 정보를 가져와 합칠 수 있다.
+  - 마지막으로 이 모든 데이터를 Account 도메인 엔티티에 매핑하고 호출자에게 반환한다.
+- 계좌의 상태를 업데이트하기 위해서는 Account 엔티티의 모든 활동을 순회하며 ID가 있는지 확인해야 한다.
+  - 만약 ID가 없다면 새로운 활동이므로 ActivityRepository를 이용해 저장해야 한다.
+- 앞에서 설명한 시나리오에서는 Account와 Activity 도메인 모델, AccountJpaEntity와 ActivityJpaEntity 데이터베이스 모델 간에 양방향 매핑이 존재한다.
+  - 그냥 JPA 애너테이션을 Account와 Activity 클래스로 옮기고 이걸 그대로 데이터베이스에 엔티티로 저장하면 안 되는 걸까?
+- 8장에서 살펴보겠지만 이런 '매핑하지 않기' 전략도 유효한 전략일 수 있다.
+  - 그러나 이 전략에서는 JPA로 인해 도메인 모델을 타협할 수밖에 없다.
+  - 예를 들어, JPA 엔티티는 기본 생성자를 필요로 한다.
+  - 또, 영속성 계층에서는 성능 측면에서 @ManyToOne 관계를 설정하는 것이 적절할 수 있지만 
+  - 예제에서는 항상 데이터의 일부만 가져오기를 바라기 때문에 도메인 모델에서는 이 관계가 반대가 되기를 원한다
+- 그러므로 영속성 측면과의 타협 없이 풍부한 도메인 모델을 생성하고 싶다면 도메인 모델과 영속성 모델을 매핑하는 것이 좋다. 
+
 
 ## f. 데이터베이스 트랜잭션은 어떻게 해야 할까?
 
