@@ -1551,6 +1551,53 @@ class AccountPersistenceAdapter implements
 
 
 ## f. 데이터베이스 트랜잭션은 어떻게 해야 할까?
+- 트랜잭션 경계는 어디에 위치 시켜야 할까?
+- 트랜잭션은 하나의 특정한 유스케이스에 대해서 일어나는 모든 쓰기 작업에 걸쳐 있어야 한다.
+  - 그래야 그중 하나라도 실패할 경우 다 같이 롤백될 수 있다.
+- 영속성 어댑터는 어떤 데이터베이스 연산이 같은 유스케이스에 포함되는지 알지 못하기 떄문에 
+  - 언제 트랜잭션을 열고 닫을지 결정할 수 없다.
+  - 이 책임은 영속성 어댑터 호출을 관장하는 서비스에 위임해야 한다.
+- 자바와 스프링에서 가장 쉬운 방법은 @Transactional 애너테이션을 애플리케이션 서비스 클래스에
+  - 붙여서 스프링이 모든 public 메서드를 트랜잭션으로 감싸게 하는 것이다. 
+
+```java
+package buckpal.application.service;
+
+@Transactional
+public class SendMoneyService implements SendMoneyUseCase {
+  ...
+}
+```
+- 만약 서비스가 @Transactional 애너테이션으로 오염 되지 않고 깔끔하게 유지 되길 원한다면 
+  - AspectJ 같은 도구를 이용해 관점 지향 프로그래밍(aspect-oriented programming)
+  - 으로 트랜잭션 경계를 코드에 위빙(weaving) 할 수 있다. 
+
+```java
+aspect TransactionManagementAspect {
+    private TransactionManager transactionManager;
+
+    pointcut transactionalOp() : ...
+
+    Object around() : transactionalOp() {
+        TransactionAttribute ta = ...
+        TransactionStatus ts = transactionManager.getTransaction(ta);
+        try {
+            Object ret = proceed();
+            transactionManager.commit(ts);
+            return ret;
+        } catch (Throwable ex) {
+            if(ta.rollbackOn(ex)) {
+                transactionManager.rollback(ts);
+            } else {
+                transactionManager.commit(ts);
+            }
+            throw ex;
+        }
+    }
+
+    ...
+}
+```
 
 ## g. 유지보수 가능한 소프트웨어를 만드는 데 어떻게 도움이 될까? 
 
