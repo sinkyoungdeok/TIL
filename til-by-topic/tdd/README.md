@@ -31,6 +31,9 @@
     - [문제의 크기](#문제의-크기)
     - [코드 재사용](#코드-재사용)
     - [모듈화](#모듈화)
+  - [4. 단위 테스트](#4-단위-테스트)
+    - [단위 테스트 예제](#단위-테스트-예제)
+    - [Parameteried Test](#parameteried-test)
 
 
 # 출처 
@@ -389,3 +392,58 @@ RESULT
   - 모듈을 제공하는 입장에서는 모듈을 잘 테스트해서 제공해줘야 한다.
   - 이러한 경우 수동으로 테스트하기 보다는 자동화된 테스트케이스를 테스트한다.
   - 클라이언트입장에서는 단위 테스트로 신뢰감을 얻을 수 있다. 
+
+## 4. 단위 테스트 
+
+### 단위 테스트 예제
+```python
+from unittest import TestCase
+
+
+def refineText(str):
+    return str.replace("    ", " ").replace("  ", " ")
+
+
+class MyTests(TestCase):
+    def test_refineText1(self):
+        res = refineText("hello  world")
+        self.assertEqual(res, "hello world")
+
+    def test_refineText2(self):
+        res = refineText("hello    world")
+        self.assertEqual(res, "hello world")
+
+    def test_refineText3(self): # 실패 케이스
+        res = refineText("hello   world")
+        self.assertEqual(res, "hello world")
+```
+- 위 테스트코드 3개를 단순하게 for문으로 코드양을 줄이면, 어디에서 테스트코드가 실패 했는지 찾기가 쉽지 않다 (피드백이 떨어진다)
+  - 코드양을 줄인다고 무조건 좋은 것이 아니다.
+- Parameterized Test
+  - 위 상황이 발생하지 않도록 해주는 것.
+  - 즉, 동일한 테스트 코드를 여러개의 파라미터로 테스트 할 수 있도록 해주는 것
+
+
+### Parameteried Test
+```python
+import unittest
+
+from nose.tools import assert_equal
+from parameterized import parameterized
+
+
+def refineText(str):
+    return str.replace("    ", " ").replace("  ", " ")
+
+
+class MyTests(unittest.TestCase):
+    @parameterized.expand([
+        ("hello  world", "hello world"),
+        ("hello    world", "hello world"),
+        ("hello   world", "hello world"),
+    ])
+    def test_refineText(self, input, exptected):
+        assert_equal(refineText(input), exptected)
+```
+- 위 상황이 발생하지 않도록 해주는 것.
+- 즉, 동일한 테스트 코드를 여러개의 파라미터로 테스트 할 수 있도록 해주는 것
