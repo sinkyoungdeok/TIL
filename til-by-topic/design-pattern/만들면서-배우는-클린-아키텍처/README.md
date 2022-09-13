@@ -1185,7 +1185,6 @@ public class SendMoneyController {
 
         sendMoneyUseCase.sendMoney(command);
     }
-  )
 }
 ```
 - 각 컨트롤러가 CreateAccountResource나 UpdateAccountResource같은 컨트롤러 자체의 모델을 가지고 있거나, 원시값을 받아도 된다.
