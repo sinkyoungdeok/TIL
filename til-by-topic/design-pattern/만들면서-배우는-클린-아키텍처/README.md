@@ -97,6 +97,7 @@
   - [a. 테스트 피라미드](#a-테스트-피라미드)
     - [비용이 많이 드는 테스트는 지양하고 비용이 적게 드는 테스트를 많이 만들어야 한다.](#비용이-많이-드는-테스트는-지양하고-비용이-적게-드는-테스트를-많이-만들어야-한다)
   - [b. 단위 테스트로 도메인 엔티티 테스트하기](#b-단위-테스트로-도메인-엔티티-테스트하기)
+  - [c. 단위 테스트로 유스케이스 테스트하기](#c-단위-테스트로-유스케이스-테스트하기)
 - [8. 경계 간 매핑하기](#8-경계-간-매핑하기)
 - [9. 애플리케이션 조립하기](#9-애플리케이션-조립하기)
 - [10. 아키텍처 경계 강제하기](#10-아키텍처-경계-강제하기)
@@ -1677,6 +1678,68 @@ class AccountTest {
 - 이 테스트는 만들고 이해하는 것도 쉽고, 아주 빠르게 실행된다.
   - 이런 식의 단위 테스트가 도메인 엔티티에 녹아 있는 비즈니스 규칙을 검증하기에 가장 적절한 방법이다.
   - 도메인 엔티티의 행동은 다른 클래스에 거의 의존하지 않기 때문에 다른 종류의 테스트는 필요하지 않다.  
+
+## c. 단위 테스트로 유스케이스 테스트하기 
+- SendMoneyService의 테스트를 살펴보자.
+  - SendMoney 유스케이스는 출금 계좌의 잔고가 다른 트랜잭션에 의해 변경되지 않도록 락(lock)을 건다.
+  - 출금 계좌에서 돈이 출금되고 나면 똑같이 입금 계좌에 락을 걸고 돈을 입금시킨다.
+  - 그리고 나서 두 계좌에서 모두 락을 해제한다.
+- 다음 코드는 트랜잭션이 성공했을 때 모든 것이 기대한 대로 동작하는지 검증한다.
+
+```java
+class SendMoneyServiceTest {
+
+  @Test
+	void transactionSucceeds() {
+
+		Account sourceAccount = givenSourceAccount();
+		Account targetAccount = givenTargetAccount();
+
+		givenWithdrawalWillSucceed(sourceAccount);
+		givenDepositWillSucceed(targetAccount);
+
+		Money money = Money.of(500L);
+
+		SendMoneyCommand command = new SendMoneyCommand(
+				sourceAccount.getId().get(),
+				targetAccount.getId().get(),
+				money);
+
+		boolean success = sendMoneyService.sendMoney(command);
+
+		assertThat(success).isTrue();
+
+		AccountId sourceAccountId = sourceAccount.getId().get();
+		AccountId targetAccountId = targetAccount.getId().get();
+
+		then(accountLock).should().lockAccount(eq(sourceAccountId));
+		then(sourceAccount).should().withdraw(eq(money), eq(targetAccountId));
+		then(accountLock).should().releaseAccount(eq(sourceAccountId));
+
+		then(accountLock).should().lockAccount(eq(targetAccountId));
+		then(targetAccount).should().deposit(eq(money), eq(sourceAccountId));
+		then(accountLock).should().releaseAccount(eq(targetAccountId));
+
+		thenAccountsHaveBeenUpdated(sourceAccountId, targetAccountId);
+	}
+}
+```
+- given 섹션에서는 출금 및 입금 Account의 인스턴스를 각각 생성하고 적절한 상태로 만들어서 given...()으로 시작하는 메서드에 인자로 넣었다.
+  - SendMoneyCommand 인스턴스도 만들어서 유스케이스의 입력으로 사용했다.
+- when 섹션에서는 유스케이스를 실행하기 위해 sendMoney() 메서드를 호출했다.
+- then 섹션에서는 트랜잭션이 성공적이었는지 확인하고, 출금 및 입금 Account, 그리고 계좌에 락을 걸고 해제하는 책임을 가진 AccountLock에 대해 특정 메서드가 호출됐는지 검증한다.
+- 코드에는 없지만 테스트는 Mockito 라이브러리를 이용해 given...() 메서드의 목 객체를 생성한다.
+  - Mockito는 목 객체에 대해 특정 메서드가 호출됐는지 검증할 수 있는 then()메서드도 제공한다.
+- 테스트 중인 유스케이스 서비스는 상태가 없기 때문에 then 섹션에서 특정 상태를 검증할 수 없다.
+  - 대신 테스트는 서비스가 (모킹된) 의존 대상의 특정 메서드와 상호작용했는지 여부를 검증한다.
+  - 이는 테스트가 코드의 행동 변경뿐만 아니라 코드의 구조 변경에도 취약해진다는 의미가 된다.
+  - 자연스럽게 코드가 리팩터링되면 테스트도 변경될 확률이 높아진다.
+- 그렇기 떄문에, 테스트에서 어떤 상호작용을 검증하고 싶은지 신중하게 생각해야 한다.
+  - 앞의 예제처럼 모든 동작을 검증하는 대신 중요한 핵심만 골라 집중해서 테스트하는 것이 좋다.
+  - 만약 모든 동작을 검증하려고 하면 클래스가 조금이라도 바뀔 때마다 테스트를 변경해야 한다.
+  - 이는 테스트의 가치를 떨어뜨리는 일이다.
+- 이 테스트는 단위 테스트이긴 하지만 의존성의 상호작용을 테스트하고 있기 때문에 통합 테스트에 가깝다.
+  - 그렇지만 목으로 작업하고 있고 실제 의존성을 관리해야 하는 것은 아니기 때문에 완전한 통합 테스트에 비해 만들고 유지보수하기 쉽다.
 
 # 8. 경계 간 매핑하기
 
