@@ -99,6 +99,7 @@
   - [b. 단위 테스트로 도메인 엔티티 테스트하기](#b-단위-테스트로-도메인-엔티티-테스트하기)
   - [c. 단위 테스트로 유스케이스 테스트하기](#c-단위-테스트로-유스케이스-테스트하기)
   - [d. 통합 테스트로 웹 어댑터 테스트하기](#d-통합-테스트로-웹-어댑터-테스트하기)
+  - [e. 통합 테스트로 영속성 어댑터 테스트하기](#e-통합-테스트로-영속성-어댑터-테스트하기)
 - [8. 경계 간 매핑하기](#8-경계-간-매핑하기)
 - [9. 애플리케이션 조립하기](#9-애플리케이션-조립하기)
 - [10. 아키텍처 경계 강제하기](#10-아키텍처-경계-강제하기)
@@ -1792,6 +1793,71 @@ class SendMoneyControllerTest {
 - 웹 컨트롤러가 스프링 프레임워크에 강하게 묶여 있기 때문에 격리된 상태로 테스트하기 보다는 이 프레임워크와 통합된 상태로 테스트하는 것이 합리적이다.
   - 웹 컨트롤러를 평범한 단위 테스트로 테스트하면 모든 매핑, 유효성 검증, HTTP 항목에 대한 커버리지가 낮아지고, 
   - 프레임웤트를 구성하는 이런 요소들이 프로덕션 환경에서 정상적으로 작동할지 확신할 수 없게 된다. 
+
+## e. 통합 테스트로 영속성 어댑터 테스트하기
+
+- 비슷한 이유로 영속성 어댑터의 테스트에는 단위 테스트보다는 통합 테스트를 적용하는 것이 합리적이다.
+  - 단순히 어댑터의 로직만 검증하고 싶은 게 아니라 데이터베이스 매핑도 검증하고 싶기 때문이다.
+- 어댑터에는 Account 엔티티를 데이터베이스로부터 가져오는 메서드 하나와 새로운 계좌 활동을 데이터베이스에 저장하는 메서드까지 총 2개의 메서드가 있었다.
+
+```java
+@DataJpaTest
+@Import({AccountPersistenceAdapter.class, AccountMapper.class})
+class AccountPersistenceAdapterTest {
+
+	@Autowired
+	private AccountPersistenceAdapter adapterUnderTest;
+
+	@Autowired
+	private ActivityRepository activityRepository;
+
+	@Test
+	@Sql("AccountPersistenceAdapterTest.sql")
+	void loadsAccount() {
+		Account account = adapterUnderTest.loadAccount(new AccountId(1L), LocalDateTime.of(2018, 8, 10, 0, 0));
+
+		assertThat(account.getActivityWindow().getActivities()).hasSize(2);
+		assertThat(account.calculateBalance()).isEqualTo(Money.of(500));
+	}
+
+	@Test
+	void updatesActivities() {
+		Account account = defaultAccount()
+				.withBaselineBalance(Money.of(555L))
+				.withActivityWindow(new ActivityWindow(
+						defaultActivity()
+								.withId(null)
+								.withMoney(Money.of(1L)).build()))
+				.build();
+
+		adapterUnderTest.updateActivities(account);
+
+		assertThat(activityRepository.count()).isEqualTo(1);
+
+		ActivityJpaEntity savedActivity = activityRepository.findAll().get(0);
+		assertThat(savedActivity.getAmount()).isEqualTo(1L);
+	}
+}
+```
+- @DataJpaTest 애너테이션으로 스프링 데이터 리포지토리들을 포함해서 데이터베이스 접근에 필요한 객체 네트워크를 인스턴스화해야 한다고 스프링에 알려준다.
+  - @Import 애너테이션을 추가해서 특정 객체가 이 네트워크에 추가됐다는 것을 명확하게 표현할 수 있다.
+  - 이 객체들은 테스트 상에서 어댑터가 도메인 객체를 데이터베이스 객체로 매핑하는 작업에 필요하다.
+- loadAccount() 메서드에 대한 테스트에서는 SQL 스크립트를 이용해 데이터베이스를 특정 상태로 만든다.
+  - 그런다음, 어댑터 API를 이용해 계좌를 가져온 후 SQL 스크립트에서 설정한 상태값을 가지고 있는 검증한다.
+- updateActivities() 메서드에 대한 테스트는 반대로 동작한다.
+  - 새로운 계좌 활동을 가진 Account 객체를 만들어서 저장하기 위해 어댑터로 전달한다.
+  - 그러고 나서 ActivityRepository의 API를 이용해 이 활동이 데이터베이스에 잘 저장됐는지 확인한다.
+  - 이 테스트에서는 데이터베이스를 모킹하지 않았다는 점이 중요하다.
+  - 테스트가 실제로 데이터베이스에 접근한다. 
+  - 데이터베이스를 모킹했더라도 테스트는 여전히 같은 코드 라인 수만큼 커버해서 똑같이 높은 커버리지를 보여줬을 것이다.
+  - 하지만 높은 커버리지도 불구하고 여전히 실제 데이터베이스와 연동 했을 때 SQL 구문의 오류나 데이터베이스 테이블과 자바 객체 간의 매핑 에러 등으로 문제가 생길 확률이 높아진다.
+- 참고로 스프링에서는 기본적으로 인메모리 데이터베이스를 테스트에서 사용한다. 아무것도 설정할 필요 없이 바로 테스트할 수 있다.
+- 하지만 프로덕션 환경에서는 인메모리 데이터베이스를 사용하지 않는 경우가 많기 때문에 인메모리 데이터베이스에서 테스트가 통과했더라도 실제 DB에서는 문제가 생길 가능성이 높다.
+  - 예를 들면, DB마다 고유한 SQL 문법이 있어서 이부분이 문제가 된다.
+- 이러한 이유로 영속성 어댑터 테스트는 실제 DB를 대상으로 진행해야 한다.
+  - Testcontainers 같은 라이브러리는 필요한 데이터베이스를 도커 컨테이너에 띄울 수 있기 때문에 이런 측면에서 아주 유용하다.
+- 실제 DB를 대상으로 테스트를 실행하면 두개의 다른 DB 시스템을 신경쓸 필요가 없다는 장점도 생긴다.
+  - 만약 테스트에서 인메모리 DB를 사용하면 특정 방식으로 DB를 설정하거나 DB별로 두가지 버전의 DB 마이그레이션 스크립트를 만들어 둬야 할 텐데, 그건 매우 좋지 않다.
 
 # 8. 경계 간 매핑하기
 
