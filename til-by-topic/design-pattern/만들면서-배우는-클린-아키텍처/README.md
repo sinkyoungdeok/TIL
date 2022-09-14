@@ -96,6 +96,7 @@
 - [7. 아키텍처 요소 테스트하기](#7-아키텍처-요소-테스트하기)
   - [a. 테스트 피라미드](#a-테스트-피라미드)
     - [비용이 많이 드는 테스트는 지양하고 비용이 적게 드는 테스트를 많이 만들어야 한다.](#비용이-많이-드는-테스트는-지양하고-비용이-적게-드는-테스트를-많이-만들어야-한다)
+  - [b. 단위 테스트로 도메인 엔티티 테스트하기](#b-단위-테스트로-도메인-엔티티-테스트하기)
 - [8. 경계 간 매핑하기](#8-경계-간-매핑하기)
 - [9. 애플리케이션 조립하기](#9-애플리케이션-조립하기)
 - [10. 아키텍처 경계 강제하기](#10-아키텍처-경계-강제하기)
@@ -1639,6 +1640,43 @@ aspect TransactionManagementAspect {
 - 시스템 테스트 위에는 애플리케이션의 UI를 포함하는 엔드투엔드 테스트층이 있을 수 있다.
   - 하지만 여기에서는 백엔드 아키텍처에 대해서 논의하고 있으므로 이 엔드투엔드 테스트에 대해서는 고려하지 않는다.
 - 테스트 종류를 정의했으므로 육각형 아키텍처의 각 계층에 가장 적합한 테스트가 어떤 종류인지 알아보자.  
+
+## b. 단위 테스트로 도메인 엔티티 테스트하기 
+- 육각형 아키텍처의 중심인 도메인 엔티티를 살펴보자. 
+  - Account의 상태는 과거 특정 시점의 계좌 잔고(baselineBalance) 와 그 이후의 입출력 내역(activity)으로 구성돼 있다.
+  - withdraw() 메서드가 기대한 대로 동작하는지 검증해보자.
+
+```java
+class AccountTest {
+
+  @Test
+	void withdrawalSucceeds() {
+		AccountId accountId = new AccountId(1L);
+		Account account = defaultAccount()
+				.withAccountId(accountId)
+				.withBaselineBalance(Money.of(555L))
+				.withActivityWindow(new ActivityWindow(
+						defaultActivity()
+								.withTargetAccount(accountId)
+								.withMoney(Money.of(999L)).build(),
+						defaultActivity()
+								.withTargetAccount(accountId)
+								.withMoney(Money.of(1L)).build()))
+				.build();
+
+		boolean success = account.withdraw(Money.of(555L), new AccountId(99L));
+
+		assertThat(success).isTrue();
+		assertThat(account.getActivityWindow().getActivities()).hasSize(3);
+		assertThat(account.calculateBalance()).isEqualTo(Money.of(1000L));
+	}
+}
+```
+- 특정 상태의 Account를 인스턴스화하고 withdraw() 메서드를 호출해서 출금을 성공했는지 검증하고, Account 객체의 상태에 대해 기대하는
+  - 부수효과들이 잘 일어 났는지 확인하는 단순한 단위 테스트다.
+- 이 테스트는 만들고 이해하는 것도 쉽고, 아주 빠르게 실행된다.
+  - 이런 식의 단위 테스트가 도메인 엔티티에 녹아 있는 비즈니스 규칙을 검증하기에 가장 적절한 방법이다.
+  - 도메인 엔티티의 행동은 다른 클래스에 거의 의존하지 않기 때문에 다른 종류의 테스트는 필요하지 않다.  
 
 # 8. 경계 간 매핑하기
 
