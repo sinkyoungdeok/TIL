@@ -100,6 +100,7 @@
   - [c. 단위 테스트로 유스케이스 테스트하기](#c-단위-테스트로-유스케이스-테스트하기)
   - [d. 통합 테스트로 웹 어댑터 테스트하기](#d-통합-테스트로-웹-어댑터-테스트하기)
   - [e. 통합 테스트로 영속성 어댑터 테스트하기](#e-통합-테스트로-영속성-어댑터-테스트하기)
+  - [f. 시스템 테스트로 주요 경로 테스트하기](#f-시스템-테스트로-주요-경로-테스트하기)
 - [8. 경계 간 매핑하기](#8-경계-간-매핑하기)
 - [9. 애플리케이션 조립하기](#9-애플리케이션-조립하기)
 - [10. 아키텍처 경계 강제하기](#10-아키텍처-경계-강제하기)
@@ -1858,6 +1859,78 @@ class AccountPersistenceAdapterTest {
   - Testcontainers 같은 라이브러리는 필요한 데이터베이스를 도커 컨테이너에 띄울 수 있기 때문에 이런 측면에서 아주 유용하다.
 - 실제 DB를 대상으로 테스트를 실행하면 두개의 다른 DB 시스템을 신경쓸 필요가 없다는 장점도 생긴다.
   - 만약 테스트에서 인메모리 DB를 사용하면 특정 방식으로 DB를 설정하거나 DB별로 두가지 버전의 DB 마이그레이션 스크립트를 만들어 둬야 할 텐데, 그건 매우 좋지 않다.
+
+## f. 시스템 테스트로 주요 경로 테스트하기 
+- 파라미드의 최상단에 있는 시스템 테스트는 전체 애플리케이션을 띄우고 API를 통해 요청을 보내고, 모든 계층이 조화롭게 잘 동작하는지 검증한다.
+- '송금하기' 유스케이스의 시스템 테스트에서는 애플리케이션에 HTTP 요청을 보내고 계좌의 잔고를 확인하는 것을 포함해서 응답을 검증한다.
+
+```java
+@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
+class SendMoneySystemTest {
+
+	@Autowired
+	private TestRestTemplate restTemplate;
+
+	@Test
+	@Sql("SendMoneySystemTest.sql")
+	void sendMoney() {
+
+		Money initialSourceBalance = sourceAccount().calculateBalance();
+		Money initialTargetBalance = targetAccount().calculateBalance();
+
+		ResponseEntity response = whenSendMoney(
+				sourceAccountId(),
+				targetAccountId(),
+				transferredAmount());
+
+		then(response.getStatusCode())
+				.isEqualTo(HttpStatus.OK);
+
+		then(sourceAccount().calculateBalance())
+				.isEqualTo(initialSourceBalance.minus(transferredAmount()));
+
+		then(targetAccount().calculateBalance())
+				.isEqualTo(initialTargetBalance.plus(transferredAmount()));
+
+	}
+
+	private ResponseEntity whenSendMoney(
+			AccountId sourceAccountId,
+			AccountId targetAccountId,
+			Money amount) {
+		HttpHeaders headers = new HttpHeaders();
+		headers.add("Content-Type", "application/json");
+		HttpEntity<Void> request = new HttpEntity<>(null, headers);
+
+		return restTemplate.exchange(
+				"/accounts/send/{sourceAccountId}/{targetAccountId}/{amount}",
+				HttpMethod.POST,
+				request,
+				Object.class,
+				sourceAccountId.getValue(),
+				targetAccountId.getValue(),
+				amount.getAmount());
+	}
+}
+```
+- @SpringBootTest 애너테이션은 스프링이 애플리케이션을 구성하는 모든 객체 네트워크를 띄우게 한다.
+  - 또한 랜던 포트로 이 애플리케이션을 띄우도록 설정하고 있다.
+- test 메서드에서는 요청을 생성해서 애플리케이션에 보내고 응답 상태와 계좌의 새로운 잔고를 검증한다.
+- 여기서는 웹 어댑터에서처럼 MockMvc를 이용해 요청을 보내는 것이 아니라 TestRestTemplate을 이용해서 요청을 보낸다.
+  - 테스트를 프로덕션 환경에 조금 더 가깝게 만들기 위해 실제 HTTP 통신을 한다.
+- 실제 HTTP 통신을 하는 것 처럼 실제 출력 어댑터도 이용한다.
+  - 예제에서 출력 어댑터는 애플리케이션과 데이터베이스를 연결하는 영속성 어댑터 뿐이다.
+  - 다른 시스템과 통신하는 애플리케이션의 경우에는 다른 출력 어댑터들도 있을 수 있다.
+  - 시스템 테스트라고 하더라도 언제나 서드파티 시스템을 실행해서 테스트할 수 있는 것은 아니기 때문에 결국 모킹을 해야 할 때도 있다.
+  - 육각형 아키텍처는 이러한 경우 몇개의 출력 포트 인터페이스만 모킹하면 되기 떄문에 아주 쉽게 이 문제를 해결할 수 있다.
+- 단위 테스트와 통합 테스트를 만들었다면 시스템 테스트는 앞서 커버한 코드와 겹치는 부분이 많을 것이다.
+  - 그럼 추가적인 다른 장점도 있을까? 물론이다.
+  - 일반적으로 시스템 테스트는 단위 테스트와 통합 테스트가 발견하는 버그와는 또 다른 종류의 버그를 발견해서 수정할 수 있게 해준다.
+  - 예를 들어, 단위 테스트나 통합테스트만으로는 알아차리지 못했을 계층 간 매핑 버그 같은 것들이다.
+- 시스템 테스트는 여러 개의 유스케이스를 결합해서 시나리오를 만들 때 더 빛이 난다.
+  - 각 시나리오는 사용자가 애플리케이션을 사용하면서 거쳐갈 특정 경로를 의미한다.
+  - 시스템 테스트를 통해 중요한 시나리오들이 커버된다면 최신 변경사항들이 애플리케이션을 망가뜨리지 않았음을 가정할 수 있고, 배포될 준비가 됐다는 확신을 가질 수 있다.
+
 
 # 8. 경계 간 매핑하기
 
