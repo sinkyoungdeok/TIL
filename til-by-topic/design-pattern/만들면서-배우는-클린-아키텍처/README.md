@@ -115,6 +115,7 @@
     - [설정 컴포넌트의 역할](#설정-컴포넌트의-역할)
     - [설정 컴포넌트의 책임](#설정-컴포넌트의-책임)
   - [b. 평범한 코드로 조립하기](#b-평범한-코드로-조립하기)
+  - [c. 스프링의 클래스패스 스캐닝으로 조립하기](#c-스프링의-클래스패스-스캐닝으로-조립하기)
 - [10. 아키텍처 경계 강제하기](#10-아키텍처-경계-강제하기)
 - [11. 의식적으로 지름길 상요하기](#11-의식적으로-지름길-상요하기)
 - [12. 아키텍처 스타일 결정하기](#12-아키텍처-스타일-결정하기)
@@ -2186,6 +2187,63 @@ class Application {
 - package-private 의존성을 유지하면서 이처럼 지저분한 작업을 대신해줄 수 있는 의존성 주입 프레임워크들이 있다.
   - 자바에서는 스프링프레임워크가 가장 인기 있다.
   - 웹과 데이터베이스 환경을 지원하기 때문에 startProcessingWebRequests() 메서드 같은것을 구현할 필요 없다.
+
+## c. 스프링의 클래스패스 스캐닝으로 조립하기 
+- 스프링 프레임워크를 이용해서 애플리케이션을 조립한 결과물을 애플리케이션 컨텍스트(application context)라고 한다.
+  - 애플리케이션 컨텍스트는 애플리케이션을 구성하는 모든 객체(bean)을 포함한다.
+- 스프링은 애플리케이션 컨텍스트를 조립하기 위한 몇 가지 방법을 제공한다
+  - 각기 장단점이 있다.
+  - 일단 가장 인기 있고 편리한 방법인 클래스패스 스캐닝(classpath scanning)을 보자.
+- 스프링은 클래스패스 스캐닝으로 클래스패스에서 접근 가능한 모든 클래스를 확인해서 @Component 애너테이션이 붙은 클래스를 찾는다.
+  - 그러고 나서 이 애너테이션이 붙은 각 클래스의 객체를 생성한다.
+  - 이 때 클래스는 AccountPersistenceAdapter 처럼 필요한 모든 필드를 인자로 받는 생성자를 가지고 있어야 한다. 
+
+```java
+@RequiredArgsConstructor
+@Component
+class AccountPersistenceAdapter implements LoadAccountPort, UpdateAccountStatePort {
+  private final AccountRepository accountRepository;
+  private final ActivityRepositroy activityRepository;
+  private final AccountMapper accountMapper;
+
+  @Override
+  public Account loadAccount(
+    AccountId accountId,
+    LocalDateTime baselineDate) {
+      // ...
+    }
+  
+  @Override
+  public void updateActivities(Account account) {
+    // ... 
+  }
+}
+```
+
+- 클래스패스 스캐닝 방식을 이용하면 아주 편리하게 애플리케이션을 조립할 수 있다. 
+  - 적절한 곳에 @Component 애너테이션을 붙이고 생성자만 잘 만들어두면 된다.
+- 스프링이 인식할 수 있는 애너테이션을 직접 만들 수도 있다.
+
+```java
+@Target({ElementType.TYPE})
+@Retention(RetentionPolicy.RUNTIME)
+@Documented
+@Component
+public @interface PersistenceAdapter {
+
+  @AliasFor(annotation = Component.class)
+  String value() default "";
+}
+```
+- 이 애너테이션 덕분에 코드를 읽는 사람들은 아키텍처를 더 쉽게 파악할 수 있다.
+- 클래스패스 스캐닝 방식의 단점 
+  1. 클래스에 프레임워크에 특화된 애너테이션을 붙여야 한다 -> 강경한 클린 아키텍처파는 이런방식이 코드를 특정한 프레임워크와 결합시키기 떄문에 사용하면 안된다라고도 한다.
+  2. 마법같은 일이 일어 날 수 있다 -> 스프링 전문가가 아니라면 원인을 찾는 데 수일이 걸릴 수 있다.
+- 클래스패스 스캐닝이 애플리케이션 조립에 사용하기에는 너무 둔한 도구이다.
+  - 이 방법에서는 단순히 스프링에게 부모 패키지를 알려준 후 이 패키지 안에서 @Component가 붙은 클래스를 찾으라고 지시한다.
+- 때론 애플리케이션 컨텍스트에 실제로는 올라가지 않았으면 하는 클래스가 있을 수 있다.
+  - 이 클래스는 애플리케이션 컨텍스트를 악의적으로 조작해서 추적하기 어려운 에러를 일으킬 수도 있다.
+- 이번에는 조금 더 제어하기 쉬운 대안을 살펴보자. 
 
 # 10. 아키텍처 경계 강제하기
 
