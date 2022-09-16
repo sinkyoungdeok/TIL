@@ -114,6 +114,7 @@
   - [a. 왜 조립까지 신경 써야 할까?](#a-왜-조립까지-신경-써야-할까)
     - [설정 컴포넌트의 역할](#설정-컴포넌트의-역할)
     - [설정 컴포넌트의 책임](#설정-컴포넌트의-책임)
+  - [b. 평범한 코드로 조립하기](#b-평범한-코드로-조립하기)
 - [10. 아키텍처 경계 강제하기](#10-아키텍처-경계-강제하기)
 - [11. 의식적으로 지름길 상요하기](#11-의식적으로-지름길-상요하기)
 - [12. 아키텍처 스타일 결정하기](#12-아키텍처-스타일-결정하기)
@@ -2152,6 +2153,39 @@ class SendMoneySystemTest {
   - 그러나 애플리케이션의 나머지 부분을 깔끔하게 유지하고 싶다면 이처럼 구성요소들을 연결하는 바깥쪽 컴포넌트가 필요하다.
   - 그리고 작동하는 애플리케이션으로 조립하기 위해 애플리케이션을 구성하는 모든 움직이는 부품을 알아야 한다.
 
+## b. 평범한 코드로 조립하기
+- 설정 컴포넌트를 구현하는 방법은 여러가지다.
+- 의존성 주입 프레임워크의 도움 없이 애플리케이션을 만들고 있다면 평범한 코드는 이러한 컴포넌트를 만들 수 있다.
+
+```java
+package copyeditor.configuration;
+
+class Application {
+  public static void main(String[] args) {
+
+    AccountRepository accountRepository = new AccountRepository();
+    ActivityRepository activityRepository = new ActivityRepository();
+
+    AccountPersistenceAdapter accountPersistenceAdapter = new AccountPersistenceAdapter(accountRepository, activityRepository);
+    
+    SendMoneyUseCase sendMoneyUseCase = new SendMoneyUseCase(
+      accountPersistenceAdapter, // LoadAccountPort
+      accountPersistenceAdapter); // UpdateAccountStatePort
+    
+    SendMoneyController sendMoneyController = new SendMoneyController(sendMoneyUseCase);
+
+    startProcessingWebRequests(sendMoneyController);
+  }
+}
+```
+
+- 웹 컨트롤러부터 영속성 어댑터까지, 필요한 모든 클래스의 인스턴스를 생성한 후 함께 연결한다.
+- 이 방식의 단점
+  1. 간단한 예제도 복잡한데, 복잡한 예제는 코드 양이 엄청 많다.
+  2. 각 클래스가 속한 패키지 외부에서 인스턴스를 생성하기 때문에 이 클래스들은 전부 public이어야 한다. -> 유스케이스 영속성 어댑터에 직접 접근을 막지 못함
+- package-private 의존성을 유지하면서 이처럼 지저분한 작업을 대신해줄 수 있는 의존성 주입 프레임워크들이 있다.
+  - 자바에서는 스프링프레임워크가 가장 인기 있다.
+  - 웹과 데이터베이스 환경을 지원하기 때문에 startProcessingWebRequests() 메서드 같은것을 구현할 필요 없다.
 
 # 10. 아키텍처 경계 강제하기
 
