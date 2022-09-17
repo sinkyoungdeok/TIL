@@ -123,6 +123,7 @@
     - [아키텍처 경계를 강제한다는 것은 의존성이 올바른 방향을 향하도록 강제한다는 의미이다.](#아키텍처-경계를-강제한다는-것은-의존성이-올바른-방향을-향하도록-강제한다는-의미이다)
   - [b. 접근 제한자](#b-접근-제한자)
     - [접근 제한자가 추가된 패키지 구조](#접근-제한자가-추가된-패키지-구조)
+  - [c. 컴파일 후 체크](#c-컴파일-후-체크)
 - [11. 의식적으로 지름길 상요하기](#11-의식적으로-지름길-상요하기)
 - [12. 아키텍처 스타일 결정하기](#12-아키텍처-스타일-결정하기)
 
@@ -2380,6 +2381,124 @@ buckpal
   - 하지만 이렇게 하면 자바는 하위 패키지를 다른 패키지로 취급하기 떄문에 하위 패키지의 package-private 멤버에 접근할 수 없다.
   - 그래서 하위 패키지의 멤버는 public으로 만들어서 바깥 세계에 노출시켜야 하기 때문에 우리의 아키텍처에서 의존성 규칙이 깨질 수 있다.
 
+## c. 컴파일 후 체크 
+- 클래스에 public 제한자를 쓰면 아키텍처 상의 의존성 방향이 잘못되더라도 컴파일러는 다른 클래스들이 이 클래스를 사용하도록 허용한다.
+  - 이런 경우에는 컴파일러가 전혀 도움이 되지 않기 떄문에 의존성 규칙을 위반했는디 확인할 다른 수단을 찾아야 한다.
+- 한 가지 방법은 컴파일 후 체크(post-compile check)를 도입하는 것이다.
+  - 코드가 컴파일된 후 런타임에 체크하는 것이다.
+  - 런타임 체크는 지속적인 통합 빌드 환경에서 자동화된 테스트 과정에서 가장 잘 동작한다.
+- 이러한 체크를 도와주는 자바용 도구는 ArchUnit이 있다.
+  - 의존성 방향이 기대한 대로 잘 설정돼 있는지 체크할 수 있는 API를 제공한다.
+  - 의존성 규칙 위반을 발견하면 예외를 던진다.
+  - 이 도구는 JUnit과 같은 단위 테스트 프레임워크 기반에서 가장 잘 동작한다. 
+- 이전 절에서 정의한 패키지 구조대로 각 계층이 전용 패키지를 가지고 있다고 가정하면 ArchUnit으로 계층 간의 의존성을 체크할 수 있다.
+- 에를 들어, 도메인 계층에서 바깥쪽의 애플리케이션 계층으로 향하는 의존성이 없다는 것을 체크할 수 있다.
+
+```java
+class DependencyRuleTests {
+
+  @Test
+  void domainLayerDoesnotDependOnApplicationLayer() {
+    noClasses()
+      .that()
+      .resideInPackage("buckpal.domain..")
+      .should()
+      .dependOnClassesThat()
+      .resideInAnyPackage("buckpal.application..")
+      .check(new ClassFileImporter().importPackages("buckpal.."));
+  }
+}
+```
+- ArchUnit API를 이용하면 적은 작업만으로도 육각형 아키텍처 내에서 관련된 모든 패키지를 명시할 수 있는 일종의 도메인 특화 언어(DSL)을 만들 수 있고,
+- 패키지 사이의 의존성 방향이 올바른지 자동으로 체크할 수 있다.
+
+```java
+class DependencyRuleTests {
+
+  @Test
+  void validateRegisterationContextArchitecture() {
+    HexagonalArchitecture.boundedContext("account")
+      .withDomainLayer("domain")
+      .withAdaptersLayer("adapter")
+      .incoming("web")
+      .outgoing("persistence")
+      .and()
+    .withApplicationLayer("application")
+      .services("service")
+      .incomingPorts("port.in")
+      .outgoingPorts("port.out")
+      .and()
+    .withConfiguration("configuration")
+    .check(new ClassFileimporter().importPackages("buckpal.."));
+  }
+} 
+```
+
+```java
+public class HexagonalArchitecture extends ArchitectureElement {
+
+  private Adapters adapters;
+  private ApplicationLayer applicationLayer;
+  private String configurationPackage;
+  private List<String> domainPackages = new ArrayList<>();
+
+  public static HexagonalArchitecture boundedContext(String basePackage) {
+    return new HexagonalArchitecture(basePackage);
+  }
+
+  public HexagonalArchitecture(String basePackage) {
+    super(basePackage);
+  }
+
+  public Adapters withAdaptersLayer(String adaptersPackage) {
+    this.adapters = new Adapters(this, fullQualifiedPackage(adaptersPackage));
+    return this.adapters;
+  }
+
+  public HexagonalArchitecture withDomainLayer(String domainPackage) {
+    this.domainPackages.add(fullQualifiedPackage(domainPackage));
+    return this;
+  }
+
+  public ApplicationLayer withApplicationLayer(String applicationPackage) {
+    this.applicationLayer = new ApplicationLayer(fullQualifiedPackage(applicationPackage), this);
+    return this.applicationLayer;
+  }
+
+  public HexagonalArchitecture withConfiguration(String packageName) {
+    this.configurationPackage = fullQualifiedPackage(packageName);
+    return this;
+  }
+
+  private void domainDoesNotDependOnOtherPackages(JavaClasses classes) {
+    denyAnyDependency(
+        this.domainPackages, Collections.singletonList(adapters.basePackage), classes);
+    denyAnyDependency(
+        this.domainPackages, Collections.singletonList(applicationLayer.basePackage), classes);
+  }
+
+  public void check(JavaClasses classes) {
+    this.adapters.doesNotContainEmptyPackages();
+    this.adapters.dontDependOnEachOther(classes);
+    this.adapters.doesNotDependOn(this.configurationPackage, classes);
+    this.applicationLayer.doesNotContainEmptyPackages();
+    this.applicationLayer.doesNotDependOn(this.adapters.getBasePackage(), classes);
+    this.applicationLayer.doesNotDependOn(this.configurationPackage, classes);
+    this.applicationLayer.incomingAndOutgoingPortsDoNotDependOnEachOther(classes);
+    this.domainDoesNotDependOnOtherPackages(classes);
+  }
+}
+```
+
+- 먼저 바운디드 컨텍스트의 부모 패키지를 지정한다. (단일 바운디드 컨텍스트라면 애플리케이션 전체에 해당된다)
+  - 그런 다음 도메인, 어댑터, 애플리케이션, 설정 계층에 해당하는 하위 패키지들을 지정한다.
+  - 마지막에 호출하는 check()는 몇 가지 체크를 실행하고 패키지 의존성이 의존성 규칙을 따라 유효하게 설정됐는지 검증한다.
+- 잘못된 의존성을 바로잡는 데 컴파일 후 체크가 큰 도움이 되긴 하지만, 실패에 안전하지는 않다.
+  - 패키지 이름인 buckpal에 오타를 내면 테스트가 어떤 클래스도 찾지 못하기 떄문에 의존성 규칙 위반 사례를 발견하지 못한다
+  - 오타가 하나라도 나거나 패키지명을 하나만 리팩터링해도 테스트 전체가 무의미해진다.
+  - 이런 상황을 방지하려면 클래스를 하나도 찾지 못했을 때 실패하는 테스트를 추가해야 한다.
+  - 그럼에도 불구하고 리팩터링에 취약한것은 어쩔수 없다.
+  - 컴파일 후 체크는 언제나 코드와 함께 유지보수 해야 한다.
 
 # 11. 의식적으로 지름길 상요하기
 
