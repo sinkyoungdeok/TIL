@@ -14,6 +14,7 @@
 - [django](./til-by-topic/django)
 - [design-pattern](./til-by-topic/design-pattern/)
 - [TDD](./til-by-topic/tdd)
+- [개발자의 기본](./til-by-topic/basic)
 
 # 년도별 들은 강의, 책
 
@@ -35,6 +36,7 @@
 15. 강의) 인프런 - Django REST Framework 핵심사항 / 김석훈님 (2022.9.4 ~ 2022.9.7) 
 16. 책) 만들면서 배우는 클린 아키텍처 / 책 (2022.09.06 ~ 2022.09.17)
 17. 강의) The Red : 이규원의 현실 세상의 TDD : 안정감을 주는 코드 작성 방법 / 이규원님 (2022.09.08 ~ )
+18. 책) 읽기 좋은 코드가 좋은 코드다 / 책 (2022.09.20 ~ )
 
 
 ### 2021년도
