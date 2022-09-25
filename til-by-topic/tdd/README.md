@@ -34,6 +34,9 @@
   - [4. 단위 테스트](#4-단위-테스트)
     - [단위 테스트 예제](#단위-테스트-예제)
     - [Parameteried Test](#parameteried-test)
+  - [5. 테스트 우선 개발](#5-테스트-우선-개발)
+    - [테스트 코드의 특징](#테스트-코드의-특징)
+    - [운영 코드 보다 테스트 코드를 먼저 작성](#운영-코드-보다-테스트-코드를-먼저-작성)
 
 
 # 출처 
@@ -447,3 +450,48 @@ class MyTests(unittest.TestCase):
 ```
 - 위 상황이 발생하지 않도록 해주는 것.
 - 즉, 동일한 테스트 코드를 여러개의 파라미터로 테스트 할 수 있도록 해주는 것
+
+
+## 5. 테스트 우선 개발 
+
+### 테스트 코드의 특징 
+- 가시적이고 구체적인 목표
+- 자가 검증
+- 반복 실행 
+- 운영 코드 API의 클라이언트가 된다.
+
+### 운영 코드 보다 테스트 코드를 먼저 작성 
+1. 명확하고 검증 가능한 목표를 설정한 후 목표 달성
+2. 프로세스가 코딩에 앞선 목표 설정을 강요 
+3. 프로그래머는 자신이 풀어야 할 문제를 구체적으로 이해해야 함 
+
+```python
+def refineText(str):
+    return str.replace("    ", " ").replace("  ", " ").replace("  ", " ")
+```
+위 코드로 고치면 지금까지의 테스트 코드는 성공한다.
+
+```python
+def refineText(str):
+    return str.replace("    ", " ").replace("  ", " ").replace("  ", " ").replace("  ", " ")
+
+
+class MyTests(unittest.TestCase):
+    @parameterized.expand([
+        ("hello  world", "hello world"),
+        ("hello    world", "hello world"),
+        ("hello   world", "hello world"),
+        ("hello    world", "hello world"),
+        ("hello     world", "hello world"),
+        ("hello      world", "hello world"),
+        ("hello       world", "hello world"), # 실패 
+        ("hello        world", "hello world"), # 실패
+    ])
+    def test_refineText(self, input, exptected):
+        assert_equal(refineText(input), exptected)
+```
+
+위 테스트코드를 통해서 또 실패 한다는 것을 알 수 있다.
+
+- 하지만, 테스트를 통해서 작성한 실수르 빠른 타이밍에 피드백을 받을 수 있다. 
+- 금지어를 마스킹하기위해서 새로운 코드를 추가한다면, 그 기능으로 인해 성공했던 테스트가 실패 할 수 있다. 
