@@ -66,6 +66,13 @@
   - [3. 입력과 출력](#3-입력과-출력)
     - [인터페이스의 입력과 출력](#인터페이스의-입력과-출력)
     - [인터페이스의 부작용](#인터페이스의-부작용)
+  - [4. 테스트 대역](#4-테스트-대역)
+    - [테스트 대역과 가정](#테스트-대역과-가정)
+    - [Dummy](#dummy)
+    - [Stub](#stub)
+    - [Spy](#spy)
+    - [Mock](#mock)
+    - [테스트 대역 유형 - Fake](#테스트-대역-유형---fake)
 
 
 # 출처 
@@ -676,3 +683,125 @@ class MyTests(unittest.TestCase):
   - 지연
   - 간접 출력 
 
+## 4. 테스트 대역 
+
+### 테스트 대역과 가정 
+- DOC 준비 비용이 큰 경우
+  - 구동에 많은 자원이 필요
+  - 환경 제어가 어려움
+  - DOC: Depend on Component (테스트하려는 대상 코드가 의존하는 코드)
+  - SUT: 테스트하려는 대상 코드 
+- DOC가 SUT에 제공하는 계약(인터페이스)을 준수하는 대역 코드를 사용
+- 대역 코드가 계약을 DOC와 동일하게 준수할 것이라고 가정
+
+### Dummy
+- 테스트 대역 중에서 가장 단순한 형태 
+- SUT 준비를 위해 해결되어야 하는 의존성이 테스트 대상 논리에 의해 사용되지 않는 경우에 의존 요소를 대신하는 테스트 대역
+
+### Stub
+- 간접 입력 대역
+- 미리 준비된 답을 출력 
+
+```java
+public class WayneEnterprisesProductSourceStub implements WayneEnterprisesProductSource {
+
+    private final WayneEnterprisesProduct[] products;
+
+    public WayneEnterprisesProductSourceStub(WayneEnterprisesProduct... products) {
+        this.products = products;
+    }
+
+    @Override
+    public Iterable<WayneEnterprisesProduct> fetchProducts() {
+        return Arrays.asList(products);
+    }
+
+}
+
+@ParameterizedTest
+@DomainArgumentsSource
+void sut_projects_all_products(WayneEnterprisesProduct[] source) {
+    var stub = new WayneEnterprisesProductSourceStub(source);
+    var sut = new WayneEnterprisesProductImporter(stub);
+
+    Iterable<Product> actual = sut.fetchProducts();
+
+    assertThat(actual).hasSize(source.length);
+}
+```
+
+### Spy
+- 간접 출력 대역
+- SUT의 간접 출력을 기록 
+
+```java
+public final class ProductInventorySpy implements ProductInventory {
+
+    private final List<Product> log = new ArrayList<Product>();
+
+    @Override
+    public void upsertProduct(Product product) {
+        log.add(product);
+    }
+
+    public List<Product> getLog() {
+        return log;
+    }
+
+}
+
+@ParameterizedTest
+@DomainArgumentsSource
+void sut_does_not_save_invalid_product(WayneEnterprisesProduct product) {
+    // Arrange
+    var lowerBound = new BigDecimal(product.getListPrice() + 10000);
+    var validator = new ListPriceFilter(lowerBound);
+
+    var stub = new WayneEnterprisesProductSourceStub(product);
+    var importer = new WayneEnterprisesProductImporter(stub);
+    var spy = new ProductInventorySpy();
+    var sut = new ProductSynchronizer(importer, validator, spy);
+
+    // Act
+    sut.run();
+
+    // Assert
+    assertThat(spy.getLog()).isEmpty();
+}
+```
+
+### Mock
+- SUT 내부의 행위(상호작용) 검증 
+
+```java
+@Test
+void sut_really_does_not_save_invalid_product() {
+    // Arrange
+    var pricing = new Pricing(BigDecimal.TEN, BigDecimal.ONE);
+    var product = new Product("supplierName", "productCode", "productName", pricing);
+
+    ProductImporter importer = mock(ProductImporter.class);
+    when(importer.fetchProducts()).thenReturn(Arrays.asList(product));
+
+    ProductValidator validator = mock(ProductValidator.class);
+    when(validator.isValid(product)).thenReturn(false);
+
+    ProductInventory inventory = mock(ProductInventory.class);
+
+    var sut = new ProductSynchronizer(importer, validator, inventory);
+
+    // Act
+    sut.run();
+
+    // Assert
+    verify(inventory, never()).upsertProduct(product);
+}
+```
+
+### 테스트 대역 유형 - Fake
+- 의존성 계약을 준수하는 가벼운 구현체
+- DOC보다 적은 부작용
+- 인메모리 데이터베이스 등 
+
+
+단위 테스트가 어려울 때, 테스트 대역은 굉장히 좋은 도구다.
