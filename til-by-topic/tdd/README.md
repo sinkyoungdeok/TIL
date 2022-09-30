@@ -73,6 +73,10 @@
     - [Spy](#spy)
     - [Mock](#mock)
     - [테스트 대역 유형 - Fake](#테스트-대역-유형---fake)
+  - [5. Mockists vs Classics](#5-mockists-vs-classics)
+    - [Sociable 테스트 vs Solitary 테스트](#sociable-테스트-vs-solitary-테스트)
+    - [가정의 안정도](#가정의-안정도)
+    - [Mock의 위험](#mock의-위험)
 
 
 # 출처 
@@ -805,3 +809,22 @@ void sut_really_does_not_save_invalid_product() {
 
 
 단위 테스트가 어려울 때, 테스트 대역은 굉장히 좋은 도구다.
+
+
+## 5. Mockists vs Classics
+
+### Sociable 테스트 vs Solitary 테스트
+- Sociable: 단위 테스트 -> 시스템 -> 의존대상 
+- Solitary: 단위 테스트 -> 시스템 -> 테스트 대역
+
+### 가정의 안정도
+- 테스트 대역 사용으로 인해 생기는 가정을 얼마나 믿을 수 있을까?
+- 테스트 대역이 구현하는 인터페이스가 단순할수록 1에 가까워짐 (안정)
+- 테스트 대역이 구현하는 인터페이스가 복잡할수록 0에 가까워짐 (불안정)
+
+### Mock의 위험 
+- 상태 검증 보다는 행위 검증에 가깝다
+- 정보 숨김을 위배할 확률이 높다
+- 테스트가 SUT 구현에 의존
+- 고통스럽고 불안한 리팩터링
+
