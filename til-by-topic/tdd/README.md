@@ -77,6 +77,9 @@
     - [Sociable 테스트 vs Solitary 테스트](#sociable-테스트-vs-solitary-테스트)
     - [가정의 안정도](#가정의-안정도)
     - [Mock의 위험](#mock의-위험)
+  - [6. Should I test private methods](#6-should-i-test-private-methods)
+    - [비공개 모듈 테스트](#비공개-모듈-테스트)
+    - [비공개 모듈 동작에 대한 불안함](#비공개-모듈-동작에-대한-불안함)
 
 
 # 출처 
@@ -828,3 +831,19 @@ void sut_really_does_not_save_invalid_product() {
 - 테스트가 SUT 구현에 의존
 - 고통스럽고 불안한 리팩터링
 
+## 6. Should I test private methods
+
+### 비공개 모듈 테스트
+- 비공개 모듈의 작성과 사용은 공개 모듈의 구현 영역
+- 비공개 모듈 테스트는 공개 모듈 구현 노출
+  - 테스트가 공개 모듈 구현에 의존
+  - 정보 숨김 위배
+  - SUT와 테스트 사이의 높은 결합 
+
+### 비공개 모듈 동작에 대한 불안함
+- 공개 모듈 동작을 고민하자.
+- 켄트 벡의 설계 규칙
+  - Passes the tests
+  - Reveals intention
+  - No duplication
+  - Fewest elements
