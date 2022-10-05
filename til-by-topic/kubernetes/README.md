@@ -216,6 +216,8 @@
 - [15. eks](#15-eks)
   - [AWS EKS 란](#aws-eks-란)
   - [aws eks 구성 예시](#aws-eks-구성-예시)
+- [16. 실전](#16-실전)
+  - [k8s에서 두 서버의 배포 sync 맞추기](#k8s에서-두-서버의-배포-sync-맞추기)
 
 ## 1. 설치 명령어 
 
@@ -2597,3 +2599,16 @@ kubectl delete secret tls-config
 ### aws eks 구성 예시
 ![image](https://user-images.githubusercontent.com/28394879/179237764-d5dbc124-4cf3-41ad-90a3-680264a03773.png)
 
+
+
+## 16. 실전
+
+### k8s에서 두 서버의 배포 sync 맞추기
+A,B 서버가 이미 배포되어 있다고 가정
+
+1. A 서버 canary 배포 
+2. B 서버 canary 배포 (신규 A서버를 바라보도록)
+3. 기존 B 트래픽을 신규 A로 변경
+4. A, B 서버 업데이트
+5. 트래픽을 다시 원래대로 복구
+6. canary 배포본 삭제
