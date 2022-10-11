@@ -17,6 +17,11 @@
       - [문자열 템플릿](#문자열-템플릿)
       - [널 안정성](#널-안정성)
       - [기타](#기타)
+  - [3. 스프링의 코틀린 지원](#3-스프링의-코틀린-지원)
+    - [@ConfigurationProperties](#configurationproperties)
+    - [테스트 지원](#테스트-지원)
+    - [확장 함수](#확장-함수)
+    - [코루틴](#코루틴)
 
 
 
@@ -255,3 +260,40 @@ a!!.length // Null이 아니라고 확신하는 경우
 - 연산자 오버로딩
 - 코루틴
 - etc
+
+## 3. 스프링의 코틀린 지원 
+
+### @ConfigurationProperties
+- 스프링 애플리케이션에 지정한 설정을 기반으로 설정 클래스를 만들 때 `@ConstructorBinding`을 사용하면 setter가 아닌 생성자를 통해 바인딩 하므로 불변 객체를 쉽게 생성할 수 있다.
+```kotlin
+@ConstructorBinding
+@ConfigurationProperties
+```
+
+### 테스트 지원
+- 기본 제공되는 Junit5 기반의 테스트를 특별한 설정 없이 그대로 사용 가능
+- Mockito 대신 MockK를 사용할 수 있다.
+- `@MockBean` `@SpyBean` --> `@MockkBean`, `@SpykBean`
+
+### 확장 함수
+- 스프링에서 지원하는 코틀린 API의 대부분은 확장 기능을 사용해 기존 API에 코틀린 API를 추가 
+- 스프링 프로젝트에선 확장함수를 통해 기존 자바 API를 건드리지 않고 쉽게 코틀린 확장 기능을 추가하고 있다.
+```kotlin
+pakcage org.springframework.data.repository
+
+fun <T, ID> CrudRepository<T, ID>.findByIdOrNull(id: ID): T? {
+  return findById(id).orElse(null)
+}
+
+class MyService(
+  private val myRepository: MyRepository,
+) {
+  fun findById(id: Long): My? = myRespotiroy.findByIdOrNull(id)
+}
+```
+
+### 코루틴
+- 비동기-논블로킹 방식을 선언형으로 구현하기 위한 코틀린 기능
+- 스프링 MVC, 스프링 WebFlux 모두 코루틴을 지원하여 의존성만 추가하면 바로 사용 가능 
+- 코루틴이 지원되어 비동기-논블로킹 스타일의 구현을 쉽게 할 수 있다.
+
