@@ -24,6 +24,7 @@
     - [코루틴](#코루틴)
   - [2. 코틀린 문법 학습하기](#2-코틀린-문법-학습하기)
     - [1. 변수](#1-변수)
+    - [2. 함수](#2-함수)
 
 
 
@@ -323,3 +324,36 @@ fun main() {
 - val == value (readonly 타입) 
 - var == variable (가변 변수)
 
+### 2. 함수
+
+```kotlin
+// 기본적인 함수 선언 - 반환 타입을 제거하면 컴파일 오류
+func sum(a: Int, b: Int) : Int {
+  return a + b
+}
+
+// 표현식 
+fun sum2(a: Int, b: Int) : Int a + b
+
+// 표현식 & 반환 타입 생략
+fun sum3(a: Int, b: Int) = a + b
+
+// 반환타입이 없는 함수는 Unit(자바에서는 Void와 유사) 을 반환한다
+fun printSum(a: Int, b: Int) {
+  println("$a + $b = ${a + b}")
+}
+
+// 디폴트 파라미터 
+fun greeting(message: String = "안녕하세요") {
+  println(message)
+}
+
+// named argument
+fun log(level: String = "INFO", message: String) {
+  println("[$level]$message")
+}
+
+fun main() {
+  log(message = "인포 로그")
+}
+```
