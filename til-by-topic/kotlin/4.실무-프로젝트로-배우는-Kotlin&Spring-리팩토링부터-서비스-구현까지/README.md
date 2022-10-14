@@ -25,6 +25,7 @@
   - [2. 코틀린 문법 학습하기](#2-코틀린-문법-학습하기)
     - [1. 변수](#1-변수)
     - [2. 함수](#2-함수)
+    - [3. 흐름 제어](#3-흐름-제어)
 
 
 
@@ -355,5 +356,122 @@ fun log(level: String = "INFO", message: String) {
 
 fun main() {
   log(message = "인포 로그")
+}
+```
+
+### 3. 흐름 제어
+
+- if else 
+```kotlin
+fun main() {
+
+  // if else
+  val job = "Software Developer"
+  if (job == "Software Developer") {
+    println("개발자")
+  } else {
+    println("개발자 아님")
+  }
+
+  // 코틀린의 if else는 표현식이다. 자바의 if else는 구문이다. 
+  val age:  Int = 10
+
+  val str = if (age > 10) {
+    "성인"
+  } else {
+    "아이"
+  }
+
+  // 코틀린은 삼항 연산자가 없다. if else가 표현식이므로 불필요하다.
+  val a = 1
+  val b = 2
+  val c = if (b > a) b else a 
+}
+```
+
+
+- when 
+```kotlin
+fun main() {
+  
+  // 자바 코드를 코틀린의 when식으로 변환 
+  val day = 2
+
+  val result = when (day) {
+    1 -> "월요일"
+    2 -> "화요일"
+    3 -> "수요일"
+    4 -> "목요일"
+    else -> "기타"
+  }
+  println(result)
+
+  // else를 생략할 수 있다.
+  when(getColor()) {
+    Color.RED -> print("red")
+    Color.GREEN -> println("green")
+  }
+
+  // 여러개의 조건을 콤마로 구분해 한줄에서 정의할 수 있다.
+  when (getNumber()) {
+    0, 1 -> print("0 or 1")
+    else -> print("not (0 or 1)")
+  }
+}
+
+enum class Color {
+  RED, GREEN
+}
+
+fun getColor() = Color.RED
+
+fun getNumber() = 2
+```
+
+
+- for
+```kotlin
+fun main() {
+
+  // 범위 연산자 .. 를 사용해 for loop 
+  for (i in 0..3) {
+    println(i) // 0,1,2,3
+  }
+
+  // until 을 사용 
+  // 뒤에 온 숫자는 포함하지 않는다 
+  for (i in 0 until 3) {
+    println(i) // 0,1,2
+  }
+
+  // step에 들어온 값 만큼 증가
+  for (i in 0..6 step 2) {
+    println(i) // 0 2 4 6
+  }
+
+  // downTo를 사용해 반복
+  for (i in 3 downTo 1) {
+    println(i) // 3 2 1
+  }
+
+  // 전달받은 배열 반복 
+  val numbers = arrayOf(1,2,3)
+
+  for (i in numbers) {
+    println(i) // 1 2 3 
+  }
+}
+```
+
+
+- while (자바와 동일)
+```kotlin
+fun main() {
+  var x = 5
+
+  while (x >0) {
+    println(x)
+    x--
+  }
 }
 ```
