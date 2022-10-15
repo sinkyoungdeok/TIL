@@ -26,6 +26,10 @@
     - [1. 변수](#1-변수)
     - [2. 함수](#2-함수)
     - [3. 흐름 제어](#3-흐름-제어)
+    - [4. 널 안정성](#4-널-안정성)
+      - [널 참조의 위험성](#널-참조의-위험성)
+      - [kotlin nullable 기본](#kotlin-nullable-기본)
+      - [kotlin nullable 예제](#kotlin-nullable-예제)
 
 
 
@@ -473,5 +477,56 @@ fun main() {
     println(x)
     x--
   }
+}
+```
+
+### 4. 널 안정성 
+
+#### 널 참조의 위험성
+- 자바를 포함한 많은 프로그래밍 언어에서 가장 많이 발생하는 예외 유형은 `NullPointerException` 즉 `NPE`
+- 자바에서는 NPE를 줄이기 위해 JDK8에서 `Optional`을 지원한다.
+- 자바의 옵셔널은 값을 래핑하기 떄문에 객체 생성에 따른 오버헤드가 발생하고, 컴파일 단계에서 Null 가능성을 검사 못함 
+- 코틀린을 비롯한 최신 언어에선 널 가능성을 컴파일러가 미리 감지해서 NPE 가능성을 줄일 수 있다.
+
+
+#### kotlin nullable 기본
+```kotlin
+fun main() {
+  
+  val a : String = null // 컴파일 오류 발생
+  val b : String = "aa"
+  b = null // 컴파일 오류 발생
+
+  val a : String? = null // null이 가능한 타입
+  a.length // 컴파일 오류
+  println(a?.length) // null 출력
+
+  val b: Int = if(a != null) a.length else 0
+  println(b) // 0
+
+  val c = a?.length ?: 0 // ?: -> 엘비스 연산자
+  println(c) // 0, 위 로직과 동일함
+}
+```
+
+
+#### kotlin nullable 예제
+
+```kotlin
+fun getNullStr(): String? = null
+
+fun getLengthIfNotNull(str: String?) = str?.length ?: 0
+
+fun main() {
+  val nullableStr = getNullStr()
+
+  val nullableStrLength = nullableStr?.length ?: 0
+  println(nullableStrLength) // 0
+
+  val length = getLengthIfNotNull(null)
+  println(length) // 0
+
+  val c: String ?= null
+  val d = c!!.length // 단언 연산자. 여기에서는 nullPointerException 발생
 }
 ```
