@@ -30,6 +30,7 @@
       - [널 참조의 위험성](#널-참조의-위험성)
       - [kotlin nullable 기본](#kotlin-nullable-기본)
       - [kotlin nullable 예제](#kotlin-nullable-예제)
+    - [5. 예외처리](#5-예외처리)
 
 
 
@@ -530,3 +531,63 @@ fun main() {
   val d = c!!.length // 단언 연산자. 여기에서는 nullPointerException 발생
 }
 ```
+
+### 5. 예외처리
+
+- 코틀린의 모든 예외 클래스는 최상위 예외 클래스인 `Throwable`을 상속한다. 
+
+![image](https://user-images.githubusercontent.com/28394879/196023739-1d75d05f-b5af-4f9c-a936-3de90069e003.png)
+- Error
+  - 시스템에 비정상적인 상황이 발생.
+  - 예측이 어렵다 
+  - 기본적으로 복구가 불가능 함
+  - ex) OutOfMemoryError, StackOverflowError, etc
+- Exception
+  - 시스템에서 포착 가능하다. (try-catch)
+  - 복구 가능
+  - 예외 처리 강제
+  - `@Transactional` 에서 해당 예외가 발생하면 기본적으로는 롤백이 동작하지 않음 (rollbackFor를 사용해야 함 )
+  - ex) IOException, FileNotFoundException, etc
+- RuntimeException
+  - 런타임시에 발생하는 예외 
+  - 예외 처리를 강제 X
+  - ex) NullPointerException, ArrayIndexOutOfBoundsException, etc 
+- Checked Exceptions
+  - 자바는 컴파일에러가 발생하기 떄문에 무조건 try-catch 로 감싸거나 throws로 예외를 전파해야함
+  - 코틀린은 강제하지 않는다 
+  - ex) InterruptedException 
+
+```kotlin
+fun main() {
+  try {
+    throw Exception()
+  } catch(e: Exception) {
+    println("에러 발생!")
+  } finally {
+    println("finally 실행!")
+  }
+
+  val a = try{ 
+    "1234".toInt()
+  } catch (e: Exception) {
+    println("예외 발생")
+  }
+  println(a)
+}
+```
+- 코틀린은 try도 표현식이다. 
+
+```kotlin
+fun main() {
+  val b: String? = null
+  val c: String = b ?: failFast("a is null")
+
+  println(c.length) // null 일경우 exception을 발생하므로, ?.처리가 필요없다.
+}
+
+fun failFast(message: String): Nothing {
+  throw IllegalArgumentException(message)
+}
+```
+- 코틀린은 아무것도 반환하지 않으면 Unit타입을 사용 한다. 
+- 코틀린은 정상적으로 실행을 보장하지 않는 경우 Nothing이라는 타입을 반환한다. (예외가 발생할 수 있는 경우)
