@@ -31,6 +31,7 @@
       - [kotlin nullable 기본](#kotlin-nullable-기본)
       - [kotlin nullable 예제](#kotlin-nullable-예제)
     - [5. 예외처리](#5-예외처리)
+    - [6. 클래스와 프로퍼티](#6-클래스와-프로퍼티)
 
 
 
@@ -591,3 +592,51 @@ fun failFast(message: String): Nothing {
 ```
 - 코틀린은 아무것도 반환하지 않으면 Unit타입을 사용 한다. 
 - 코틀린은 정상적으로 실행을 보장하지 않는 경우 Nothing이라는 타입을 반환한다. (예외가 발생할 수 있는 경우)
+
+### 6. 클래스와 프로퍼티
+
+```kotlin
+class Coffee(
+  var name: String = "",
+  var price: Int = 0,
+  var iced: Boolean = false,
+) {
+
+  val brand: String
+      get() = "스타벅스" //custom getter
+
+  val brand2: String
+      get() {
+        return "스타벅스" 
+      }
+
+  var quantity: Int = 0
+      set(value) { //custom setter
+        if (value > 0) { 
+          field = value // field == backing field
+          // quantity = value 로 할당하면 stackOverflow 발생 
+        }
+      }
+}
+
+class EmptyClass
+
+fun main() {
+  val coffee = Coffee()
+  coffee.name = "아이스 아메리카노"
+  coffee.price = 2000
+  coffee.quantity = 1 
+  coffee.iced = true
+
+  if (coffee.iced) { // getter를 사용하긴 하지만, 프로퍼티 자체로 상태를 표현이 가능하다.
+    println("아이스 커피")
+  }
+
+  println("${coffee.brand} ${coffee.name} 가격은 ${coffee.price} 수량은 ${coffee.quantity}")
+}
+```
+
+- 프로퍼티를 var로 선언하면 getter, setter를 사용할 수 있다.
+- 프로퍼티를 val로 선언하면 getter만 사용할 수 있다.
+- 코틀린은 프로퍼티의 상태를 표현하기 위해 프로퍼티로써 표현이 가능하다. (위 예제에서 iced)
+- 자바에서는 프로퍼티의 상태를 표현하기 위해 메서드를 만들어야 한다. 
