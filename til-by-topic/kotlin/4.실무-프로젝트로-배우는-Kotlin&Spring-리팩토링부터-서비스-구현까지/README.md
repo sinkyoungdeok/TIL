@@ -32,6 +32,7 @@
       - [kotlin nullable 예제](#kotlin-nullable-예제)
     - [5. 예외처리](#5-예외처리)
     - [6. 클래스와 프로퍼티](#6-클래스와-프로퍼티)
+    - [7. 상속](#7-상속)
 
 
 
@@ -640,3 +641,86 @@ fun main() {
 - 프로퍼티를 val로 선언하면 getter만 사용할 수 있다.
 - 코틀린은 프로퍼티의 상태를 표현하기 위해 프로퍼티로써 표현이 가능하다. (위 예제에서 iced)
 - 자바에서는 프로퍼티의 상태를 표현하기 위해 메서드를 만들어야 한다. 
+
+
+### 7. 상속
+
+1. 자바의 상속 
+- 자바는 기본적으로 모든 클래스가 상속이 가능하나 
+- 상속에 따른 부작용이 발생할 경우를 대비해 `final` 키워드로 막을 수 있다
+- 대표적으로 System 클래스 
+```java
+System.out.println("");
+
+public final class System {
+  /*...*./
+}
+```
+
+- 이펙티브 자바의 아이템중 `상속을 위한 설계와 문서를 작성하고 그렇지 않으면 상속을 금지하라` 라는 주제가 있는데
+- 여기에는 여러가지 상속에 대한 문제점에 대해 나와있으며 결과적으로 상속을 목적으로 만든 클래스가 아니라면
+- `모두 final로 작성하는 것이` 좋다 
+
+
+2. 코틀린의 상속
+
+```kotlin
+open class Dog {
+  open var age: Int = 0
+
+  open fun bark() {
+    println("멍멍")
+  }
+}
+
+class Bulldog : Dog() {
+  
+  override var age: Int = 0
+
+  override fun bark() {
+    println("컹컹")
+  }
+}
+
+class BulldogV2(override var age: Int = 0): Dog() {
+
+  override fun bark() {
+    println("컹컹")
+  }
+}
+
+class ChildBulldog : BulldogV2 () {
+  override var age: Int = 0
+  override fun bark() {
+    super.bark()
+  }
+}
+
+abstract class Developer {
+
+  abstract var age: Int
+  abstract fun code(language: String)
+}
+
+class BackendDeveloper(override var age: Int = 0): Developer() {
+
+  override fun code(language: String) {
+    println("develop $language")
+  }
+}
+
+fun main() {
+  val dog = Bulldog(age = 2)
+  println(dog.age)
+  dog.bark()
+}
+```
+- 코틀린은 open 키워드를 써야 상속을 허용할 수 있다
+- override 된 함수 `Bulldog.bark()`나 프토퍼티는 자동으로 상속을 허용(open)하게 된다.
+- 상속을 허용하지 않으려면 final키워드를 사용하자. `final override fun bark(){}`
+- super 키워드를 통해서 부모클래스의 함수나 프로퍼티를 사용할 수 있다. `ChildBulldog.bark()`
+- abstract는 자바와 동일하다 
+
+
+
+
