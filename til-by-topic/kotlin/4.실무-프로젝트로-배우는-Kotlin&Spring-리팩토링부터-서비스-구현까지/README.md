@@ -33,6 +33,7 @@
     - [5. 예외처리](#5-예외처리)
     - [6. 클래스와 프로퍼티](#6-클래스와-프로퍼티)
     - [7. 상속](#7-상속)
+    - [8. 인터페이스](#8-인터페이스)
 
 
 
@@ -721,6 +722,57 @@ fun main() {
 - super 키워드를 통해서 부모클래스의 함수나 프로퍼티를 사용할 수 있다. `ChildBulldog.bark()`
 - abstract는 자바와 동일하다 
 
+### 8. 인터페이스
 
+```kotlin
+class Product(val name: String, val price: Int)
 
+interface Wheel {
+  fun roll()
+}
 
+interface Cart : Wheel {
+
+  var coin: Int // 추상 프로퍼티 -> override해야됨 
+  
+  val weight: String
+      get() = "20KG" // interface에서는 backing field를 사용할 수 없다. 
+
+  fun add(product: Product)
+
+  fun rent() { // 여기에서 구현했으므로, override안해도 된다. 
+    if (coin > 0) {
+      println("카트를 대여합니다")
+    }
+  }
+
+  override fun roll() {
+    println("카트가 굴러갑니다")
+  }
+}
+
+interface Order {
+  fun add(product: Product) {
+    println("${product.name} 주문이 완료되었습니다")
+  }
+}
+
+class MyCart(override var coin): Cart, Order {
+  override fun add(product: Product) {
+    if (coin <= 0) println("코인을 넣어주세요")
+    else println("%{product.name}이(가) 카트에 추가됐습니다")
+
+    // 주문하기
+    super<Order>.add(product)
+  }
+}
+
+fun main() {
+  val cart = MyCart(coin=100)
+  cart.rent()
+  cart.roll()
+  cart.add(Product(name = "장난감", price = 1000))
+}
+```
+- default함수는 override안해도 된다.
+- 하지만, 부모클래스 두개다 동일한 시그니처의 default 함수를 제공한다면 자식 클래스에서 구현해야 컴파일오류가 발생하지 않는다.
