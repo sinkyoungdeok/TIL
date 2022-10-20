@@ -34,6 +34,7 @@
     - [6. 클래스와 프로퍼티](#6-클래스와-프로퍼티)
     - [7. 상속](#7-상속)
     - [8. 인터페이스](#8-인터페이스)
+    - [9. 열거형](#9-열거형)
 
 
 
@@ -776,3 +777,46 @@ fun main() {
 ```
 - default함수는 override안해도 된다.
 - 하지만, 부모클래스 두개다 동일한 시그니처의 default 함수를 제공한다면 자식 클래스에서 구현해야 컴파일오류가 발생하지 않는다.
+
+
+### 9. 열거형
+
+```kotlin
+enum class PaymentStatus(val label: String) : Payable{
+  UNPAID("미지급") {
+    override fun isPayable(): = true 
+  }, 
+  PAID("지급완료") {
+    override fun isPayable() = false 
+  }, 
+  FAILED("지급실패") {
+    override fun isPayable() = false 
+  }, 
+  REFUNDED("환불") {
+    override fun isPayable() = false 
+  }; 
+}
+
+interface Payable {
+  fun isPayable(): Boolean
+}
+
+fun main() {
+  print(PaymentStatus.UNPAID.label)
+
+  if (PaymentStatus.UNPAID.isPayable()) {
+    println("결재 가능 상태")
+  }
+
+  val paymentStatus = PaymentStatus.valueOf("PAID")
+  println(paymentStatus.label)
+
+  if (paymentStatus == PaymentStatus.PAID) {
+    println("결재 완료 상태")
+  }
+
+  for (status in PaymentStatus.values()) {
+    println("[$status.name](${status.label} : ${status.ordinal}")
+  }
+}
+```
