@@ -37,6 +37,7 @@
     - [8. 인터페이스](#8-인터페이스)
     - [9. 열거형](#9-열거형)
   - [2. 코틀린 고급](#2-코틀린-고급)
+    - [1. 컬렉션 타입](#1-컬렉션-타입)
 
 
 
@@ -826,3 +827,108 @@ fun main() {
 ```
 
 ## 2. 코틀린 고급
+
+### 1. 컬렉션 타입
+- 코틀린 표준 라이브러리는 기본 컬렉션 타입인 `List`, `Set`, `Map`을 제공
+- 컬렉션은 두가지 종류로 나뉨 
+  - 불변 컬렉션: 읽기 전용
+  - 가변 컬렉션: 삽입, 수정, 삭제와 같은 쓰기 작업이 가능
+
+
+컬렉션 계층 다이어그램 
+![image](https://user-images.githubusercontent.com/28394879/197341885-05555d9b-4006-423a-8cc8-473c979a21ef.png)
+
+```kotlin
+fun main() {
+  
+  // immutable
+  val currentList = listOf("달러", "유로", "원") // add 함수 제공 X
+
+  // mutable
+  val mutableCurrentList = mutableListOf<String>()
+  mutableCurrentList.add("달러")
+  mutableCurrentList.add("유로")
+  mutableCurrentList.add("원")
+
+  // mutable
+  val mutableCurrentList2 = mutableListOf<String>().apply {
+      this.add("달러")
+      add("유로")
+      add("원") 
+  }
+
+  // immutable set
+  val numberSet = setOf(1,2,3,4)
+
+  // mutable set
+  val mutableSet = mutableSetOf<Int>().apply {
+    add(1)
+    add(2)
+    add(3)
+    add(4)
+  }
+
+  // immutable map
+  val numberMap = mapOf("one" to 1, "two" to 2)
+
+  // mutable map
+  val mutableNumberMap = mutableMapOf<String, Int>()
+  mutableNumberMap["one"] = 1
+  mutableNumberMap["two"] = 2
+
+  
+
+  // 컬렉션 빌더 -> 내부에선 mutable로 쓰지만, immutable로 변환해서 return 한다
+  val numberList: List<Int> = buildList {
+    add(1)
+    add(2)
+    add(3)
+  }
+
+  // linkedList
+  val linkedList = LinkedList<Int>.apply {
+    addFirst(1)
+    add(2)
+    addLast(1)
+  }
+
+  // arrayList
+  val arrayList = ArrayList<Int>().apply {
+    add(1)
+    add(2)
+    add(3)
+  }
+
+  val iterator = currencyList.iterator()
+  while (iterator.hasNext()) {
+    println(iterator.next())
+  }
+
+  for (currency in currencyList) {
+    println(currency)
+  }
+
+  currencyList.forEach {
+    println(it)
+  }
+
+  val lowerList = listOf("a","b","c")
+  val upperList = lowerList.map { it.uppercase() }
+  println(upperList)
+
+  val filteredList = upperList.filter { it == "A" || it == "C" } // inline 함수
+  println(filteredList)
+
+  val filteredList2 = upperList
+      .asSequence() // 자바의 stream과 유사
+      .filter {it == "A" || it == "C"}
+      .toList() // 이게 없으면 값을 리턴 못받고, 레퍼런스가 출력됨
+}
+```
+
+- 자바의 foreach, map 등은 terminal operator (`collect().Collectors.toList()`) 가 호출이 되어야 값을 리턴 받는다.
+- 코틀린은 terminal operator없이도 값을 리턴받을 수 있다.
+- 하지만, inline 함수를 사용하면
+  - filter를 연속으로 5개 쓴다고 가정하면, 5번다 collection을 반환하기 때문에 메모리가 비효율적이다.
+  - asSequence로 처리하고 inline이 아닌 filter를 5번쓰고 최종적으로 collection으로 변환하는게 좋다 
+  - asSequence는 terminal operator가 있어야 collection으로 반환한다
