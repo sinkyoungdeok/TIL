@@ -38,6 +38,7 @@
     - [9. 열거형](#9-열거형)
   - [2. 코틀린 고급](#2-코틀린-고급)
     - [1. 컬렉션 타입](#1-컬렉션-타입)
+    - [2. 데이터 클래스](#2-데이터-클래스)
 
 
 
@@ -932,3 +933,35 @@ fun main() {
   - filter를 연속으로 5개 쓴다고 가정하면, 5번다 collection을 반환하기 때문에 메모리가 비효율적이다.
   - asSequence로 처리하고 inline이 아닌 filter를 5번쓰고 최종적으로 collection으로 변환하는게 좋다 
   - asSequence는 terminal operator가 있어야 collection으로 반환한다
+
+
+### 2. 데이터 클래스 
+- 데이터를 보관하거나 전달하는 목적을 가진 객체를 만들 때 사용
+
+```kotlin
+data class Person(val name: String, val age: Int)
+
+fun main() {
+  val person1 = Person(name = "tony", age = 12)
+  val person2 = Person(name = "tony", age = 12)
+
+  println(person1 == person2) // data class는 equals를 자동으로 생성해주기때문에 true로 반환됨. 일반 class면 false.
+
+  val set = hashSetOf(person1)
+  println(set.contains(person2)) // data class는 hashCode도 자동으로 생성해주기 때문에 true.
+
+  val person11 = person1.copy(name="strange")
+  println(person11)
+
+  println("이름=${person1.component1()}, 나이=${person1.component2()}")
+
+  val (name, age) = person1
+  println(name, age)
+}
+```
+- data class가 생성해주는 함수
+  - equals
+  - hashCode
+  - toString
+  - copy
+
