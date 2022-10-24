@@ -39,6 +39,7 @@
   - [2. 코틀린 고급](#2-코틀린-고급)
     - [1. 컬렉션 타입](#1-컬렉션-타입)
     - [2. 데이터 클래스](#2-데이터-클래스)
+    - [3. 싱글톤과 동반객체](#3-싱글톤과-동반객체)
 
 
 
@@ -965,3 +966,83 @@ fun main() {
   - toString
   - copy
 
+### 3. 싱글톤과 동반객체
+
+1. 싱글톤 
+- 싱글톤 패턴은 클래스의 인스턴스를 하나의 `단일` 인스턴스로 제한하는 디자인 패턴이다.
+- 싱글톤 패턴을 구현할 때는 몇가지 제약사항을 통해 구현한다
+  - 직접 인스턴스화 하지 못하도록 생성자를 `private`으로 숨긴다
+  - `getInstance()`라는 클래스의 단일 인스턴스를 반환하는 static 메서드를 제공한다
+  - 멀티-스레드 환경에서도 `안전하게` 유일한 인스턴스를 반환해야 한다 
+- 다양한 구현 방법들
+  - DCL (JVM에선 거의 사용X)
+  - Enum 싱글톤 (이펙티브 자바에서 소개)
+  - 이른 초기화(Eager)
+  - 지연 초기화(Lazy)
+- 자바에서 많이 쓰이는 구현 방식
+  - 이른 초기화 (사용하지 않는 객체들도 메모리에 생성되므로 비효율적)
+  - 지연 초기화 (사용하지 않는 객체들은 메모리에 생성안된다)
+
+
+코틀린의 싱글톤 
+```kotlin
+object Singleton {
+
+  val a = 1234
+
+  fun printA() = println(a)
+}
+
+fun main() {
+  println(Singleton.a)
+  Singleton.printA()
+}
+```
+
+```kotlin
+object DatetimeUtils {
+
+  val now : LocalDateTime
+      get() = LocalDateTime.now()
+
+  const val DEFAULT_FORMAT = "YYYY-MM-DD"
+
+  fun same(a: LocalDateTime, b: LocalDateTime) : Boolean {
+    return a == b 
+  }
+}
+
+fun main() {
+  println(DateTimeUtils.now)
+  println(DateTimeUtils.now)
+  println(DateTimeUtils.now)
+
+  println(DateTimeUtils.DEFAULT_FORMAt)
+
+  val now = LocalDateTime.now()
+  println(DatetimeUtils.same(now, now)) // true
+}
+```
+
+
+2. 코틀린의 동반객체 
+```kotlin
+class MyClass {
+  
+  private constructor()
+
+  companion object MyCompanion{
+    val a = 1234
+    
+    fun newInstance() = MyClass()
+  }
+}
+
+fun main() {
+  println(MyClass.a)
+  println(MyClass.newInstance())
+
+  println(MyClass.MyCompanion.a)
+  println(MyClass.MyCompanion.newInstance())
+}
+```
