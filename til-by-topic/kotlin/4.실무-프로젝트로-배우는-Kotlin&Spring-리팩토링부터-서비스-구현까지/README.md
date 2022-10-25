@@ -40,6 +40,7 @@
     - [1. 컬렉션 타입](#1-컬렉션-타입)
     - [2. 데이터 클래스](#2-데이터-클래스)
     - [3. 싱글톤과 동반객체](#3-싱글톤과-동반객체)
+    - [4. 실드 클래스](#4-실드-클래스)
 
 
 
@@ -1046,3 +1047,71 @@ fun main() {
   println(MyClass.MyCompanion.newInstance())
 }
 ```
+
+
+### 4. 실드 클래스 
+- 실드클래스: 하나의 상위클래스 또는 인터페이스에서 하위 클래스에 대한 정의를 제한
+
+```kotlin
+sealed class Developer {
+
+    abstract val name: String
+    abstract fun code(language: String)
+
+}
+
+data class BackendDeveloper(override val name: String) : Developer() {
+
+    override fun code(language: String) {
+        println("저는 백엔드 개발자입니다 ${language}를 사용합니다")
+    }
+}
+
+object OtherDeveloper : Developer() {
+
+    override val name: String = "익명"
+
+    override fun code(language: String) {
+        TODO("Not yet implemented")
+    }
+
+}
+
+data class AndroidDeveloper(override val name: String) : Developer() {
+
+    override fun code(language: String) {
+        println("저는 안드로이드 개발자입니다 ${language}를 사용합니다")
+    }
+}
+
+
+
+object DeveloperPool {
+    val pool = mutableMapOf<String, Developer>()
+
+    fun add(developer: Developer) = when(developer) {
+        is BackendDeveloper -> pool[developer.name] = developer
+        is FrontendDeveloper -> pool[developer.name] = developer
+        is AndroidDeveloper ->  pool[developer.name] = developer
+        is OtherDeveloper -> println("지원하지않는 개발자종류입니다")
+    }
+
+    fun get(name: String) = pool[name]
+}
+
+fun main() {
+    val backendDeveloper = BackendDeveloper(name="토니")
+    DeveloperPool.add(backendDeveloper)
+
+    val androidDeveloper = AndroidDeveloper(name="안드로")
+    DeveloperPool.add(androidDeveloper)
+
+    println(DeveloperPool.get("토니"))
+    println(DeveloperPool.get("안드로"))
+
+
+}
+```
+- 일반 추상클래스를 상속받은 2개의 클래스가 있다면, when절에 2개의 클래스를 정의하고 else를 안적는다면 컴파일 오류가 발생한다. -> 컴파일 단계에서 어떤 클래스를 상속받고 있는지 모른다.
+- sealed class를 상속받은 2개의 클래스가 있다면, when절에 그 2개의 클래스만 정의해도 else를 정의안해도 된다 -> 컴파일 단계에서 어떤 클래스를 상속받고 있는지 알고 있으므로 else가 필요 없다.
+- sealed class를 상속받은 클래스가 추가될 때 마다 컴파일러는 그 추가된 클래스들의 존재를 알기 때문에 when절에 그 추가된 클래스를 추가해주어야 한다.
