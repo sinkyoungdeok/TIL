@@ -41,6 +41,7 @@
     - [2. 데이터 클래스](#2-데이터-클래스)
     - [3. 싱글톤과 동반객체](#3-싱글톤과-동반객체)
     - [4. 실드 클래스](#4-실드-클래스)
+    - [5. 확장 함수](#5-확장-함수)
 
 
 
@@ -1115,3 +1116,58 @@ fun main() {
 - 일반 추상클래스를 상속받은 2개의 클래스가 있다면, when절에 2개의 클래스를 정의하고 else를 안적는다면 컴파일 오류가 발생한다. -> 컴파일 단계에서 어떤 클래스를 상속받고 있는지 모른다.
 - sealed class를 상속받은 2개의 클래스가 있다면, when절에 그 2개의 클래스만 정의해도 else를 정의안해도 된다 -> 컴파일 단계에서 어떤 클래스를 상속받고 있는지 알고 있으므로 else가 필요 없다.
 - sealed class를 상속받은 클래스가 추가될 때 마다 컴파일러는 그 추가된 클래스들의 존재를 알기 때문에 when절에 그 추가된 클래스를 추가해주어야 한다.
+
+
+### 5. 확장 함수 
+
+```kotlin
+fun String.first() : Char {
+  return this[0]
+}
+
+fun String.addFirst(char: Char) : String {
+  return char + this.substring(0)
+}
+
+fun main() {
+  println("ABCD".first())
+
+  println("ABCD".addFirst('Z'))
+}
+```
+- 여기서 this를 리시버 혹은 수신자객체 라고 부른다
+
+
+```kotlin
+class MyExample {
+  fun printMessage() = println("클래스 출력")
+}
+
+fun MyExample.printMessage() = println("확장 출력") // 이미 멤버 함수가 있으므로 무시됨
+
+fun main() {
+  MyExample().printMessage() // 클래스 출력
+}
+```
+- 확장함수 주의점
+  - 확장하는 클래스의 동일한 명칭의 함수가 존재할 경우 클래스의 멤버 함수가 우선되는 규칙이 있다.
+  - 그래서 동일한 시그니처가 있는지 확인해봐야 한다.
+
+
+
+```kotlin
+fun MyExample?.printNullOrNotNull() {
+  if (this == null) println("널인 경우에만 출력")
+  else println("널이 아닌 경우에만 출력")
+}
+
+fun main() {
+  var myExample: MyExample? = null
+  myExample.printNullOrNotNull() // 널인 경우에만 출력
+
+  myExample = MyExample()
+  myExample.printNullOrNotNull() // 널이 아닌 경우에만 출력
+}
+```
+- 위 예제에서는 안전 연산자(?)를 안써도 에러가 안뜬다.
+- 왜냐하면 null인 케이스에 대해서도 다루고 있다는것을 컴파일러가 알기 때문에 NPE가 발생하지 않는것을 알고 있으므로 컴파일 에러가 생기지 않는다 
