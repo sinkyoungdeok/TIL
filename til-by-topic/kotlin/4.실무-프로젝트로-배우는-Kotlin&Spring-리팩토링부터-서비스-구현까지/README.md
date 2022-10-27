@@ -42,6 +42,7 @@
     - [3. 싱글톤과 동반객체](#3-싱글톤과-동반객체)
     - [4. 실드 클래스](#4-실드-클래스)
     - [5. 확장 함수](#5-확장-함수)
+    - [6. 제네릭](#6-제네릭)
 
 
 
@@ -1171,3 +1172,71 @@ fun main() {
 ```
 - 위 예제에서는 안전 연산자(?)를 안써도 에러가 안뜬다.
 - 왜냐하면 null인 케이스에 대해서도 다루고 있다는것을 컴파일러가 알기 때문에 NPE가 발생하지 않는것을 알고 있으므로 컴파일 에러가 생기지 않는다 
+
+
+### 6. 제네릭
+
+```kotlin
+class MyGenerics<T>(val t: T) {
+  
+}
+
+fun main() {
+  // 제네릭을 사용한 클래스의 인스턴스를 만들려면 타입아규먼트를 제공
+  val generics = MyGenerics<String>("테스트")
+
+  // 타입 아규먼트 생략 가능
+  val generics = MyGenerics("테스트")
+
+  // 변수의 타입에 제네릭을 사용한 경우 
+  val list1: MutableList<String> = mutableListOf()
+  // 타입아규먼트를 생성자에서 추가
+  val list2 = mutableListOf<String>()
+
+  // *를 사용하면 어떤 타입이든 올 수 있다.
+  val list3 : List<*> = listOf<String>("테스트")
+  val list4 : List<*> = listOf<String>(1,2,3,4)
+}
+```
+
+
+
+- 변성
+  - 공변성은 자바 제네릭의 extends, 코틀린에선 out
+  - 반공변성은 자바 제네릭의 super, 코틀린에선 in 
+
+```kotlin
+class MyGenerics<out T>(val t: T) {
+
+}
+
+fun main() {
+  val generics = MyGenerics<String>("테스트")
+  val charGenerics : MyGenerics<CharSequence> = generics
+}
+```
+- CharSequence가 부모, String 클래스가 자식 클래스이다.
+- 위 예제는 공변성에 대한 예제이다.
+- CharSequence에 generics를 할당하려면 Mygenerics타입에 out키워드를 추가해야한다.
+- 추가하지 않으면 컴파일 오류가 발생한다 
+
+
+```kotlin
+class Bag<T> {
+  
+  fun saveAll(
+    to: MutableList<in T>,
+    from: MutableList<T>,
+  ) {
+    to.addAll(from)
+  }
+}
+
+fun main() {
+  val bag = Bag<String>()
+  bag.saveAll(mutableListOf<CharSequence>("1","2"), mutableListOf<String>("3","4"))
+  
+}
+```
+- 위 예제는 반공변성 예쩨이다.
+- saveAll함수의 to쪽에 in키워드를 추가하지 않으면 컴파일 오류가 발생한다.
