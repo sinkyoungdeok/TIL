@@ -43,6 +43,7 @@
     - [4. 실드 클래스](#4-실드-클래스)
     - [5. 확장 함수](#5-확장-함수)
     - [6. 제네릭](#6-제네릭)
+    - [7. 지연 초기화](#7-지연-초기화)
 
 
 
@@ -1240,3 +1241,56 @@ fun main() {
 ```
 - 위 예제는 반공변성 예쩨이다.
 - saveAll함수의 to쪽에 in키워드를 추가하지 않으면 컴파일 오류가 발생한다.
+
+
+### 7. 지연 초기화 
+
+- 지연초기화는 많은 상황에서 쓰이고 있다.
+  - 웹페이지에서 특정 스크롤에 도달했을 때 컨텐츠를 보여주는 무한 스크롤
+  - 싱글톤 패턴의 지연초기화 
+  - JPA의 엔티티 LazyLoading 기능
+
+
+코틀린은 두가지 다른 방식의 지연초기화를 제공한다
+
+1. 코틀린의 by lazy
+
+```kotlin
+class HelloBot {
+
+  val greeting: String by lazy { getHello() }
+  
+  fun sayHello() = println(greeting)
+}
+
+fun getHello() = "안녕하세요"
+
+fun main() {
+  val helloBot = HelloBot()
+
+  helloBot.sayHello()
+}
+```
+- var에서는 by lazy를 사용할 수 없다.
+- val변수에서만 사용할 수 있다.
+- by lazy 안에 로직은 정확히 딱 한번만 수행된다.
+- by lazy는 기본적으로 멀티쓰레드에서도 안전하게 동작하도록 설계되었다.
+
+
+2. 코틀린의 lateinit
+```kotlin
+class Test {
+  lateinit var text: String
+
+  fun printText() {
+    if (this::text.isInitialized) { 
+      println("초기화됨")
+    } else {
+      text = "안녕하세요"
+    }
+    println(text)
+  }
+}
+```
+- lateinit은 val에선 사용하지못하고, var에서만 사용할 수 있다.
+- 클래스 외부에서는 isInitialized를 사용할 수 없다.
