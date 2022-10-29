@@ -44,6 +44,7 @@
     - [5. 확장 함수](#5-확장-함수)
     - [6. 제네릭](#6-제네릭)
     - [7. 지연 초기화](#7-지연-초기화)
+    - [8. 페어와 구조분해할당](#8-페어와-구조분해할당)
 
 
 
@@ -1294,3 +1295,23 @@ class Test {
 ```
 - lateinit은 val에선 사용하지못하고, var에서만 사용할 수 있다.
 - 클래스 외부에서는 isInitialized를 사용할 수 없다.
+
+
+### 8. 페어와 구조분해할당
+
+```kotlin
+// data class Tuple(val a : Int, val b : Int)
+
+// fun plus(tuple: Tuple) = tuple.a + tuple.b
+fun plus(pair: Pair<Int,Int>) = pair.first + pair.second
+fun plus(triple: Triple<Int,Int,Int>) = triple.first + triple.second + triple.third
+```
+- 코틀린에서 pair와 triple을 사용할 수 있다.
+
+
+```kotlin
+fun main() { 
+  val (a,b,c) = Triple(1,2,3)
+}
+```
+- 구조 분해 할당을 사용하면, 값을 분해해서 한번에 여러개의 변수를 초기화 할 수 있다. 
