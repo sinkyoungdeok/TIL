@@ -45,6 +45,7 @@
     - [6. 제네릭](#6-제네릭)
     - [7. 지연 초기화](#7-지연-초기화)
     - [8. 페어와 구조분해할당](#8-페어와-구조분해할당)
+    - [9. 스코프 함수](#9-스코프-함수)
 
 
 
@@ -1315,3 +1316,141 @@ fun main() {
 }
 ```
 - 구조 분해 할당을 사용하면, 값을 분해해서 한번에 여러개의 변수를 초기화 할 수 있다. 
+
+### 9. 스코프 함수
+
+스코프 함수란
+- 코틀린의 표준 라이브러리에는 객체의 컨텍스트 내에서 코드 블록을 실행하기 위해서만 존재하는 몇가지 함수가 포함되어 있는데 이것을 `스코프함수`라고 한다
+- 스포크 함수를 제대로 사용하면 불필요한 변수 선언이 없어지며 코드를 더 간결하고 읽기 쉽게 만든다
+- 스코프 함수의 코드 블록 내부에서는 변수명을 사용하지 않고도 수신자 객체에 접근할 수 있기 때문에 객체에 접근할 수 있다.
+- 수신자 객체는 람다식 내부에서 사용할 수 있는 객체의 참조이다
+- 스코프 함수를 사용하면 수신자 객체에 대한 참조로 `this` 또는 `it` 를 사용한다
+
+
+스코프 함수들의 특징
+
+| 함수명 | 수신자 객체 참조 방법 | 반환 값 | 확장 함수 여부 |
+| --- | --- | --- | --- |
+| let | it | 함수의 결과 | O |
+| run | this | 함수의 결과 | O |
+| with | this | 함수의 결과 | X |
+| apply | this | 컨텍스트 객체 | O |
+| also | it | 컨텍스트 객체 | O | 
+
+
+
+let 예제
+```kotlin
+fun main() {
+  val str: String? = null
+  
+  val result = str?.let {
+    println(it)
+
+    1234
+  }
+
+  println(result)
+}
+```
+- null 가능한 변수에 대해서 동작시킬 때 주로 사용 
+
+
+run 예제 
+```kotlin
+class DatabaseClient {
+    var url: String? = null
+    var username: String? = null
+    var password: String? = null
+
+    // DB에 접속하고 Boolean 결과를 반환
+    fun connect(): Boolean {
+        println("DB 접속 중 ...")
+        Thread.sleep(1000)
+        println("DB 접속 완료")
+        return true
+    }
+}
+
+fun main() {
+
+//    val config = DatabaseClient()
+//    config.url = "localhost:3306"
+//    config.username = "mysql"
+//    config.password = "1234"
+//    val connected = config.connect()
+
+    val connected: Boolean = DatabaseClient().run {
+        this.url = "localhost:3306"
+        username = "mysql"
+        password = "1234"
+        connect()
+    }
+    println(connected)
+}
+```
+- 수신객체에 프로퍼티를 구성하거나, 새로운 결과를 반환할 때 사용 
+- let으로도 대체 가능하지만, 프로퍼티에 접근하기위해서 it를 반복적으로 추가해주어야 한다.
+
+
+with 예제
+```kotlin
+fun main() {
+  
+  val str = "hi"
+  
+  val leng = with(str) {
+    length
+  }
+
+  println(leng)
+}
+```
+- 결과 반환 없이 내부에서 수신 객체를 사용해서 다른 함수를 호출하고 싶을 때 사용 
+- run을 대체할 수도 있다.
+
+
+apply 예제
+```kotlin
+fun main() {
+
+  val client: DatabaseClient = DatabaseClient().apply {
+        this.url = "localhost:3306"
+        username = "mysql"
+        password = "1234"
+        connect()
+    }
+
+    client.connect().run { println(this) }
+}
+```
+- 수신객체 프로퍼티를 구성하고, 수신 객체 결과를 그대로 반환할 때 사용 
+
+
+also 예제
+```kotlin
+class User(val name: String, val password: String) {
+
+    fun validate() {
+        if (name.isNotEmpty() && password.isNotEmpty()) {
+            println("검증 성공!")
+        } else {
+            println("검증 실패!")
+        }
+    }
+
+    fun printName() = println(name)
+
+}
+
+fun main() {
+
+    User(name = "tony", password = "1234").also {
+        it.validate()
+        it.printName()
+    }
+}
+```
+- 부수작업을 수행하거나, 전달받은 수신 객체를 그대로 반환할 때 사용
+
+
