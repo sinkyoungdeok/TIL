@@ -46,6 +46,7 @@
     - [7. 지연 초기화](#7-지연-초기화)
     - [8. 페어와 구조분해할당](#8-페어와-구조분해할당)
     - [9. 스코프 함수](#9-스코프-함수)
+    - [10. 고급 예외처리](#10-고급-예외처리)
 
 
 
@@ -1454,3 +1455,26 @@ fun main() {
 - 부수작업을 수행하거나, 전달받은 수신 객체를 그대로 반환할 때 사용
 
 
+### 10. 고급 예외처리
+
+1. use 
+```kotlin
+fun main() {
+  FileWriter("test.txt")
+    .use {
+      it.write("Hello world")
+    }
+}
+```
+
+2. runCatching
+```kotlin
+fun getStr(): Nothing = throw Exception("test")
+fun main() {
+  val result = runCatching { getStr() }
+    .getOrElse { println(it.message) "기본값" }
+    
+  println(result)
+}
+```
+- runCatching은 try catch를 사용하는것이랑 동일한 동작을 해준다
