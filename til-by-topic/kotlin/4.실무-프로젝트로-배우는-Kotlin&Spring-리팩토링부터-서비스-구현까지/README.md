@@ -47,6 +47,7 @@
     - [8. 페어와 구조분해할당](#8-페어와-구조분해할당)
     - [9. 스코프 함수](#9-스코프-함수)
     - [10. 고급 예외처리](#10-고급-예외처리)
+    - [11. 람다로 프로그래밍하기](#11-람다로-프로그래밍하기)
 
 
 
@@ -1478,3 +1479,134 @@ fun main() {
 }
 ```
 - runCatching은 try catch를 사용하는것이랑 동일한 동작을 해준다
+
+
+### 11. 람다로 프로그래밍하기
+
+```kotlin
+fun main() {
+  
+  val list = mutableListOf(printHello) // 일반 함수는 넣을 수 없다.
+
+  val func = list[0]
+  func()
+  // list[0]()
+
+  call(printHello) // 일반 함수는 넣을 수 없다.
+}
+val printHello : () -> Unit = { println("hello")}
+
+fun call(block: () -> Unit) {
+  block()
+}
+
+val printMessage: (String) -> Unit = { println(it) }
+
+val plus: (Int, Int) -> Int = { a,b -> a + b}
+```
+
+
+고차 함수 예시
+```kotlin
+fun main() {
+  val list = listOf("a", "b", "c")
+  val printStr : (String) -> Unit = { println(it) }
+  forEachStr(list, printStr)
+
+  list.forEach (printStr) // forEach도 고차함수다.
+}
+
+fun forEachStr(collection:Collection<String>, action: (String) -> Unit) {
+  for (item in collection) {
+    action(item)
+  }
+}
+```
+- 함수를 인자로 받아서 별도 처리하는것을 고차함수라고 한다.
+- forEach도 고차함수다.
+
+
+익명 함수
+```kotlin
+fun main() {
+  outerFunc()()
+}
+
+fun outerFunc() : () -> Unit {
+
+  return fun() {
+    println("익명함수")
+  }
+}
+```
+- 이름없는 함수를 익명함수라고 한다
+
+
+람다 함수
+```kotlin
+fun main() {
+  outerFunc()()
+}
+
+fun outerFunc() : () -> Unit {
+  return { println("람다함수") }
+}
+
+fun outerFunc2() : () -> Unit = { println("람다함수") }
+
+fun sum: (Int, Int) -> Int = { x: Int, y: Int -> x + y }
+
+fun sum2 = {x: Int, y: Int -> x + y }
+```
+- 익명함수와 비슷한데 함수 블록만 선언한것을 람다함수라고 한다.
+
+
+후행 람다 
+```kotlin
+fun main() {
+  val list = listOf("a", "b", "c")
+  val printStr : (String) -> Unit = { println(it) }
+  // forEachStr(list, printStr)
+
+  forEachStr(list) {
+    printStr
+  }
+  
+  forEachStr(list) {
+    println(it.length)
+  }
+}
+
+fun forEachStr(collection:Collection<String>, action: (String) -> Unit) {
+  for (item in collection) {
+    action(item)
+  }
+}
+```
+- 람다의 마지막 인자가 함수일 때 사용할 수 있다.
+
+
+람다 레퍼런스 
+```kotlin
+fun main() {
+
+  val callReference : () -> Unit = { printHello() }
+  val callReference2 = ::printHello
+  
+  callReference()()
+}
+
+val printHello : () -> Unit = { println("hello")}
+```
+
+람다 레퍼런스2
+```kotlin
+fun main() { 
+  val numberList = list("1", "2", "3")
+  
+  numberList.map { it.toInt() }.forEach { println(it) }
+  numberList.map(String::toInt).forEach(::println) // 람다 레퍼런스
+}
+```
+
+다양한 함수형 프로그래밍의 함수들을 사용하고 싶다면, `Arrow` 라는 라이브러리를 사용해보자. 
