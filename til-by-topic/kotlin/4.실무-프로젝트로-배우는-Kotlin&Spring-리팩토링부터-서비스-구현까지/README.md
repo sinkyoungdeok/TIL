@@ -48,6 +48,8 @@
     - [9. 스코프 함수](#9-스코프-함수)
     - [10. 고급 예외처리](#10-고급-예외처리)
     - [11. 람다로 프로그래밍하기](#11-람다로-프로그래밍하기)
+- [3. 자바 프로젝트에 코틀린 도입해보기](#3-자바-프로젝트에-코틀린-도입해보기)
+    - [1. 게터, 세터 호출하기](#1-게터-세터-호출하기)
 
 
 
@@ -1610,3 +1612,36 @@ fun main() {
 ```
 
 다양한 함수형 프로그래밍의 함수들을 사용하고 싶다면, `Arrow` 라는 라이브러리를 사용해보자. 
+
+
+# 3. 자바 프로젝트에 코틀린 도입해보기
+
+### 1. 게터, 세터 호출하기
+
+```kotlin
+class Student {
+  
+  var name: String? = null
+
+  var birthDate: LocalDate? = null
+
+  val age : Int = 10 
+
+  val grade: String? = null
+    private set
+}
+
+fun main() {
+
+  // 자바 스타일 
+  val student = Student()
+  student.setName("토니스타크")
+  println(student.getName())
+  
+  // 코틀린 스타일
+  val student2 = Student()
+  student2.name = "토니스타크"
+
+  println(student2.name)
+}
+```
