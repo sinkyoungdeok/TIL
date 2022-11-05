@@ -6,8 +6,6 @@ plugins {
     kotlin("jvm") version "1.6.21"
     kotlin("plugin.spring") version "1.6.21"
     kotlin("plugin.jpa") version "1.6.21"
-
-    kotlin("kapt") version "1.6.21"
 }
 
 java.sourceCompatibility = JavaVersion.VERSION_17
@@ -19,13 +17,13 @@ allprojects {
     repositories {
         mavenCentral()
     }
+
 }
 
 subprojects {
     apply(plugin = "kotlin")
     apply(plugin = "kotlin-spring")
     apply(plugin = "io.spring.dependency-management")
-    apply(plugin = "kotlin-kapt")
 
     dependencies {
         // JWT 인증
@@ -37,13 +35,14 @@ subprojects {
         // Kotlin
         implementation("org.jetbrains.kotlin:kotlin-reflect")
         implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
-        implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 
-        // H2DB
+        // h2
         runtimeOnly("com.h2database:h2")
 
+        implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
         testImplementation("org.springframework.boot:spring-boot-starter-test")
     }
+
 
     dependencyManagement {
         imports {
