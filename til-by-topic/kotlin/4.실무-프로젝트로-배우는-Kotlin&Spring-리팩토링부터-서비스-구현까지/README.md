@@ -53,6 +53,7 @@
 - [4. 코틀린&스프링 MVC](#4-코틀린스프링-mvc)
     - [1. 요구사항 분석](#1-요구사항-분석)
     - [2. 프로젝트 구성하기](#2-프로젝트-구성하기)
+    - [3. API 스펙 정의](#3-api-스펙-정의)
 
 
 
@@ -1664,4 +1665,233 @@ fun main() {
 ### 2. 프로젝트 구성하기
 ```
 ./TIL/til-by-topic/kotlin/4.실무-프로젝트로-배우는-Kotlin&Spring-리팩토링부터-서비스-구현까지/4.kotlin_spring_mvc
+```
+
+
+### 3. API 스펙 정의 
+
+1. 이슈 목록 조회 API
+
+- 메인 페이지에는 상태에 따라 할일, 진행중, 완료 세가지 탭이 존재
+- 기본 상태는 할일이고 탭을 눌렀을 때 상태별 `이슈 목록 API`를 조회한다
+
+요청
+```
+GET {host}/api/v1/issues?status=TODO
+```
+
+요청 파라미터
+- status: `TODO(기본값)`, `IS_PROGRESS`, `RESOLVED`
+
+응답 
+```
+200 OK
+
+[
+  {
+    "id": 1,
+    "comments": [
+      {
+        "id": 1,
+        "issueId": 1,
+        "userId": 1,
+        "body": "이것은 댓글입니다",
+        "username": "kd"
+      }
+    ],
+    "summary": 테스트",
+    "description": "설명",
+    "userId": 1,
+    "type": "TASK",
+    "priority": "LOW",
+    "status": "TODO",
+    "createdAt": "2022-11-06 00:16:42",
+    "updatedAt": "2022-11-06 00:16:42"
+  }
+]
+```
+- type: `BUG`, `TASK`
+- priority: `LOW`, `MEDIUM`, `HIGH`
+- status: `TODO`, `IN_PROGRESS`, `RESOLVED`
+
+2. 이슈 등록 
+- 이슈 등록 모달에선 이슈를 생성하는데 필요한 데이터를 입력받아 이슈 등록 API를 호출한다
+
+요청
+```
+POST {host}/api/v1/issues
+```
+
+요청 본문
+```
+{
+  "summary": "test",
+  "description": "설명",
+  "userId": 1,
+  "type": "TASK",
+  "priority": "LOW",
+  "status": "TODO"
+}
+```
+
+응답
+```
+200 OK
+
+{
+  "id": 1,
+  "comments": [],
+  "description": "설명",
+  "userId": 1,
+  "type": "TASK",
+  "priority": "LOW",
+  "createdAt": "2022-11-06 00:16:42",
+  "updatedAt": "2022-11-06 00:16:42"
+}
+```
+
+3. 이슈 상세 조회 API
+- 이슈 상세를 눌렀을 때 선택된 `이슈 상세 조회 API`를 호출한다
+
+```
+GET {host}/api/v1/issues/{issueId}
+```
+
+응답
+```
+200 OK
+
+{
+  "id": 1,
+  "comments": [
+    {
+      "id": 1,
+      "issueId": 1,
+      "userId": 1,
+      "body": "이것은 댓글입니다",
+      "username": "kd"
+    }
+  ]
+  "summary": "test",
+  "description": "설명",
+  "userId": 1,
+  "type": "TASK",
+  "priority": "LOW",
+  "status": "TODO"
+}
+```
+
+4. 이슈 수정 API
+- 저장 버튼을 눌렀을 때 변경된 데이터로 `이슈 수정 API`를 호출한다
+
+```
+PUT {host}/api/v1/issues/{issueId}
+```
+
+요청 본문
+```
+{
+  "summary": 변경된 제목",
+  "description": "바뀐 설명",
+  "type": "BUG",
+  "priority": "HIGH",
+  "status": "TODO"
+}
+```
+
+응답 
+```
+200 OK
+
+{
+  "id": 1,
+  "comments": [],
+  "summary": "변경된 제목",
+  "description": "바뀐 설명",
+  "type": "BUG",
+  "priority": "HIGH",
+  "status": "TODO",
+  "createdAt": "2022-11-06 00:16:42",
+  "updatedAt": "2022-11-06 00:17:10"
+}
+```
+
+5. 이슈 삭제 API
+- 삭제 버튼을 누르면 `이슈 삭제 API`를 호출 
+
+요청
+```
+DELETE {host}/api/v1/issues/{issueId}
+```
+
+응답 
+```
+204 No Content
+```
+
+6. 코멘트 등록 API
+- 댓글 입력 후 엔터를 누르면 `코멘트 등록 API`를 호출한다
+
+코멘트 등록 API
+```
+POST {host}/api/v1/issues/{issueId}/comments
+```
+
+요청 본문
+```
+{
+  "body": "이것은 댓글입니다"
+}
+```
+
+응답
+```
+200 OK
+
+{
+  "id": 1,
+  "issueId": 1,
+  "userId": 1,
+  "body": "이것은 댓글입니다"
+}
+```
+
+7. 코멘트 수정 API
+- 댓글 수정 버튼을 누르면 댓글을 수정할 수 있고 엔터를 누르면 `코멘트 수정 API`를 호출한다
+
+요청
+```
+PUT {host}/api/v1/issues/{issueId}/comments/{commentId}
+```
+
+요청 본문 
+```
+{
+  "body": "수정된 댓글입니다"
+}
+```
+
+응답
+```
+200 OK
+
+{
+  "id": 1,
+  "issueId": 1,
+  "userId": 1,
+  "body": "수정된 댓글입니다"
+}
+```
+
+8. 코멘트 삭제 API
+- 댓글 삭제 버튼을 누르면 `코멘트 삭제 API`를 호출한다
+
+코멘트 삭제 API
+```
+DELETE {host}/api/v1/issue/{issueId}/comments/{commentId}
+```
+
+응답
+```
+204 No Content
 ```
