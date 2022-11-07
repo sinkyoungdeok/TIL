@@ -11,7 +11,7 @@ plugins {
 java.sourceCompatibility = JavaVersion.VERSION_17
 
 allprojects {
-    group = "com.kdsin"
+    group = "com.com.kdsin"
     version = "0.0.1-SNAPSHOT"
 
     repositories {

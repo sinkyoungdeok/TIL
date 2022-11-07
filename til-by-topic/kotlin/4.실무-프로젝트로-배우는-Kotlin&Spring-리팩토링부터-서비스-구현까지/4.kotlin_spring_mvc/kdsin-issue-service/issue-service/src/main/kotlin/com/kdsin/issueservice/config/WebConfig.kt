@@ -1,4 +1,4 @@
-package kdsin.issueservice.config
+package com.kdsin.issueservice.config
 
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.MethodParameter

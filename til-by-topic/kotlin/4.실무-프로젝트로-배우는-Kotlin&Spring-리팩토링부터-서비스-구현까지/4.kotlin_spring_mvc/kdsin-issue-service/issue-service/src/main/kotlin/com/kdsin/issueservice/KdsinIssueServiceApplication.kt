@@ -1,4 +1,4 @@
-package kdsin.issueservice
+package com.kdsin.issueservice
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication

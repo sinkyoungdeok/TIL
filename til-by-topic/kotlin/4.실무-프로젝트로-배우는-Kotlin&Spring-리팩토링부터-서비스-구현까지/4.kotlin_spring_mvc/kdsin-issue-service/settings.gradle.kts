@@ -1,2 +1,2 @@
-rootProject.name = "kdsin-issue-service"
+rootProject.name = "com.kdsin-issue-service"
 include("issue-service")
