@@ -55,6 +55,7 @@
     - [2. 프로젝트 구성하기](#2-프로젝트-구성하기)
     - [3. API 스펙 정의](#3-api-스펙-정의)
     - [4. 공통 에러 처리](#4-공통-에러-처리)
+    - [5. 이슈 등록 ~](#5-이슈-등록-)
 
 
 
@@ -1900,4 +1901,9 @@ DELETE {host}/api/v1/issue/{issueId}/comments/{commentId}
 ### 4. 공통 에러 처리 
 ```
 /TIL/til-by-topic/kotlin/4.실무-프로젝트로-배우는-Kotlin&Spring-리팩토링부터-서비스-구현까지/4.kotlin_spring_mvc/kdsin-issue-service/issue-service/src/main/kotlin/com/kdsin/issueservice/exception/...
+```
+
+### 5. 이슈 등록 ~
+```
+/TIL/til-by-topic/kotlin/4.실무-프로젝트로-배우는-Kotlin&Spring-리팩토링부터-서비스-구현까지/4.kotlin_spring_mvc/kdsin-issue-service/issue-service/src/main/kotlin/com/kdsin/issueservice/...
 ```
