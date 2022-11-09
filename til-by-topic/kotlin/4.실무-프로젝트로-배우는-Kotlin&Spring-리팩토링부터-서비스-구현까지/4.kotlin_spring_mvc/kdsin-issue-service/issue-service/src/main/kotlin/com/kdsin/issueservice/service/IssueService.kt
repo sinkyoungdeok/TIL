@@ -2,13 +2,14 @@ package com.kdsin.issueservice.service
 
 import com.kdsin.issueservice.domain.Issue
 import com.kdsin.issueservice.domain.IssueRepository
+import com.kdsin.issueservice.domain.enums.IssueStatus
 import com.kdsin.issueservice.model.IssueRequest
 import com.kdsin.issueservice.model.IssueResponse
 import org.springframework.stereotype.Service
-import javax.transaction.Transactional
+import org.springframework.transaction.annotation.Transactional
 
 @Service
-class IssueService (
+class IssueService(
     private val issueRepository: IssueRepository,
 ) {
 
@@ -26,4 +27,9 @@ class IssueService (
 
         return IssueResponse(issueRepository.save(issue))
     }
+
+    @Transactional(readOnly = true)
+    fun getAll(status: IssueStatus) =
+        issueRepository.findAllByStatusOrderByCreatedAtDesc(status)
+            ?.map { IssueResponse(it) }
 }
