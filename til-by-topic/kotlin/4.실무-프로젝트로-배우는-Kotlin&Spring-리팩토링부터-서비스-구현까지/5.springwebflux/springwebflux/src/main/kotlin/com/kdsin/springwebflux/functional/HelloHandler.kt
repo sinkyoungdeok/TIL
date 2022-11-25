@@ -1,4 +1,4 @@
-package com.kdsin.springwebflux
+package com.kdsin.springwebflux.functional
 
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.server.ServerRequest

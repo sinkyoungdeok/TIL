@@ -1,4 +1,4 @@
-package com.kdsin.springwebflux
+package com.kdsin.springwebflux.functional
 
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration

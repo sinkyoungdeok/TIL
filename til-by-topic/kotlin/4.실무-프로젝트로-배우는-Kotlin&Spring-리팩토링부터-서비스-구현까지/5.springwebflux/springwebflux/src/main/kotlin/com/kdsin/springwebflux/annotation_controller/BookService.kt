@@ -1,4 +1,4 @@
-package com.kdsin.springwebflux
+package com.kdsin.springwebflux.annotation_controller
 
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Flux
