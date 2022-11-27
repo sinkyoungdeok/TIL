@@ -77,6 +77,9 @@
     - [1. 스프링 Webflux](#1-스프링-webflux)
       - [1. 프로젝트 리액터](#1-프로젝트-리액터)
       - [2. 스프링 WebFlux와 스프링 MVC 비교](#2-스프링-webflux와-스프링-mvc-비교)
+    - [2. 함수형 엔드포인트](#2-함수형-엔드포인트)
+    - [3. 애노테이션 컨트롤러](#3-애노테이션-컨트롤러)
+    - [4. 웹 클라이언트](#4-웹-클라이언트)
 
 
 
@@ -2100,3 +2103,20 @@ val blockingWrapper = Mono.fromCallable {
 ```
 - 스프링 MVC에서도 리액터와 Webflux 의존성을 추가하여 리액티브 코드와 논블로킹 라이브러리를 사용할 수 있음 
 
+### 2. 함수형 엔드포인트 
+
+```
+./til-by-topic/kotlin/4.실무-프로젝트로-배우는-Kotlin&Spring-리팩토링부터-서비스-구현까지/5.springwebflux/springwebflux/src/main/kotlin/com/kdsin/springwebflux/functional
+```
+
+### 3. 애노테이션 컨트롤러 
+
+```
+./til-by-topic/kotlin/4.실무-프로젝트로-배우는-Kotlin&Spring-리팩토링부터-서비스-구현까지/5.springwebflux/springwebflux/src/main/kotlin/com/kdsin/springwebflux/annotation_controller
+```
+
+### 4. 웹 클라이언트
+
+```
+./til-by-topic/kotlin/4.실무-프로젝트로-배우는-Kotlin&Spring-리팩토링부터-서비스-구현까지/5.springwebflux/springwebflux/src/main/kotlin/com/kdsin/springwebflux/webclient
+```
