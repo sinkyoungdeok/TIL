@@ -80,6 +80,11 @@
     - [2. 함수형 엔드포인트](#2-함수형-엔드포인트)
     - [3. 애노테이션 컨트롤러](#3-애노테이션-컨트롤러)
     - [4. 웹 클라이언트](#4-웹-클라이언트)
+    - [5. 스프링 데이터 R2DBC](#5-스프링-데이터-r2dbc)
+        - [1.1 R2DBC 이전](#11-r2dbc-이전)
+        - [1.2 R2DBC](#12-r2dbc)
+      - [2. 스프링 데이터 R2DBC](#2-스프링-데이터-r2dbc)
+        - [2.1 ReactiveCrudRepository 살펴보기](#21-reactivecrudrepository-살펴보기)
 
 
 
@@ -2120,3 +2125,48 @@ val blockingWrapper = Mono.fromCallable {
 ```
 ./til-by-topic/kotlin/4.실무-프로젝트로-배우는-Kotlin&Spring-리팩토링부터-서비스-구현까지/5.springwebflux/springwebflux/src/main/kotlin/com/kdsin/springwebflux/webclient
 ```
+
+### 5. 스프링 데이터 R2DBC
+
+##### 1.1 R2DBC 이전 
+- 전통적인 방식의 `JDBC` 드라이버는 하나의 커넥션에 하나의 스레드를 사용하는 `Thread Per Connection` 방식
+- Thread per Connection 방식은 데이터베이스로부터 응답을 받기 전까지 스레드는 블로킹 됨
+- 높은 처리량과 대규모 애플리케이션을 위해 비동기-논블로킹 데이터베이스 API에 대한 요구가 생김
+- 애플리케이션 로직이 비동기-논블로킹 이더라도 DB 드라이버가 JDBC라면 필연적으로 블로킹이 발생하므로 100% 비동기-논블로킹의 성능을 내기 어려웠음
+- JPA, Mybatis 둘다 `JDBC` 드라이버를 사용한다
+- 오라클의 `ADBA` 프로젝트가 표준화 진행 중 지원 종료 됨 
+
+##### 1.2 R2DBC
+- `R2DBC`는 빠르게 성장 중인 리액티브 기반의 비동기-논블로킹 데이터베이스 드라이버
+- 다양한 데이터베이스를 지원한다 
+  - Oracle
+  - Postgres
+  - H2
+  - MSSQL
+  - Google Spanner
+  - MariaDB
+- 리액티브 스트림 구현체인 Porject Reactor, RxJava 등을 지원 
+```java
+connection.createStatement("SELECT * FROM employess")
+    .execute()
+    .flatMap(r -> r.map((row, metadata) -> {
+    Employee emp = new Employee();
+    emp.setId(row.get("emp_id", Integer.class));
+    emp.setName(row.get("name", String.class));
+    emp.setPosition(row.get("position", String.class));
+    emp.setSalary(row.get("salary", Double.class));
+    return emp;
+    }))
+    .close()
+    .subscribe();
+```
+
+#### 2. 스프링 데이터 R2DBC
+- R2DBC 기바의 스프링 데이터 프로젝트
+- 스프링 데이터 프로젝트이므로 스프링 애플리케이션에 쉽게 통합할 수 있으며 스프링 데이터 JPA, 스프링 데이터 몽고DB 같은 프로젝트처럼 뛰어난 추상화를 제공
+- 스프링 WebFlux와 스프링 데이터 R2DBC를 같이 사용하면 전 구간 비동기-논블로킹 애플리케이션을 구현할 수 있다
+- 많은 ORM(JPA)에서 제공하는 LazyLoading, Dirty-checking, Cache 등을 지원하지 않으므로 ORM으로써의 기능은 적지만 오히려 더 심플하게 사용할 수 있음 
+
+##### 2.1 ReactiveCrudRepository 살펴보기 
+- `ReactiveCRUDRepository`는 리액티브를 지원하는 CRUD 인터페이스
+- 모든 반환 타입이 Mono, Flux 같은 리액터의 Publisher인 것을 확인할 수 있다
