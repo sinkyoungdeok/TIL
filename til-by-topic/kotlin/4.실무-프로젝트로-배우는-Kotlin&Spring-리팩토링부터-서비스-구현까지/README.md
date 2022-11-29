@@ -85,6 +85,9 @@
         - [1.2 R2DBC](#12-r2dbc)
       - [2. 스프링 데이터 R2DBC](#2-스프링-데이터-r2dbc)
         - [2.1 ReactiveCrudRepository 살펴보기](#21-reactivecrudrepository-살펴보기)
+    - [6. 스프링 WebFlux의 코루틴 지원](#6-스프링-webflux의-코루틴-지원)
+      - [1. 코루틴](#1-코루틴)
+      - [2. 스프링 WebFlux의 코루틴 지원](#2-스프링-webflux의-코루틴-지원)
 
 
 
@@ -2170,3 +2173,110 @@ connection.createStatement("SELECT * FROM employess")
 ##### 2.1 ReactiveCrudRepository 살펴보기 
 - `ReactiveCRUDRepository`는 리액티브를 지원하는 CRUD 인터페이스
 - 모든 반환 타입이 Mono, Flux 같은 리액터의 Publisher인 것을 확인할 수 있다
+
+### 6. 스프링 WebFlux의 코루틴 지원
+
+#### 1. 코루틴 
+- 코틀린에서 비동기-논블로킹 프로그래밍을 명령형 스타일로 작성할 수 있도록 도와주는 라이브러리
+- 코루틴은 멀티 플랫폼을 지원하여 코틀린을 사용하는 안드로이드, 서버 등 여러 환경에서 사용 가능
+- 일시 중단 가능한 함수(suspend function) 를 통해 스레드가 실행을 잠시 중단했다가 중단한 지점부터 다시 재개(resume) 할 수 있다.
+
+```kotlin
+suspend fun combineApi() = coroutineScope {
+  val response1 = async { getApi1() }
+  val response2 = async { getApi2() }
+
+  return ApiResult {
+    response1.await()
+    response2.await()
+  }
+}
+```
+
+#### 2. 스프링 WebFlux의 코루틴 지원
+- 스프링 MVC, 스프링 WebFlux 모두 코루틴을 지원하여 의존성만 추가하면 바로 사용 가능
+- 아래 의존성을 build.gradle.kts에 추가하면 코루틴을 사용 가능
+```kotlin
+dependencies {
+  implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:${version}")
+  implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:${version}")
+}
+```
+
+**리액티브가 코루틴으로 변환되는 방식**
+```kotlin
+// Mono -> suspend
+fun handler(): Mono<Void> -> suspend fun handler()
+
+// Fluw -> Flow
+fun handler(): Flux<T> -> fun handler(): Flow<T>
+```
+- Mono는 suspend 함수로 변환
+- Flux는 Flow로 변환
+
+
+**코루틴을 적용한 컨트롤러 코드**
+```kotlin
+@RestController
+class UserController(
+  private val userService : UserService,
+  private val userDetailService: UserDetailService
+  ) {
+
+  @GetMapping("/{id}")
+  suspend fun get(@PathVariable id: Long) : User {
+    return userService.getById(id)
+  }
+  @GetMapping("/users")
+  suspend fun gets() = withContext(Dispatchers.IO) {
+    val usersDeffered = async { userService.gets() }
+    val userDetailsDeffered = async { userDetailService.gets() }
+    return UserList(usersDeffered.await(), userDetailsDeffered.await())
+  }
+}
+```
+
+**코루틴을 사용한 WebClient**
+```kotlin
+val client = WebClient.create("https://example.org")
+
+val result = client.get()
+  .uri("/persons/{id}", id)
+  .retrieve()
+  .awaitBody<Person>()
+```
+- 기존 리액티브 코드를 코루틴으로 변환하고 싶다면 `awaitXXX` 시작하는 확장 함수를 사용하면 즉시 코루틴으로 변환 가능
+
+
+**Spring Data R2DBC의 ReactiveCrudRepository에서 코루틴 적용**
+```kotlin
+interface ContentReactiveRepository : ReactiveCrudRepository<Content, Long> {
+  fun findByUserId(userId: Long) : Mono<Content>
+  fun findAllByUserId(userId: Long): Flux<Content>
+}
+class ContentService (
+  val repository : ContentReactiveRepository
+) {
+  fun findByUserIdMono(userId: Long) : Mono<Content> {
+    return repository.findByUserId(userId)
+  }
+  suspend findByUserId (userId: Long) : Content {
+    return repository.findByUserId(userId).awaitSingle()
+  }
+}
+```
+
+**CoroutineCrudRepository 를 사용하면 awaitXXX 코드 없이 사용 가능**
+```kotlin
+interface ContentCouroutineRepository : CoroutineCrudRepository<Content, Long> {
+  suspend fun findByUserId(userId:Long) : Content?
+  fun findAllByUserId(userId: Long): Flow<Content>
+}
+class ContentService (
+  val repository : ContentCouroutineRepository
+) {
+  suspend findByUserId (userId: Long) : Content {
+    return repository.findByUserId(userId)
+  }
+}
+```
