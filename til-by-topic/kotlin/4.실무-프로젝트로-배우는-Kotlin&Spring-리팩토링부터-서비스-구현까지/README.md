@@ -98,6 +98,13 @@
   - [1. 회원 인증 서비스 개발하기](#1-회원-인증-서비스-개발하기)
     - [1. 요구사항 분석](#1-요구사항-분석-1)
     - [2. 프로젝트 구성](#2-프로젝트-구성)
+    - [3. API 스펙](#3-api-스펙)
+      - [1. 회원 가입](#1-회원-가입)
+      - [2. 로그인](#2-로그인)
+      - [3. 로그아웃](#3-로그아웃)
+      - [4. 내정보 조회](#4-내정보-조회)
+      - [5. 리포터 조회](#5-리포터-조회)
+      - [6. 내정보 수정](#6-내정보-수정)
 
 
 
@@ -2459,4 +2466,136 @@ fun simple(): Flow<Int> = flow {
 ### 2. 프로젝트 구성
 ```
 ./til-by-topic/kotlin/4.실무-프로젝트로-배우는-Kotlin&Spring-리팩토링부터-서비스-구현까지/5.springwebflux
+```
+
+### 3. API 스펙 
+
+#### 1. 회원 가입 
+
+**API**  
+```
+POST {host}/api/v1/users/signup
+```
+
+**body**
+```
+{
+  "email" : "dev@gmail.com",
+  "password" : "",
+  "username" : "사용자"
+}
+```
+
+**response**
+```
+200 OK
+```
+
+#### 2. 로그인 
+
+**API**
+```
+POST {host}/api/v1/users/signin
+```
+
+**body**
+```
+{
+  "email" : "dev@gmail.com",
+  "password" : "",
+}
+```
+
+**response**
+```
+{
+  "email" : "",
+  "username" : "",
+  "token" : "",
+  "refreshToken" : ""
+}
+```
+
+
+#### 3. 로그아웃
+
+**API**
+```
+DELETE {host}/api/v1/users/logout
+```
+
+**헤더**
+```
+Authorization : Bearer {token}
+```
+
+**response**
+```
+204 NO_CONTENT
+```
+
+
+#### 4. 내정보 조회
+**API**
+```
+GET {host}/api/v1/users/me
+```
+
+**헤더**
+```
+Authorization : Bearer {token}
+```
+
+**response**
+```
+200 OK
+{
+  "id": 1,
+  "profileUrl": "",
+  "username": "사용자",
+  "email": "dev@gmail.com",
+  "createdAt": "2022-06-12 00:16:41",
+  "updatedAt": "2022-06-12 00:18:01"
+}
+```
+
+#### 5. 리포터 조회 
+
+**API**
+```
+GET{host}/api/v1/users/{reporterId}/username
+```
+
+**response**
+```
+200 OK
+{
+  "reporter" : "작성자"
+}
+```
+
+
+#### 6. 내정보 수정 
+
+**API**
+```
+POST {host}/api/v1/users/{id}
+```
+
+**헤더**
+```
+Content-Type: multipart/form-data
+```
+
+**response**
+```
+200 OK
+{
+  "id": 1,
+  "profileUrl": "이미지 경로",
+  "username": "사용자",
+  "email": "dev@gmail.com",
+  "createdAt": "2022-06-12 00:16:41",
+  "updatedAt": "2022-06-12 00:18:01"
+}
 ```
