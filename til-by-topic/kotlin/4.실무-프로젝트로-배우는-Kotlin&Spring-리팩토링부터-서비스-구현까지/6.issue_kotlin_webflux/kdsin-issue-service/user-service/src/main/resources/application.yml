@@ -1,2 +1,9 @@
 server:
   port: 9090
+
+
+jwt:
+  issuer: jara
+  subject: auth
+  expires-time: 3600
+  secret: my-secret
