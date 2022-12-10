@@ -68,4 +68,8 @@ class UserService (
     suspend fun logout(token: String) {
         cacheManager.awaitEvict(token)
     }
+
+    suspend fun get(userId: Long): User {
+        return userRepository.findById(userId) ?: throw UserNotFoundException()
+    }
 }
