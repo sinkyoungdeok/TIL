@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<!--
+  WARNING! Make sure that you match all Quasar related
+  tags to the same version! (Below it's "@2.6.6")
+-->
+
+<head>
+    <meta charset="utf-8">
+    <title>JARA</title>
+    <link href="/css/material.css" rel="stylesheet" type="text/css">
+    <link href="/css/all.css" rel="stylesheet" type="text/css">
+    <link href="/css/line-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href="/css/bootstrap-icons.css" rel="stylesheet" type="text/css">
+    <link href="/css/animate.min.css" rel="stylesheet" type="text/css">
+    <link href="/css/quasar.prod.css" rel="stylesheet" type="text/css">
+</head>
+
+<body>
+<div id="q-app">
+    <div class="q-pa-md">
+        <q-layout>
+            <my-layout
+                    :layout-label="layoutLabel"
+                    :type-label="typeLabel"
+            />
+
+        </q-layout>
+
+    </div>
+</div>
+
+<!-- Add the following at the end of your body tag -->
+<script src="https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.prod.js"></script>
+<script src="/js/quasar.umd.prod.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script src="/app/layout.vue.js"></script>
+<script src="/app/issuelist.vue.js"></script>
+<script src="/app/issue.write.form.vue.js"></script>
+<script src="/app/issue.edit.form.vue.js"></script>
+<script src="/app/user.edit.form.vue.js"></script>
+
+<script>
+
+    const app = Vue.createApp({
+        setup() {
+            return {}
+        },
+        methods: {},
+        mounted() {
+        },
+        data() {
+            return {
+                layoutLabel: {
+                    userNameSuffix: ' 님',
+                    myInfo: '내정보',
+                    userEdit: '사용자 정보 수정',
+                    logout: '로그아웃',
+                    todo: '할일',
+                    inProgress: '진행중',
+                    resolved: '완료',
+                    publishIssue: '이슈등록',
+                },
+                typeLabel: {
+                    type: [
+                        'TASK',
+                        'BUG'
+                    ],
+                    TASK: '업무',
+                    BUG: '버그리포트',
+                    priorityOptions: [
+                        'LOW',
+                        'MEDIUM',
+                        'HIGH',
+                    ],
+                    statusOptions: [
+                        'TODO',
+                        'IN_PROGRESS',
+                        'RESOLVED',
+                    ],
+                },
+            }
+        }
+    })
+
+    app.use(Quasar)
+    app.component("MyLayout", MyLayout);
+    app.component("IssueList", IssueList);
+    app.component("IssueWriteForm", IssueWriteForm);
+    app.component("IssueEditForm", IssueEditForm);
+    app.component("UserEditForm", UserEditForm);
+    app.mount('#q-app')
+
+
+</script>
+</body>
+</html>

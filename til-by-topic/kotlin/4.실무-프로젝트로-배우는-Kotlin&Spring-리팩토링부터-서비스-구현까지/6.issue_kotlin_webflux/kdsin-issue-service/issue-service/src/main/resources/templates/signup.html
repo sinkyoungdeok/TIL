@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
+    <meta name="generator" content="Hugo 0.98.0">
+    <title>Checkout example · Bootstrap v5.2</title>
+
+    <link rel="canonical" href="https://getbootstrap.com/docs/5.2/examples/checkout/">
+
+
+    <link href="/assets/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        .bd-placeholder-img {
+            font-size: 1.125rem;
+            text-anchor: middle;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            user-select: none;
+        }
+
+        @media (min-width: 768px) {
+            .bd-placeholder-img-lg {
+                font-size: 3.5rem;
+            }
+        }
+
+        .b-example-divider {
+            height: 3rem;
+            background-color: rgba(0, 0, 0, .1);
+            border: solid rgba(0, 0, 0, .15);
+            border-width: 1px 0;
+            box-shadow: inset 0 .5em 1.5em rgba(0, 0, 0, .1), inset 0 .125em .5em rgba(0, 0, 0, .15);
+        }
+
+        .b-example-vr {
+            flex-shrink: 0;
+            width: 1.5rem;
+            height: 100vh;
+        }
+
+        .bi {
+            vertical-align: -.125em;
+            fill: currentColor;
+        }
+
+        .nav-scroller {
+            position: relative;
+            z-index: 2;
+            height: 2.75rem;
+            overflow-y: hidden;
+        }
+
+        .nav-scroller .nav {
+            display: flex;
+            flex-wrap: nowrap;
+            padding-bottom: 1rem;
+            margin-top: -1px;
+            overflow-x: auto;
+            text-align: center;
+            white-space: nowrap;
+            -webkit-overflow-scrolling: touch;
+        }
+    </style>
+
+
+    <!-- Custom styles for this template -->
+    <link href="/css/form-validation.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+
+<div class="container">
+    <main>
+        <div class="py-5 text-center">
+            <h2>JARA 회원가입</h2>
+        </div>
+
+        <div class="row g-5">
+
+            <div class="col-md-7 col-lg-8">
+                <form class="needs-validation" novalidate>
+                    <div class="row g-3">
+
+                        <div class="col-12">
+                            <label for="email" class="form-label">이메일 <span class="text-muted">(아이디)</span></label>
+                            <input type="email" class="form-control" id="email" placeholder="you@example.com">
+                            <div class="invalid-feedback">
+                                정확한 이메일 주소를 입력해주세요.
+                            </div>
+                        </div>
+
+
+                        <div class="col-12">
+                            <label for="password" class="form-label">비밀번호</label>
+                            <div class="input-group has-validation">
+                                <input type="password" class="form-control" id="password" placeholder="비밀번호" required>
+                                <div class="invalid-feedback">
+                                    패스워드를 입력해주세요.
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div class="col-sm-6">
+                            <label for="username" class="form-label">이름</label>
+                            <input type="text" class="form-control" id="username" placeholder="" value="" required>
+                            <div class="invalid-feedback">
+                                이름을 입력해주세요.
+                            </div>
+                        </div>
+
+
+                        <button class="w-100 btn btn-primary btn-lg" id="signUp" type="button">회원가입</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+</div>
+
+
+<script src="/assets/dist/js/bootstrap.bundle.min.js"></script>
+
+<script src="/js/form-validation.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script>
+
+    const regExp = /^[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*.[a-zA-Z]{2,3}$/i
+
+    document.getElementById("signUp").addEventListener('click', event => {
+        let email = document.getElementById("email").value
+        let password = document.getElementById("password").value
+        let username = document.getElementById("username").value
+
+        if (!email || !email.match(regExp)) {
+            alert('정확한 이메일 주소를 입력해주세요.')
+            return
+        }
+        if (!password) {
+            alert('패스워드를 입력해주세요.')
+            return
+        }
+        if (!username) {
+            alert('이름을 입력해주세요.')
+            return
+        }
+
+        event.preventDefault() && event.stopPropagation()
+
+        window.axios.post(`${localStorage.getItem('userServiceUrl')}/api/v1/users/signup`, {
+            email: email,
+            password: password,
+            username: username,
+        }).then(response => {
+            if (response.data && response.data.code) {
+                alert(response.data.message)
+                return
+            }
+            location.href = "/"
+        }).catch(error => {
+            console.log(error)
+            alert('오류가 발생했습니다')
+        })
+
+    })
+
+</script>
+</body>
+</html>

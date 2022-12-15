@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
+    <meta name="generator" content="Hugo 0.98.0">
+    <title>JARA</title>
+
+    <link rel="canonical" href="https://getbootstrap.com/docs/5.2/examples/sign-in/">
+    <link href="/assets/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        .bd-placeholder-img {
+            font-size: 1.125rem;
+            text-anchor: middle;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            user-select: none;
+        }
+
+        @media (min-width: 768px) {
+            .bd-placeholder-img-lg {
+                font-size: 3.5rem;
+            }
+        }
+
+        .b-example-divider {
+            height: 3rem;
+            background-color: rgba(0, 0, 0, .1);
+            border: solid rgba(0, 0, 0, .15);
+            border-width: 1px 0;
+            box-shadow: inset 0 .5em 1.5em rgba(0, 0, 0, .1), inset 0 .125em .5em rgba(0, 0, 0, .15);
+        }
+
+        .b-example-vr {
+            flex-shrink: 0;
+            width: 1.5rem;
+            height: 100vh;
+        }
+
+        .bi {
+            vertical-align: -.125em;
+            fill: currentColor;
+        }
+
+        .nav-scroller {
+            position: relative;
+            z-index: 2;
+            height: 2.75rem;
+            overflow-y: hidden;
+        }
+
+        .nav-scroller .nav {
+            display: flex;
+            flex-wrap: nowrap;
+            padding-bottom: 1rem;
+            margin-top: -1px;
+            overflow-x: auto;
+            text-align: center;
+            white-space: nowrap;
+            -webkit-overflow-scrolling: touch;
+        }
+    </style>
+
+
+    <!-- Custom styles for this template -->
+    <link href="/css/signin.css" rel="stylesheet">
+</head>
+<body class="text-center">
+
+<main class="form-signin w-100 m-auto">
+
+    <h1 class="h3 mb-3 fw-normal">JARA 로그인</h1>
+
+    <div class="form-floating">
+        <input type="email" class="form-control" id="email" placeholder="name@example.com">
+        <label for="email">이메일</label>
+    </div>
+    <div class="form-floating">
+        <input type="password" class="form-control" id="password" placeholder="Password">
+        <label for="password">암호</label>
+    </div>
+
+    <div class="checkbox mb-3">
+    </div>
+    <button class="w-30 btn btn-lg btn-primary" type="button" id="signIn">로그인</button>
+    <button class="w-30 btn btn-lg btn-secondary" onclick="location.href='/signup'" type="button">회원가입</button>
+
+</main>
+
+
+</body>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script src="/js/config.js"></script>
+<script>
+    const regExp = /^[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*.[a-zA-Z]{2,3}$/i
+
+    document.getElementById("signIn").addEventListener('click', event => {
+        let email = document.getElementById("email").value
+        let password = document.getElementById("password").value
+
+        if (!email || !email.match(regExp)) {
+            alert('정확한 이메일 주소를 입력해주세요.')
+            return
+        }
+        if (!password) {
+            alert('패스워드를 입력해주세요.')
+            return
+        }
+
+        window.axios.post(`${localStorage.getItem('userServiceUrl')}/api/v1/users/signin`, {
+            email: email,
+            password: password,
+        }).then(response => {
+            if (!response.data) {
+                alert('오류가 발생했습니다')
+                return
+            }
+            if (response.data && response.data.code) {
+                alert(response.data.message)
+                return
+            }
+
+            localStorage.setItem('token', response.data.token)
+
+            location.href = '/issueapp'
+        }).catch(error => {
+            console.log(error)
+            alert('오류가 발생했습니다')
+        })
+
+    })
+
+</script>
+</html>
