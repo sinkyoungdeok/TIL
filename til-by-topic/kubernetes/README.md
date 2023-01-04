@@ -1,4 +1,7 @@
 
+- [0. k9s](#0-k9s)
+  - [Cluster 변경 명령어](#cluster-변경-명령어)
+  - [Port forwarding 명령어](#port-forwarding-명령어)
 - [1. 설치 명령어](#1-설치-명령어)
   - [Kubectl 설치 명령어 (Mac OS)](#kubectl-설치-명령어-mac-os)
   - [Kustomize 설치 명령어 (Mac OS)](#kustomize-설치-명령어-mac-os)
@@ -218,6 +221,19 @@
   - [aws eks 구성 예시](#aws-eks-구성-예시)
 - [16. 실전](#16-실전)
   - [k8s에서 두 서버의 배포 sync 맞추기](#k8s에서-두-서버의-배포-sync-맞추기)
+
+## 0. k9s 
+
+### Cluster 변경 명령어 
+```
+:context
+```
+
+### Port forwarding 명령어
+```
+shift + f
+```
+
 
 ## 1. 설치 명령어 
 
