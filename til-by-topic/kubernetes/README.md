@@ -196,6 +196,7 @@
   - [readniessProbe란](#readniessprobe란)
   - [exec readinessProbe 선언](#exec-readinessprobe-선언)
   - [readinessProbe 배포 예시](#readinessprobe-배포-예시)
+  - [readniessProbe, livenessProbe, startupProbe](#readniessprobe-livenessprobe-startupprobe)
 - [12. config map](#12-config-map)
   - [config map 이란](#config-map-이란)
   - [Pod에서 ConfigMap에 접근하는 방법](#pod에서-configmap에-접근하는-방법)
@@ -2303,6 +2304,14 @@ kubectl exec -it unhealthy -- mkdir /var/ready
 # 서비스, 파드 삭제
 kubectl delete all -l app=myapp
 ```
+
+### readniessProbe, livenessProbe, startupProbe 
+- startupProbe는 시작될 때만 실행됨
+- readniessProbe는 매번 확인 해서 정상동작인지 확인하는 것임.
+- Probe모두 해당되는 이야기인데
+  - pod안에 container가 여러개가 있다고 하면,
+  - container안에 Probe설정을 모두 한다고 치면
+  - 그 중에 하나라도 Probe에 통과하지 못하면 pod가 정상적으로 띄워지지 않는것으로 취급된다.  
 
 ## 12. config map
 
