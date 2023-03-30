@@ -222,6 +222,7 @@
   - [aws eks 구성 예시](#aws-eks-구성-예시)
 - [16. 실전](#16-실전)
   - [k8s에서 두 서버의 배포 sync 맞추기](#k8s에서-두-서버의-배포-sync-맞추기)
+  - [k8s에서 elasticsearch 배포시 latency 밀리는 현상 제거하기.](#k8s에서-elasticsearch-배포시-latency-밀리는-현상-제거하기)
 
 ## 0. k9s 
 
@@ -2637,3 +2638,8 @@ A,B 서버가 이미 배포되어 있다고 가정
 4. A, B 서버 업데이트
 5. 트래픽을 다시 원래대로 복구
 6. canary 배포본 삭제
+
+
+### k8s에서 elasticsearch 배포시 latency 밀리는 현상 제거하기.
+1. jvm 이슈는 아닌것으로 확인됨.
+2. rolling 배포에서 maxunavailable 0값으로 새로운 pod가 먼저 뜨고, 기존 pod를 제거하는 방식으로 시도하였으나, elasticsearch에서는 해당 방법이 좋지 않을 수 있다고 함.
