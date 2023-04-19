@@ -223,6 +223,7 @@
 - [16. 실전](#16-실전)
   - [k8s에서 두 서버의 배포 sync 맞추기](#k8s에서-두-서버의-배포-sync-맞추기)
   - [k8s에서 elasticsearch 배포시 latency 밀리는 현상 제거하기.](#k8s에서-elasticsearch-배포시-latency-밀리는-현상-제거하기)
+  - [Volume 줄이기?](#volume-줄이기)
 
 ## 0. k9s 
 
@@ -2643,3 +2644,10 @@ A,B 서버가 이미 배포되어 있다고 가정
 ### k8s에서 elasticsearch 배포시 latency 밀리는 현상 제거하기.
 1. jvm 이슈는 아닌것으로 확인됨.
 2. rolling 배포에서 maxunavailable 0값으로 새로운 pod가 먼저 뜨고, 기존 pod를 제거하는 방식으로 시도하였으나, elasticsearch에서는 해당 방법이 좋지 않을 수 있다고 함.
+
+### Volume 줄이기?
+- kubernetes 뿐만아니라 모두다에 해당하는데, 할당된 블록스토리지를 사이즈 줄이는건 불가능하다.
+- block 스토리지를 할당 해줄 때 해당 block의 어떤 영역을 사용할지를 결정하는건 os레벨이라서
+- 인프라 레벨에서는 블록을 추가해줄 수는 있어도
+- 줄일 때 어딜 줄일지는 결정할 수없다.
+
