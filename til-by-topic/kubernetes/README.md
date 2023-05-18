@@ -91,7 +91,7 @@
   - [기존에 생성한 Pod를 ReplicaSet으로 관리](#기존에-생성한-pod를-replicaset으로-관리)
   - [replicaset의 Pod 생성/복구 자동화 기능](#replicaset의-pod-생성복구-자동화-기능)
   - [pod는 납두고, replicaset만 삭제 하기](#pod는-납두고-replicaset만-삭제-하기)
-  - [gracefully하게 replicaSet&pod 삭제 하기](#gracefully하게-replicasetpod-삭제-하기)
+  - [gracefully하게 replicaSet\&pod 삭제 하기](#gracefully하게-replicasetpod-삭제-하기)
   - [pod watch 모드로 모니터링 방법](#pod-watch-모드로-모니터링-방법)
   - [pod의 owner 확인 명령어](#pod의-owner-확인-명령어)
   - [배포한 ReplicaSet의 Pod Template을 변경](#배포한-replicaset의-pod-template을-변경)
@@ -103,7 +103,7 @@
   - [Deployment의 필요성](#deployment의-필요성)
   - [Deployment 오브젝트란](#deployment-오브젝트란)
   - [Deployment 오브젝트 표현 방법](#deployment-오브젝트-표현-방법)
-  - [Deployment의 Pod Template 1.0 -> 2.0 변경 요청](#deployment의-pod-template-10---20-변경-요청)
+  - [Deployment의 Pod Template 1.0 -\> 2.0 변경 요청](#deployment의-pod-template-10---20-변경-요청)
   - [Deployment 롤아웃 전략1 - Recreate 배포](#deployment-롤아웃-전략1---recreate-배포)
   - [Deployment 롤아웃 전략2 - RollingUpdate 배포](#deployment-롤아웃-전략2---rollingupdate-배포)
   - [Recreate vs Rollingupdate](#recreate-vs-rollingupdate)
@@ -121,7 +121,7 @@
   - [ReplicaSet이 생성한 Pod 상태 변화 확인](#replicaset이-생성한-pod-상태-변화-확인)
   - [label selector로 리소스 삭제](#label-selector로-리소스-삭제)
   - [Deployment 배포 및 replicas 변경 예시](#deployment-배포-및-replicas-변경-예시)
-  - [Deployment의 Pod Template 이미지 변경 & 레이블 변경 과정](#deployment의-pod-template-이미지-변경--레이블-변경-과정)
+  - [Deployment의 Pod Template 이미지 변경 \& 레이블 변경 과정](#deployment의-pod-template-이미지-변경--레이블-변경-과정)
   - [Deployment Pod Template 예시](#deployment-pod-template-예시)
   - [Deployment Recreate 전략 예시](#deployment-recreate-전략-예시)
   - [Deployment RollingUpdate 전략 예시](#deployment-rollingupdate-전략-예시)
@@ -222,7 +222,7 @@
   - [aws eks 구성 예시](#aws-eks-구성-예시)
 - [16. 실전](#16-실전)
   - [k8s에서 두 서버의 배포 sync 맞추기](#k8s에서-두-서버의-배포-sync-맞추기)
-  - [k8s에서 elasticsearch 배포시 latency 밀리는 현상 제거하기.](#k8s에서-elasticsearch-배포시-latency-밀리는-현상-제거하기)
+  - [ECK의 장점](#eck의-장점)
   - [Volume 줄이기?](#volume-줄이기)
   - [pod 하나를 debug하기](#pod-하나를-debug하기)
 
@@ -2641,10 +2641,23 @@ A,B 서버가 이미 배포되어 있다고 가정
 5. 트래픽을 다시 원래대로 복구
 6. canary 배포본 삭제
 
-
-### k8s에서 elasticsearch 배포시 latency 밀리는 현상 제거하기.
-1. jvm 이슈는 아닌것으로 확인됨.
-2. rolling 배포에서 maxunavailable 0값으로 새로운 pod가 먼저 뜨고, 기존 pod를 제거하는 방식으로 시도하였으나, elasticsearch에서는 해당 방법이 좋지 않을 수 있다고 함.
+### ECK의 장점
+1. 배포 안정성
+   - 쿠버네티스의 컨테이너 오케스트레이션은 배포 자동화를 지원한다.
+   - Pod만 종료됐다가 다시 실행되기 때문에 샤드를 새로운 노드로 이동하지 않아도 되므로 네트워크 비용도 없앨 수 있다.
+   - 그리고 특정 노드로 샤드가 몰리는 상황을 방지할 수 있으며 배포 시간도 크게 단축할 수 있다. 
+2. 손쉬운 배포
+   - ECK를 사용하면 누구나 ES클러스터를 배포할 수 있다.
+   - 토크나이저 플러그인을 설치하기 위해 클러스터 배포를 해야 할 때 누구나 간단하게 배포할 수 있다.
+3. 손쉬운 버전 업그레이드
+   - minor 버전 업그레이드를 손쉽게 할 수 있다.
+   - YAML manifest에서 sepc.version만 변경해주면 ECK가 알아서 롤링 배포를 통한 버전 업그레이드를 적용한다. 
+4. AutoScaling 적용
+   - ECK를 사용하면 HPA(HorizontalPodAutoscaler)를 적용할 수 있어서 리소스를 더욱 효과적으로 사용할 수 있고 클러스터 운영 비용도 최적화할 수  있다.
+   - 검색 클러스터 노드의 상태는 ECK가 알아서 모니터링 하기 때문에 우리는 신경 쓸 필요가 없어진다.  
+5. 역할과 책임 분리
+   - ECK를 사용하면 AWS및 인프라에 대한 운영은 DEVOPS팀에 위임하고 
+   - 검색팀은 검색 클러스터 운영과 검색 서비스에 집중할 수 있다. 
 
 ### Volume 줄이기?
 - kubernetes 뿐만아니라 모두다에 해당하는데, 할당된 블록스토리지를 사이즈 줄이는건 불가능하다.
