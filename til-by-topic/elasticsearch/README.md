@@ -105,6 +105,8 @@
   - [nori_tokenizer](#nori_tokenizer)
   - [nori_part_of_speech token filter](#nori_part_of_speech-token-filter)
   - [_analyze API를 이용한 NoriAnalyzer 테스트](#_analyze-api를-이용한-norianalyzer-테스트)
+- [실전](#실전)
+  - [Rolling Update 배포시 Unassigned Shard 문제 해결](#rolling-update-배포시-unassigned-shard-문제-해결)
 ## 0. ES 명령어 모음집 
 
 ### 1. alias 조회 
@@ -1558,3 +1560,41 @@ bin/elasticsearch-plugin remove analysis-nori
 ```
 
 
+
+## 실전 
+
+### Rolling Update 배포시 Unassigned Shard 문제 해결 
+
+1. Unassigned Shard 목록 확인 
+
+```
+GET _cat/shards?v=true&h=index,shard,prirep,state,node,unassigned.reason&s=state
+```
+
+2. Unassigned 원인 확인
+```
+GET _cluster/allocation/explain
+{
+  "index": "address_search",     # 인덱스 이름
+  "shard": 1,                    # shard 번호 (위 cat API에서 확인가능)
+  "primary": false               # primary shard 여부
+}
+```
+
+3. Unassigned Shard 재할당 
+```
+POST /_cluster/reroute?explain
+{
+  "commands": [
+    {
+      # 할당할 노드를 직접 지정하여 replica shard 할당
+      "allocate_replica": {
+        "index": "address_search",       # 인덱스 이름
+        "shard": 0,                      # shard 번호
+        "node": "search-dev-es-master-1" # 재할당 할 노드, GET _cat/nodes 로 노드 확인 가능 
+      }
+    }
+  ],
+  "dry_run": false  # true로 설정시 실제 operation은 수행하지 않으면서, 실행 결과를 확인할 수 있음
+}
+```
