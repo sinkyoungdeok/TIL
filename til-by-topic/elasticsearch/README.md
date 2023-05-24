@@ -107,6 +107,7 @@
   - [_analyze API를 이용한 NoriAnalyzer 테스트](#_analyze-api를-이용한-norianalyzer-테스트)
 - [실전](#실전)
   - [Rolling Update 배포시 Unassigned Shard 문제 해결](#rolling-update-배포시-unassigned-shard-문제-해결)
+  - [Rolling Update 배포로 data 노드 배포 시 latency 생기는 현상 원인 및 해결 방법](#rolling-update-배포로-data-노드-배포-시-latency-생기는-현상-원인-및-해결-방법)
 ## 0. ES 명령어 모음집 
 
 ### 1. alias 조회 
@@ -1598,3 +1599,23 @@ POST /_cluster/reroute?explain
   "dry_run": false  # true로 설정시 실제 operation은 수행하지 않으면서, 실행 결과를 확인할 수 있음
 }
 ```
+
+### Rolling Update 배포로 data 노드 배포 시 latency 생기는 현상 원인 및 해결 방법 
+
+- 원인
+  - data노드가 한대씩 내려갈 때 마다 내려간 data노드가 가지고 있던 primary shard 들이 없어지면서 
+  - 다른 data노드에서는 없어진 primary shard들을 복구하기위해 recovery 모드로 전환된다. (기본값은 1m 이라서 1분뒤 recovery 모드가 시작됨)
+  - recovery 모드로 진입되면서 latency가 조금씩 튀는 현상이 생긴것이였음 
+- 해결 방법 
+```
+PUT _all/_settings
+{
+  "settings": {
+    "index.unassigned.node_left.delayed_timeout": "5m"
+  }
+}
+```
+  - 위 명령어로 사라진 primary shard들의 복구 시간을 1분에서 5분으로 늘려주면됨.
+  - 그러면 5분안에 내려간 data노드가 restart가 된다면 recovery 모드로 진입하지 않는다.
+  - eck에서는 pod를 새로띄우는것이 아닌, restart 하는 방식으로 배포를 진행한다.
+  - 그래서 restart되고나면 없어졌던 primary shard들을 그대로 갖고 있는 pod가 다시 붙게되면 recovery 할 필요가 없어짐.
