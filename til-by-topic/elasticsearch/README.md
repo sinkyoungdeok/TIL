@@ -108,6 +108,7 @@
 - [실전](#실전)
   - [Rolling Update 배포시 Unassigned Shard 문제 해결](#rolling-update-배포시-unassigned-shard-문제-해결)
   - [Rolling Update 배포로 data 노드 배포 시 latency 생기는 현상 원인 및 해결 방법](#rolling-update-배포로-data-노드-배포-시-latency-생기는-현상-원인-및-해결-방법)
+  - [Master, Data Node로만 구성했을 때 배포 시 Latency 튀는 현상 원인 및 해결 방법](#master-data-node로만-구성했을-때-배포-시-latency-튀는-현상-원인-및-해결-방법)
 ## 0. ES 명령어 모음집 
 
 ### 1. alias 조회 
@@ -1619,3 +1620,14 @@ PUT _all/_settings
   - 그러면 5분안에 내려간 data노드가 restart가 된다면 recovery 모드로 진입하지 않는다.
   - eck에서는 pod를 새로띄우는것이 아닌, restart 하는 방식으로 배포를 진행한다.
   - 그래서 restart되고나면 없어졌던 primary shard들을 그대로 갖고 있는 pod가 다시 붙게되면 recovery 할 필요가 없어짐.
+
+
+### Master, Data Node로만 구성했을 때 배포 시 Latency 튀는 현상 원인 및 해결 방법 
+
+- 원인 
+  - ingress를 master로 구성하게 될텐데, 이러면 coordination 노드의 역할인 Web Server 역할까지도 맡는 것이다.
+  - 이렇게 구성하게 되면 Web Server인 Master 노드가 한대 씩 내려갈 때 마다 엄청난 Latency가 튄다 (5초까지 고정적으로 튀는것을 확인)
+- 해결 방법 
+  - Coordination 노드를 투입시키고
+  - ingress를 master노드에서 coordination노드로 변경한다.
+  - 그리고 배포할 때 coordination을 제외한 master, data 노드만 배포되도록 한다.
