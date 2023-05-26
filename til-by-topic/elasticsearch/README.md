@@ -79,19 +79,19 @@
   - [주요 System 설정](#주요-system-설정)
   - [Closed Index 설정 변경](#closed-index-설정-변경)
 - [7. Index Modules](#7-index-modules)
-  - [Static Index Settings - 1. index.number_of_shards](#static-index-settings---1-indexnumber_of_shards)
-  - [Static Index Settings - 2. index.number_of_routing_shards](#static-index-settings---2-indexnumber_of_routing_shards)
+  - [Static Index Settings - 1. index.number\_of\_shards](#static-index-settings---1-indexnumber_of_shards)
+  - [Static Index Settings - 2. index.number\_of\_routing\_shards](#static-index-settings---2-indexnumber_of_routing_shards)
   - [Static Index Settings - 3. index.codec](#static-index-settings---3-indexcodec)
   - [Static Index Settings - 4. index.hidden](#static-index-settings---4-indexhidden)
-  - [Dynamic Index Settings - 1. index.number_of_replicas](#dynamic-index-settings---1-indexnumber_of_replicas)
-  - [Dynamic Index Settings - 2. index.refresh_interval](#dynamic-index-settings---2-indexrefresh_interval)
-  - [Dynamic Index Settings - 3. index.max_result_window](#dynamic-index-settings---3-indexmax_result_window)
+  - [Dynamic Index Settings - 1. index.number\_of\_replicas](#dynamic-index-settings---1-indexnumber_of_replicas)
+  - [Dynamic Index Settings - 2. index.refresh\_interval](#dynamic-index-settings---2-indexrefresh_interval)
+  - [Dynamic Index Settings - 3. index.max\_result\_window](#dynamic-index-settings---3-indexmax_result_window)
   - [Elasticsearch에서 검색을 실행하는 방법](#elasticsearch에서-검색을-실행하는-방법)
   - [scroll](#scroll)
-  - [search_after 기능](#search_after-기능)
-  - [Dynamic Index Settings - 4. index.max_inner_result_window](#dynamic-index-settings---4-indexmax_inner_result_window)
-  - [Dynamic Index Settings - 5. index.analyze.max_token_count](#dynamic-index-settings---5-indexanalyzemax_token_count)
-  - [Dynamic Index Settings - 6. index.max_terms_count](#dynamic-index-settings---6-indexmax_terms_count)
+  - [search\_after 기능](#search_after-기능)
+  - [Dynamic Index Settings - 4. index.max\_inner\_result\_window](#dynamic-index-settings---4-indexmax_inner_result_window)
+  - [Dynamic Index Settings - 5. index.analyze.max\_token\_count](#dynamic-index-settings---5-indexanalyzemax_token_count)
+  - [Dynamic Index Settings - 6. index.max\_terms\_count](#dynamic-index-settings---6-indexmax_terms_count)
   - [Dynamic Index Settings - 7. index.routing.allocation.enable](#dynamic-index-settings---7-indexroutingallocationenable)
   - [Dynamic Index Settings - 8. index.routing.rebalance.enable](#dynamic-index-settings---8-indexroutingrebalanceenable)
   - [Scroll 실습](#scroll-실습)
@@ -100,15 +100,16 @@
   - [Analyzer란](#analyzer란)
   - [Analyzer 종류](#analyzer-종류)
   - [Analyzer의 구성 항목](#analyzer의-구성-항목)
-  - [_analyze API 구조](#_analyze-api-구조)
-  - [_analyze API Parameters](#_analyze-api-parameters)
-  - [nori_tokenizer](#nori_tokenizer)
-  - [nori_part_of_speech token filter](#nori_part_of_speech-token-filter)
-  - [_analyze API를 이용한 NoriAnalyzer 테스트](#_analyze-api를-이용한-norianalyzer-테스트)
+  - [\_analyze API 구조](#_analyze-api-구조)
+  - [\_analyze API Parameters](#_analyze-api-parameters)
+  - [nori\_tokenizer](#nori_tokenizer)
+  - [nori\_part\_of\_speech token filter](#nori_part_of_speech-token-filter)
+  - [\_analyze API를 이용한 NoriAnalyzer 테스트](#_analyze-api를-이용한-norianalyzer-테스트)
 - [실전](#실전)
   - [Rolling Update 배포시 Unassigned Shard 문제 해결](#rolling-update-배포시-unassigned-shard-문제-해결)
   - [Rolling Update 배포로 data 노드 배포 시 latency 생기는 현상 원인 및 해결 방법](#rolling-update-배포로-data-노드-배포-시-latency-생기는-현상-원인-및-해결-방법)
   - [Master, Data Node로만 구성했을 때 배포 시 Latency 튀는 현상 원인 및 해결 방법](#master-data-node로만-구성했을-때-배포-시-latency-튀는-현상-원인-및-해결-방법)
+  - [Elasticsearch Warm Up](#elasticsearch-warm-up)
 ## 0. ES 명령어 모음집 
 
 ### 1. alias 조회 
@@ -1606,7 +1607,8 @@ POST /_cluster/reroute?explain
 - 원인
   - data노드가 한대씩 내려갈 때 마다 내려간 data노드가 가지고 있던 primary shard 들이 없어지면서 
   - 다른 data노드에서는 없어진 primary shard들을 복구하기위해 recovery 모드로 전환된다. (기본값은 1m 이라서 1분뒤 recovery 모드가 시작됨)
-  - recovery 모드로 진입되면서 latency가 조금씩 튀는 현상이 생긴것이였음 
+  - recovery 모드로 진입되면 없어진 primary shard들을 재할당하게 된다. 
+  - recovery 모드로 진입되면서 primary shard들을 재할당 하면서 latency가 조금씩 튀는 현상이 생긴것이였음 
 - 해결 방법 
 ```
 PUT _all/_settings
@@ -1631,3 +1633,26 @@ PUT _all/_settings
   - Coordination 노드를 투입시키고
   - ingress를 master노드에서 coordination노드로 변경한다.
   - 그리고 배포할 때 coordination을 제외한 master, data 노드만 배포되도록 한다.
+
+
+### Elasticsearch Warm Up
+- 두가지의 warm up 을 생각해볼 수 있다.
+- 1번째: index warm up
+  - 출처: https://www.elastic.co/guide/en/elasticsearch/reference/7.17/indices-warmers.html
+  - 과거 elasticsearch 에서는 index를 warm up 을 하기 위해 warmer를 쓸 수 있었는데
+  - 7버전부터 warmer가 제거됐다.
+  - index warm up을 안해도 될만큼 index의 성능이 개선된 것으로 확인됨.
+- 2번째: jvm warm up
+  - elasticsearch 도 jvm위에 돌아간다.
+  - jvm을 사용하므로 결국 jit compiler를 사용하고 있을텐데, 이것을 해결하기 위해선 warm up 이 필요하다.
+  - 나는 kubernetes의 startup probe설정과 side car패턴으로 warm up을 하는 앱을 띄워서 해결했다. 
+  - warm up 앱에서는 localhost:9200 으로 data노드 갯수 * 250번 만큼 호출하도록 했다.
+  - 여기서 warm up 도중에 startup probe 통과를 아직 못한 노드에 unassigned shard들이 할당되는 것을 확인 됐었는데 여기서 잠깐 의문이 들었었다.
+  - 알고보니 kubernetes의 startup probe가 service의 ip에 할당할지 말지를 결정하는 거라서 
+  - startup probe를 통과하지 못하더라도 ES cluster에는 바로 붙는 것이다.
+  - 그래서 결론적으로는 ES node가 한대 재시작 되면
+    - warmup 하는 과정을 거치는데
+    - 바로 ES cluster에는 붙어서 unassigned shard들을 재할당 받을 수는 있지만
+    - warmup 도중에는 startup probe를 통과하지 못하고
+    - startup probe를 통과하지 못하면 검색 요청을 못받는 상태에 있다가
+    - warmup이 종료되고 startup probe을 통과하고 나면 검색 요청을 받는 것이다.
