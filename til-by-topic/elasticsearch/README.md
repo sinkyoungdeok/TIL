@@ -79,19 +79,19 @@
   - [주요 System 설정](#주요-system-설정)
   - [Closed Index 설정 변경](#closed-index-설정-변경)
 - [7. Index Modules](#7-index-modules)
-  - [Static Index Settings - 1. index.number\_of\_shards](#static-index-settings---1-indexnumber_of_shards)
-  - [Static Index Settings - 2. index.number\_of\_routing\_shards](#static-index-settings---2-indexnumber_of_routing_shards)
+  - [Static Index Settings - 1. index.number_of_shards](#static-index-settings---1-indexnumber_of_shards)
+  - [Static Index Settings - 2. index.number_of_routing_shards](#static-index-settings---2-indexnumber_of_routing_shards)
   - [Static Index Settings - 3. index.codec](#static-index-settings---3-indexcodec)
   - [Static Index Settings - 4. index.hidden](#static-index-settings---4-indexhidden)
-  - [Dynamic Index Settings - 1. index.number\_of\_replicas](#dynamic-index-settings---1-indexnumber_of_replicas)
-  - [Dynamic Index Settings - 2. index.refresh\_interval](#dynamic-index-settings---2-indexrefresh_interval)
-  - [Dynamic Index Settings - 3. index.max\_result\_window](#dynamic-index-settings---3-indexmax_result_window)
+  - [Dynamic Index Settings - 1. index.number_of_replicas](#dynamic-index-settings---1-indexnumber_of_replicas)
+  - [Dynamic Index Settings - 2. index.refresh_interval](#dynamic-index-settings---2-indexrefresh_interval)
+  - [Dynamic Index Settings - 3. index.max_result_window](#dynamic-index-settings---3-indexmax_result_window)
   - [Elasticsearch에서 검색을 실행하는 방법](#elasticsearch에서-검색을-실행하는-방법)
   - [scroll](#scroll)
-  - [search\_after 기능](#search_after-기능)
-  - [Dynamic Index Settings - 4. index.max\_inner\_result\_window](#dynamic-index-settings---4-indexmax_inner_result_window)
-  - [Dynamic Index Settings - 5. index.analyze.max\_token\_count](#dynamic-index-settings---5-indexanalyzemax_token_count)
-  - [Dynamic Index Settings - 6. index.max\_terms\_count](#dynamic-index-settings---6-indexmax_terms_count)
+  - [search_after 기능](#search_after-기능)
+  - [Dynamic Index Settings - 4. index.max_inner_result_window](#dynamic-index-settings---4-indexmax_inner_result_window)
+  - [Dynamic Index Settings - 5. index.analyze.max_token_count](#dynamic-index-settings---5-indexanalyzemax_token_count)
+  - [Dynamic Index Settings - 6. index.max_terms_count](#dynamic-index-settings---6-indexmax_terms_count)
   - [Dynamic Index Settings - 7. index.routing.allocation.enable](#dynamic-index-settings---7-indexroutingallocationenable)
   - [Dynamic Index Settings - 8. index.routing.rebalance.enable](#dynamic-index-settings---8-indexroutingrebalanceenable)
   - [Scroll 실습](#scroll-실습)
@@ -100,11 +100,11 @@
   - [Analyzer란](#analyzer란)
   - [Analyzer 종류](#analyzer-종류)
   - [Analyzer의 구성 항목](#analyzer의-구성-항목)
-  - [\_analyze API 구조](#_analyze-api-구조)
-  - [\_analyze API Parameters](#_analyze-api-parameters)
-  - [nori\_tokenizer](#nori_tokenizer)
-  - [nori\_part\_of\_speech token filter](#nori_part_of_speech-token-filter)
-  - [\_analyze API를 이용한 NoriAnalyzer 테스트](#_analyze-api를-이용한-norianalyzer-테스트)
+  - [_analyze API 구조](#_analyze-api-구조)
+  - [_analyze API Parameters](#_analyze-api-parameters)
+  - [nori_tokenizer](#nori_tokenizer)
+  - [nori_part_of_speech token filter](#nori_part_of_speech-token-filter)
+  - [_analyze API를 이용한 NoriAnalyzer 테스트](#_analyze-api를-이용한-norianalyzer-테스트)
 - [실전](#실전)
   - [Rolling Update 배포시 Unassigned Shard 문제 해결](#rolling-update-배포시-unassigned-shard-문제-해결)
   - [Rolling Update 배포로 data 노드 배포 시 latency 생기는 현상 원인 및 해결 방법](#rolling-update-배포로-data-노드-배포-시-latency-생기는-현상-원인-및-해결-방법)
@@ -1628,7 +1628,7 @@ PUT _all/_settings
 
 - 원인 
   - ingress를 master로 구성하게 될텐데, 이러면 coordination 노드의 역할인 Web Server 역할까지도 맡는 것이다.
-  - 이렇게 구성하게 되면 Web Server인 Master 노드가 한대 씩 내려갈 때 마다 엄청난 Latency가 튄다 (5초까지 고정적으로 튀는것을 확인)
+  - 이렇게 구성하게 되면 Web Server인 Master 노드가 한대 씩 내려갈 때 마다 엄청난 Latency가 튄다 (1대 내려갈 때 마다 5초까지 고정적으로 튀는것을 확인)
 - 해결 방법 
   - Coordination 노드를 투입시키고
   - ingress를 master노드에서 coordination노드로 변경한다.
@@ -1644,7 +1644,7 @@ PUT _all/_settings
   - index warm up을 안해도 될만큼 index의 성능이 개선된 것으로 확인됨.
 - 2번째: jvm warm up
   - elasticsearch 도 jvm위에 돌아간다.
-  - jvm을 사용하므로 결국 jit compiler를 사용하고 있을텐데, 이것을 해결하기 위해선 warm up 이 필요하다.
+  - jvm을 사용하므로 결국 jit compiler를 사용하고 있을텐데, 그럼 배포를 할 때 마다 latency 밀리는 현상이 조금씩은 있을 수 있고 이것을 해결하기 위해선 warm up 이 필요하다.
   - 나는 kubernetes의 startup probe설정과 side car패턴으로 warm up을 하는 앱을 띄워서 해결했다. 
   - warm up 앱에서는 localhost:9200 으로 data노드 갯수 * 250번 만큼 호출하도록 했다.
   - 여기서 warm up 도중에 startup probe 통과를 아직 못한 노드에 unassigned shard들이 할당되는 것을 확인 됐었는데 여기서 잠깐 의문이 들었었다.
