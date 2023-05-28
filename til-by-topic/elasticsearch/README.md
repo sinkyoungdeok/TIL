@@ -106,7 +106,7 @@
   - [nori_part_of_speech token filter](#nori_part_of_speech-token-filter)
   - [_analyze API를 이용한 NoriAnalyzer 테스트](#_analyze-api를-이용한-norianalyzer-테스트)
 - [실전](#실전)
-  - [Rolling Update 배포시 Unassigned Shard 문제 해결](#rolling-update-배포시-unassigned-shard-문제-해결)
+  - [Unassigned Shard 문제 해결](#unassigned-shard-문제-해결)
   - [Rolling Update 배포로 data 노드 배포 시 latency 생기는 현상 원인 및 해결 방법](#rolling-update-배포로-data-노드-배포-시-latency-생기는-현상-원인-및-해결-방법)
   - [Master, Data Node로만 구성했을 때 배포 시 Latency 튀는 현상 원인 및 해결 방법](#master-data-node로만-구성했을-때-배포-시-latency-튀는-현상-원인-및-해결-방법)
   - [Elasticsearch Warm Up](#elasticsearch-warm-up)
@@ -1566,7 +1566,7 @@ bin/elasticsearch-plugin remove analysis-nori
 
 ## 실전 
 
-### Rolling Update 배포시 Unassigned Shard 문제 해결 
+### Unassigned Shard 문제 해결 
 
 1. Unassigned Shard 목록 확인 
 
