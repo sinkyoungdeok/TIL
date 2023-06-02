@@ -224,6 +224,7 @@
   - [k8s에서 두 서버의 배포 sync 맞추기](#k8s에서-두-서버의-배포-sync-맞추기)
   - [k8s에서 elasticsearch 배포시 latency 밀리는 현상 제거하기.](#k8s에서-elasticsearch-배포시-latency-밀리는-현상-제거하기)
   - [Volume 줄이기?](#volume-줄이기)
+  - [pod 하나를 debug하기](#pod-하나를-debug하기)
 
 ## 0. k9s 
 
@@ -2651,3 +2652,7 @@ A,B 서버가 이미 배포되어 있다고 가정
 - 인프라 레벨에서는 블록을 추가해줄 수는 있어도
 - 줄일 때 어딜 줄일지는 결정할 수없다.
 
+### pod 하나를 debug하기
+1. label을 debug로 override
+2. 트래픽이 안전하게 빠진걸 확인후 thread dump를 뜬다.
+3. 디버깅 진행(메모리 릭 등 확인)
