@@ -225,6 +225,7 @@
   - [ECK의 장점](#eck의-장점)
   - [Volume 줄이기?](#volume-줄이기)
   - [pod 하나를 debug하기](#pod-하나를-debug하기)
+  - [argocd 팁](#argocd-팁)
 
 ## 0. k9s 
 
@@ -2669,3 +2670,8 @@ A,B 서버가 이미 배포되어 있다고 가정
 1. label을 debug로 override
 2. 트래픽이 안전하게 빠진걸 확인후 thread dump를 뜬다.
 3. 디버깅 진행(메모리 릭 등 확인)
+
+### argocd 팁 
+1. refresh 버튼을 누르면 바로 변경사항을 불러올 수 있다.
+2. app detail에서 앱의 cluster 등 각종 정보를 확인할 수 있다.
+3. app detail에서 enable auto sync 설정을 통해서 자동 배포 등을 설정할 수 있다.
