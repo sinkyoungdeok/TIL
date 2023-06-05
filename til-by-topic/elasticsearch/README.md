@@ -79,19 +79,19 @@
   - [주요 System 설정](#주요-system-설정)
   - [Closed Index 설정 변경](#closed-index-설정-변경)
 - [7. Index Modules](#7-index-modules)
-  - [Static Index Settings - 1. index.number_of_shards](#static-index-settings---1-indexnumber_of_shards)
-  - [Static Index Settings - 2. index.number_of_routing_shards](#static-index-settings---2-indexnumber_of_routing_shards)
+  - [Static Index Settings - 1. index.number\_of\_shards](#static-index-settings---1-indexnumber_of_shards)
+  - [Static Index Settings - 2. index.number\_of\_routing\_shards](#static-index-settings---2-indexnumber_of_routing_shards)
   - [Static Index Settings - 3. index.codec](#static-index-settings---3-indexcodec)
   - [Static Index Settings - 4. index.hidden](#static-index-settings---4-indexhidden)
-  - [Dynamic Index Settings - 1. index.number_of_replicas](#dynamic-index-settings---1-indexnumber_of_replicas)
-  - [Dynamic Index Settings - 2. index.refresh_interval](#dynamic-index-settings---2-indexrefresh_interval)
-  - [Dynamic Index Settings - 3. index.max_result_window](#dynamic-index-settings---3-indexmax_result_window)
+  - [Dynamic Index Settings - 1. index.number\_of\_replicas](#dynamic-index-settings---1-indexnumber_of_replicas)
+  - [Dynamic Index Settings - 2. index.refresh\_interval](#dynamic-index-settings---2-indexrefresh_interval)
+  - [Dynamic Index Settings - 3. index.max\_result\_window](#dynamic-index-settings---3-indexmax_result_window)
   - [Elasticsearch에서 검색을 실행하는 방법](#elasticsearch에서-검색을-실행하는-방법)
   - [scroll](#scroll)
-  - [search_after 기능](#search_after-기능)
-  - [Dynamic Index Settings - 4. index.max_inner_result_window](#dynamic-index-settings---4-indexmax_inner_result_window)
-  - [Dynamic Index Settings - 5. index.analyze.max_token_count](#dynamic-index-settings---5-indexanalyzemax_token_count)
-  - [Dynamic Index Settings - 6. index.max_terms_count](#dynamic-index-settings---6-indexmax_terms_count)
+  - [search\_after 기능](#search_after-기능)
+  - [Dynamic Index Settings - 4. index.max\_inner\_result\_window](#dynamic-index-settings---4-indexmax_inner_result_window)
+  - [Dynamic Index Settings - 5. index.analyze.max\_token\_count](#dynamic-index-settings---5-indexanalyzemax_token_count)
+  - [Dynamic Index Settings - 6. index.max\_terms\_count](#dynamic-index-settings---6-indexmax_terms_count)
   - [Dynamic Index Settings - 7. index.routing.allocation.enable](#dynamic-index-settings---7-indexroutingallocationenable)
   - [Dynamic Index Settings - 8. index.routing.rebalance.enable](#dynamic-index-settings---8-indexroutingrebalanceenable)
   - [Scroll 실습](#scroll-실습)
@@ -100,11 +100,11 @@
   - [Analyzer란](#analyzer란)
   - [Analyzer 종류](#analyzer-종류)
   - [Analyzer의 구성 항목](#analyzer의-구성-항목)
-  - [_analyze API 구조](#_analyze-api-구조)
-  - [_analyze API Parameters](#_analyze-api-parameters)
-  - [nori_tokenizer](#nori_tokenizer)
-  - [nori_part_of_speech token filter](#nori_part_of_speech-token-filter)
-  - [_analyze API를 이용한 NoriAnalyzer 테스트](#_analyze-api를-이용한-norianalyzer-테스트)
+  - [\_analyze API 구조](#_analyze-api-구조)
+  - [\_analyze API Parameters](#_analyze-api-parameters)
+  - [nori\_tokenizer](#nori_tokenizer)
+  - [nori\_part\_of\_speech token filter](#nori_part_of_speech-token-filter)
+  - [\_analyze API를 이용한 NoriAnalyzer 테스트](#_analyze-api를-이용한-norianalyzer-테스트)
 - [실전](#실전)
   - [Unassigned Shard 문제 해결](#unassigned-shard-문제-해결)
   - [Rolling Update 배포로 data 노드 배포 시 latency 생기는 현상 원인 및 해결 방법](#rolling-update-배포로-data-노드-배포-시-latency-생기는-현상-원인-및-해결-방법)
@@ -1625,6 +1625,26 @@ PUT _all/_settings
 
 
 ### Master, Data Node로만 구성했을 때 배포 시 Latency 튀는 현상 원인 및 해결 방법 
+
+**상황**
+
+<img width="490" alt="image" src="https://github.com/sinkyoungdeok/TIL/assets/28394879/0476162b-18b0-4891-844c-fa1ce3dca991">
+- 위는 평소 상황
+- 위 상황에서 배포를 시작하면 아래 과정들을 거침 
+
+<img width="480" alt="image" src="https://github.com/sinkyoungdeok/TIL/assets/28394879/ef11ed79-319d-4372-9638-41b79b7c5cd0">
+- 배포 시작하면 Pod중 한대를 종료함
+- 이 떄 까지는 Latency가 정상임
+
+<img width="473" alt="image" src="https://github.com/sinkyoungdeok/TIL/assets/28394879/0bab9c8b-7284-409a-8203-c4ed0c15ac4e">
+- 종료된 pod가 init 상태로 변경됨
+- 이 때 latency가 비정상적으로 올라감
+
+<img width="473" alt="image" src="https://github.com/sinkyoungdeok/TIL/assets/28394879/e8971a44-8bc8-4af5-a560-485ee022d513">
+- 배포된 pod가 running상태로 변경되고, 다음 pod도 위와 같은 Eng -> init -> Running 상태를 거친다.
+- 그럼 다른 pod들도 이미지가 교체(배포)되면서 latency가 비정상저긍로 올라간다.
+- 그래서, 배포 할 때 마다 master 노드의 대수 만큼 latency가 비정상적으로 올라가는 현상임.
+
 
 - 원인 
   - ingress를 master로 구성하게 될텐데, 이러면 coordination 노드의 역할인 Web Server 역할까지도 맡는 것이다.
