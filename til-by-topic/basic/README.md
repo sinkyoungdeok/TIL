@@ -4,6 +4,7 @@
     - [문제점 - 등록 및 조회시](#문제점---등록-및-조회시)
     - [문제점 - 수정 혹은 on/off 시](#문제점---수정-혹은-onoff-시)
     - [해결 방법](#해결-방법)
+    - [왜 backend에서 kst로 변경하면 문제가 될까?](#왜-backend에서-kst로-변경하면-문제가-될까)
 
 
 # 실전 
@@ -61,3 +62,34 @@
 즉
 - backend & DB 까지는 utc를 유지하고
 - frontend 나 땡겨가는쪽에서 9시간을 붙여줘서 처리하도록 변경했다.
+
+### 왜 backend에서 kst로 변경하면 문제가 될까? 
+
+```py
+from datetime import datetime
+from pytz import timezone
+
+
+def convert_to_seoul_time(date_string):
+    # 입력된 날짜 문자열을 datetime 객체로 변환
+    date = datetime.strptime(date_string, "%Y-%m-%d %H:%M:%S")
+
+    # 서울 시간대로 변환
+    seoul_timezone = timezone('Asia/Seoul')
+    seoul_date = date.astimezone(seoul_timezone)
+
+    # 변환된 날짜를 원하는 형식으로 출력
+    seoul_date_string = seoul_date.strftime("%Y-%m-%d %H:%M:%S")
+    return seoul_date_string
+
+
+# 테스트
+date_string = "2023-06-06 15:00:00"
+seoul_time = convert_to_seoul_time(date_string)
+print(seoul_time)
+```
+
+- 위 로직을 local 환경에서 실행해보면 06-06 15:00:00가 나올 것이다.
+- 그런데 ec2 환경이나 ideone같은 서버ide에서 실행해보면 06-07 00:00:00가 나온다.
+- `2023-06-06T15:00:00.000Z` 값으로 들어오면 local, ec2 모두 같은 결과를 내지만 
+- `2023-06-06 15:00:00` 값으로 들어오면 환경에따라서 다른 시간을 보여주게된다.
