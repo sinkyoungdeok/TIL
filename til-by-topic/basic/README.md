@@ -2,6 +2,7 @@
   - [timezone 문제 해결](#timezone-문제-해결)
     - [상황](#상황)
     - [문제점 - 등록 및 조회시](#문제점---등록-및-조회시)
+    - [문제점 - 수정 혹은 on/off 시](#문제점---수정-혹은-onoff-시)
 
 
 # 실전 
@@ -24,4 +25,24 @@
 
 ### 문제점 - 등록 및 조회시
 
-![image](https://github.com/sinkyoungdeok/TIL/assets/28394879/fe1b854d-8ff8-4032-9e46-4f162d5b911c)
+![image](https://github.com/sinkyoungdeok/TIL/assets/28394879/28564de7-41b8-4700-8794-a2e81bf20579)
+
+**등록**
+1. 유저가 6/14 00:00 을 입력하면 frontend에서는 이 값을 utc로 변환해서 6/13 15:00로 backend 로 전달한다.
+2. backend에서는 전달받은 시간을 kst(seoul timezone)으로 변경해서 6/14 00:00로 DB에 저장한다.
+3. 그러면 DB에는 6/14 00:00가 저장되어 있게 된다. (참고로 DB에는 timezone 정보를 저장하지 않았다.)
+
+**조회 - 여기에서 local, ec2 다른점이 생김**
+1. DB에 있던 6/14 00:00값을 backend에서 그대로 가져옴 (여기까진 동일)
+2. backend에서 serialize 하면서 kst로 변경함 (여기부터 문제 발생)
+   - localhost에서는 korea 기준이므로 6/14 00:00 시간이 korea니까 그대로 6/14 00:00그대로 변경됨
+   - ec2에서는 uct 기준이므로 6/14 00:00 시간이 uct니까 korea로 바꾸면서 6/14 09:00로 변경됨
+3. 변경된 시간을 front-end에 전달 
+   - localhost에서는 문제 없지만
+   - ec2에서는 등록했던 시간보다 9시간이 +된 상태에서 보임. 
+
+### 문제점 - 수정 혹은 on/off 시
+- 등록과 마찬가지인 문제인데 on/off 할 때 마다 front-end에서 전달받은 시작 날짜와 종료 날짜를 backend로 전달하면서 문제가 생김
+  - localhost는 9시간이 안붙은상태에서 보여졌다가 그대로 전달하므로 문제가 없음.
+  - ec2에서는 9시간이 붙은 상태에서 front-end에서 저장하고 있다가, 그대로 back-end로 전달하므로 DB에서 꺼낼 때 또 9시간이 붙음.
+- 즉, on/off 한번 누를 때 마다 9시간씩 증가하는 문제가 발생.
