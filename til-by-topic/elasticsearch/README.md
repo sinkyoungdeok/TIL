@@ -1684,3 +1684,6 @@ PUT _all/_settings
   - primary shard 1로 세팅한다면 
   - 최대 replica shard 갯수는 3개이다. 
   - data노드안에 같은 shard가 배치될순 없는 것 같다. 
+- data 노드 갯수가 4개라면
+  - 적어도 primary, replica shard 총 갯수가 4개이상은 되어야 한다.
+  - 그리고 primary, replica shard 총 갯수가 4의 배수가 적절할 수 있다.
