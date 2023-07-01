@@ -111,6 +111,11 @@
   - [Master, Data Node로만 구성했을 때 배포 시 Latency 튀는 현상 원인 및 해결 방법](#master-data-node로만-구성했을-때-배포-시-latency-튀는-현상-원인-및-해결-방법)
   - [Elasticsearch Warm Up](#elasticsearch-warm-up)
   - [Primary Shard, Replica Shard 성능 튜닝 관련 정리](#primary-shard-replica-shard-성능-튜닝-관련-정리)
+  - [node_left.delayed_timeout 설정으로 latency 지연 해결](#node_leftdelayed_timeout-설정으로-latency-지연-해결)
+    - [상황](#상황)
+    - [배포 시 상황](#배포-시-상황)
+    - [해결 방법](#해결-방법)
+    - [설정](#설정)
 ## 0. ES 명령어 모음집 
 
 ### 1. alias 조회 
@@ -1701,3 +1706,34 @@ PUT _all/_settings
   - primary shard 4, replica shard 1로 
   - 세팅했을 때가 가장 안정적으로 성능이 나왔다.
   - 안정적이라는게, 색인 + 배포를 동시에 진행하면서 검색했을 때를 말하는 것이다.
+
+### node_left.delayed_timeout 설정으로 latency 지연 해결 
+
+#### 상황
+- - elasticsearch 에서는 Fault Detection을 위해 master → nodes, nodes → master 양방향으로 주기적으로 ping을 날림.
+- 별도 설정이 없다면 1초마다 ping을 날리고, 30초 동안 응답이 없으면 3번 재시도 후 최종적으로 fault라고 단정짓고 해당 노드를 클러스터에서 제외 시킴.
+- 위에 상황이 운영중인 클러스터에선 문제가 심각해 질 수 있음.
+  1. 클러스터에서 노드가 한개 빠짐 
+  2. 빠진 노드가 갖고 있던 shard들이 unassigned shards로 변경됨
+  3. unassigned shards를 기존 노드들이 나눠갖는 shard allocation 발생
+  4. 데이터량이 많은 인덱스의 경우 shard allocation 작업이 굉장히 비싼 작업이여서 CPU load 높아짐 
+  5. 서비스 지연 발생
+- 위 문제가 배포한다면 data노드 갯수만큼 벌어짐. 
+
+
+#### 배포 시 상황 
+- data 노드 3대로 시작.
+1. 3대중에 1대 종료
+2. 종료된 노드에서 shard들 unassigned shard로 변경됨.
+3. unassigned shard 들을 나머지 2대로 allocation 작업 → latency 증가
+4. 종료된 노드 재시작 완료
+5. 재시작된 노드가 투입되면서 재할당 시작. → latency 증가
+- 위 1~5번을 data노드 갯수(3개)만큼 반복
+
+#### 해결 방법 
+- unassigned shards의 allocation을 기본 설정은 1분인데, 이것을 5분으로 변경한다.
+- 즉, unassigned shards를 5분이 지날때 까지 unassigned 상태로 유지
+- 이렇게 하게되면, 종료된 data node가 갖고 있던 shard들을 재시작 됐을 때 그대로 사용 가능.
+
+#### 설정 
+- https://www.elastic.co/guide/en/elasticsearch/reference/current/delayed-allocation.html
