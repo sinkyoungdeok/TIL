@@ -116,13 +116,13 @@
     - [배포 시 상황](#배포-시-상황)
     - [해결 방법](#해결-방법)
     - [설정](#설정)
-- [data 노드 수와 shard 갯수 조절로 latency 해결](#data-노드-수와-shard-갯수-조절로-latency-해결)
-  - [Background](#background)
+  - [data 노드 수와 shard 갯수 조절로 latency 해결](#data-노드-수와-shard-갯수-조절로-latency-해결)
+    - [Background](#background)
     - [검색 원리](#검색-원리)
     - [Case1) 샤드 갯수 1, 단일 쿼리](#case1-샤드-갯수-1-단일-쿼리)
     - [Case 2) 샤드 갯수 1, 멀티 쿼리](#case-2-샤드-갯수-1-멀티-쿼리)
     - [Case 3) 샤드 갯수 n, 멀티 쿼리 (n: 코어의 갯수)](#case-3-샤드-갯수-n-멀티-쿼리-n-코어의-갯수)
-  - [결론](#결론)
+    - [결론](#결론)
 ## 0. ES 명령어 모음집 
 
 ### 1. alias 조회 
@@ -1746,9 +1746,9 @@ PUT _all/_settings
 - https://www.elastic.co/guide/en/elasticsearch/reference/current/delayed-allocation.html
 
 
-## data 노드 수와 shard 갯수 조절로 latency 해결
+### data 노드 수와 shard 갯수 조절로 latency 해결
 
-### Background
+#### Background
 
 #### 검색 원리
 - es 검색은 1쿼리 1샤드 1스레드를 바탕으로 일어남.
@@ -1785,7 +1785,7 @@ PUT _all/_settings
 - 결국 2~4 쿼리에 대한 응답 결과가 느려지게 되고, 쿼리 간의 응답속도차가 점점 벌어짐
 
 
-### 결론 
+#### 결론 
 - 현재 오늘의집 검색팀에서는 대부분의 ES의 data노드를 4대 두고 있고, 각 노드별로 스레드 갯수는 10개정도 된다.
 - data노드를 한 6~8대 정도까지 늘리고, shard갯수도 그만큼 늘리면 성능 이점을 가져갈 수 있다.
 - 추가로
