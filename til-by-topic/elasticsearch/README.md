@@ -123,6 +123,7 @@
     - [Case 2) 샤드 갯수 1, 멀티 쿼리](#case-2-샤드-갯수-1-멀티-쿼리)
     - [Case 3) 샤드 갯수 n, 멀티 쿼리 (n: 코어의 갯수)](#case-3-샤드-갯수-n-멀티-쿼리-n-코어의-갯수)
     - [결론](#결론)
+  - [Query Cache](#query-cache)
 ## 0. ES 명령어 모음집 
 
 ### 1. alias 조회 
@@ -1792,3 +1793,19 @@ PUT _all/_settings
     - 현재 data노드가 4개니까 배포하면 data 노드 3대로 트래픽을 버텨야한다.
     - commerce 같은경우는 data노드 3대로 트래픽을 버티기에는 역부족일 수 있다.
     - 그래서, data 노드 수를 6대로 늘리고 primary shard 갯수도 6개로 늘리면 성능 이점과 배포했을 때 latency 밀리는 현상을 완화할 수 있다.
+- 4대였던 data노드를 6대로 늘리고, primary shard도 4개에서 6개로 변경했을 때 1.5배이상의 성능이점을 가져갈 수 있었다(latency가 1.5배 줄었다)
+
+
+### Query Cache
+- 빈번하게 요청되는 filter query의 응답 속도를 개선하기 위해서 cache를 사용.
+- 문서 자체를 캐시하는 것이 아닌, 응답값 (true, false)만 bitset 형태로 캐시한다.
+- 스코어 계산이 필요한 query나 aggregation등은 query cache가 적용되지 않는다.
+
+```
+PUT /my_index
+{
+  "settings": {
+    "index.requests.cache.enable": true
+  }
+}
+```
