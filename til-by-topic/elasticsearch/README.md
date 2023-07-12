@@ -124,6 +124,7 @@
     - [Case 3) 샤드 갯수 n, 멀티 쿼리 (n: 코어의 갯수)](#case-3-샤드-갯수-n-멀티-쿼리-n-코어의-갯수)
     - [결론](#결론)
   - [Query Cache](#query-cache)
+  - [Replica Shard 갯수 조정 명령어](#replica-shard-갯수-조정-명령어)
 ## 0. ES 명령어 모음집 
 
 ### 1. alias 조회 
@@ -1809,3 +1810,15 @@ PUT /my_index
   }
 }
 ```
+
+### Replica Shard 갯수 조정 명령어
+```
+PUT /my-index/_settings
+{
+  "index": {
+    "number_of_replicas": 2
+  }
+}
+```
+- primary shard는 reindex하지 않는이상, 갯수조정은 못한다.
+- replica shard는 갯수 조정이 자유롭다. 
