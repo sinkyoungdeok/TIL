@@ -123,7 +123,9 @@
     - [Case 2) 샤드 갯수 1, 멀티 쿼리](#case-2-샤드-갯수-1-멀티-쿼리)
     - [Case 3) 샤드 갯수 n, 멀티 쿼리 (n: 코어의 갯수)](#case-3-샤드-갯수-n-멀티-쿼리-n-코어의-갯수)
     - [결론](#결론)
-  - [Query Cache](#query-cache)
+  - [Query Cache & Page Cache](#query-cache--page-cache)
+    - [1. Query Cache](#1-query-cache)
+    - [2. Page Cache](#2-page-cache)
   - [Replica Shard 갯수 조정 명령어](#replica-shard-갯수-조정-명령어)
 ## 0. ES 명령어 모음집 
 
@@ -1746,6 +1748,14 @@ PUT _all/_settings
 
 #### 설정 
 - https://www.elastic.co/guide/en/elasticsearch/reference/current/delayed-allocation.html
+```
+PUT _all/_settings
+{
+  "settings": {
+    "index.unassigned.node_left.delayed_timeout": "5m"
+  }
+}
+```
 
 
 ### data 노드 수와 shard 갯수 조절로 latency 해결
@@ -1797,7 +1807,9 @@ PUT _all/_settings
 - 4대였던 data노드를 6대로 늘리고, primary shard도 4개에서 6개로 변경했을 때 1.5배이상의 성능이점을 가져갈 수 있었다(latency가 1.5배 줄었다)
 
 
-### Query Cache
+### Query Cache & Page Cache
+
+#### 1. Query Cache
 - 빈번하게 요청되는 filter query의 응답 속도를 개선하기 위해서 cache를 사용.
 - 문서 자체를 캐시하는 것이 아닌, 응답값 (true, false)만 bitset 형태로 캐시한다.
 - 스코어 계산이 필요한 query나 aggregation등은 query cache가 적용되지 않는다.
@@ -1810,6 +1822,18 @@ PUT /my_index
   }
 }
 ```
+
+#### 2. Page Cache
+- 운영 체제 레벨의 첫 번째 캐시
+- 디스크에서 데이터를 읽은 후 사용 가능한 메모리에 데이터를 넣는 것으로, 다음 읽기는 메모리에서 반환되고 데이터를 가져오는 데 디스크 탐색이 필요 없다.
+![image](https://github.com/sinkyoungdeok/TIL/assets/28394879/6effe0ba-fd7c-4dc8-8c1d-51bcc9117ca6)
+- 첫 번째 읽기는 애플리케이션이 디스크에서 데이터를 읽기 위해 시스템 호출을 실행하고, 커널/운영 체제가 디스크로 이동하여 데이터를 페이지 캐시에, 그리고 메모리에 넣는다.
+- 두 번째 읽기는 커널에 의해 운영 체제 메모리 내의 페이지 캐시로 리디렉션될 수 있으므로 훨씬 빠르다. 
+- Elasticsearch 메모리에 대한 권장 사항이 일반적으로 사용 가능한 총 메모리의 절반 이하인 이유중 하나가, 나머지 절반을 페이지 캐시에 사용할 수 있기 때문이다. (메모리가 낭비되지 않고 페이지 캐시에 재사용된다는 뜻이기도 한다)
+- 캐시의 만료시점
+  - 1) 데이터 자체가 변경되면 페이지 캐시는 해당 데이터를 더티(dirty)로 표시하고 페이지 캐시에서 해제됨
+  - 2) 메모리가 가득차는 경우
+
 
 ### Replica Shard 갯수 조정 명령어
 ```
