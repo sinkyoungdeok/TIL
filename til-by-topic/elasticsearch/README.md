@@ -1679,6 +1679,9 @@ PUT _all/_settings
   - 과거 elasticsearch 에서는 index를 warm up 을 하기 위해 warmer를 쓸 수 있었는데
   - 7버전부터 warmer가 제거됐다.
   - index warm up을 안해도 될만큼 index의 성능이 개선된 것으로 확인됨.
+  - 테스트 진행해보았는데, index warm up 은 필요 없는게 확실함.
+    - indexing 새로 해서 만든 index로 latency 밀렸던 쿼리를 넣어봤으나, 문제 없음. 
+    - data노드 껏다키고나서 동일한 쿼리를 넣어보면 latency 확 밀림. 
 - 2번째: jvm warm up
   - elasticsearch 도 jvm위에 돌아간다.
   - jvm을 사용하므로 결국 jit compiler를 사용하고 있을텐데, 그럼 배포를 할 때 마다 latency 밀리는 현상이 조금씩은 있을 수 있고 이것을 해결하기 위해선 warm up 이 필요하다.
