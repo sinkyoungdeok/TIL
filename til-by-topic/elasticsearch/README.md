@@ -127,6 +127,7 @@
     - [1. Query Cache](#1-query-cache)
     - [2. Page Cache](#2-page-cache)
   - [Replica Shard 갯수 조정 명령어](#replica-shard-갯수-조정-명령어)
+  - [쿼리 Timeout 설정하기](#쿼리-timeout-설정하기)
 ## 0. ES 명령어 모음집 
 
 ### 1. alias 조회 
@@ -1849,3 +1850,38 @@ PUT /my-index/_settings
 ```
 - primary shard는 reindex하지 않는이상, 갯수조정은 못한다.
 - replica shard는 갯수 조정이 자유롭다. 
+
+### 쿼리 Timeout 설정하기 
+
+1. 쿼리에 직접 걸기 
+
+```
+GET test_index/_search
+{
+  "timeout": "60s", 
+  "query": {},
+  "aggs": {}
+}
+```
+
+
+2. cluster 전체에 걸기 
+
+```
+PUT /_cluster/settings
+{
+  "persistent": {
+    "search.default_search_timeout": "60s"
+  }
+}
+```
+
+- 만약 300ms 을 설정하더라도, 가끔 1000ms 정도 까지는 튀긴한다.
+- timeout 설정만큼 latency가 튀면 500 error를 뱉는게 아니다.
+- timeout 설정만큼 데이터를 수집하고, timeout 설정 이후엔 데이터를 모아서 정렬까지만 처리하고 return 해주는 것으로 보인다.
+- timeout 만큼 각 샤드가 완료될 때까지 기다리는 시간을 지정하는 것이다.
+- 각 샤드는 지정된 기간 내에 데이터를 수집한다.
+- 기간이 끝나도 수집이 완료되지 않으면 elasticsearch는 해당 시점까지 누적된 데이터만 사용한다.
+- 검색 요청의 전체 대기 시간은 검색에 필요한 샤드 수와 동시 샤드 요청 수에 따라 다르다.
+- 검색 요청이 완료되기 전에 전역 검색 제한 시간이 만료되면 요청한 timeout를 활용해서 취소된다.
+- 전역 timeout 설정의 기본값은 -1(시간 제한 없음)이다. 
