@@ -349,3 +349,70 @@ class ImageLoader {
     - 리턴 타입이 더 짧아지며, 전달하기 쉬워짐
     - 사용자가 데이터 클래스에 적혀 있는 것과 다른 이름을 활용해 변수를 해제하면, 경고가 출력됨
 - 코틀린에서 클래스는 큰 비용없이 사용할 수 있는 좋은 도구이니, 적극적으로 활용하자.
+
+#### 38. 연산 또는 액션을 전달할 떄는 인터페이스 대신 함수 타입을 사용하라 
+- 대부분의 프로그래밍 언어에는 함수 타입이라는 개념이 없다.
+- 그래서 연산 또는 액션을 전달할 때 메서드가 하나만 있는 인터페이스를 활용한다.
+- 이러한 인터페이스를 SAM이라고 함.
+
+**SAM**
+```kotlin
+fun setOnClickListener(listener: OnClick) {
+  // ...
+}
+
+setOnClickListener(object: OnClick {
+  override fun clicked(view: View) {
+    // ...
+  }
+})
+```
+
+**함수 타입**
+```kotlin
+fun setOnClickListener(listener: (View) -> Unit) {
+
+}
+```
+
+- 함수 타입을 사용하는 코드로 변경하면, 더 많은 자유를 얻을 수 있다.
+
+- 람다 표현식 또는 익명 함수로 전달
+```kotlin
+setOnClickListener { }
+setOnClickListener(fun(view) {})
+```
+
+- 함수 레퍼런스 또는 제한된 함수 레퍼런스로 전달
+```kotlin
+setOnClickListener(::println)
+setClickListener(this::showUsers)
+```
+
+- 선언된 함수 타입을 구현한 객체로 전달
+```kotlin
+class ClickListener: (View) ->Unit {
+  override fun invoke(view: View) {
+
+  }
+}
+
+setOnClickListener(ClickListener())
+```  
+
+- SAM의 장점은 '그 아규먼트에 이름이 붙어있는 것'이라고도 하는데, 타입별칭을 사용하면 함수타입도 이름을 가질 수 있음 
+```kotlin
+typealias OnClick = (View) -> Unit
+```
+
+- 파라미터도 이름을 가질 수 있음 -> 이름을 붙이면, IDE의 지원을 받을 수 있는 큰 장점이 있음 
+```kotlin
+fun setOnClickListener(listener: OnClick) {}
+typealias OnClick = (view: View)->Unit
+```
+
+- 람다 표현식을 사용할 때는 아규먼트 분해도 사용할 수 있음 -> 이것도 SAM 보다 훨씬 더 좋은점임
+- 인터페이스를 사용해야 하는 특별한 이유가 없다면, 함수 타입을 활용하는게 좋다.
+
+**SAM을 언제 사용해야 할까?**
+- 코틀린이 아닌 다른 언어에서 상요할 클래스를 설계할 때이다. ex) 자바 
