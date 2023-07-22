@@ -416,3 +416,76 @@ typealias OnClick = (view: View)->Unit
 
 **SAM을 언제 사용해야 할까?**
 - 코틀린이 아닌 다른 언어에서 상요할 클래스를 설계할 때이다. ex) 자바 
+
+
+#### 39. 태그 클래스보다는 클래스 계층을 사용하라 
+
+```kotlin
+class ValueMatcher<T> private constructor(
+  private val value: T? = null,
+  private val matcher: Matcher
+) {
+  
+  fun match(value: T?) = when(matcher) {
+    Matcher.EQUAL -> value == this.value
+    Matcher.NOT_EQUAL -> value != this.value
+    Matcher.LIST_EMPTY -> value is List<*> && value.isEmpty()
+    Matcher.LIST_NOT_EMPTY -> value is List<*> && value.isNotEmpty()
+  }
+
+  enum class Matcher(
+    Equal,
+    NOT_EQUAL,
+    LIST_EMPTY,
+    LIST_NOT_EMPTY
+  )
+
+  companion object {
+    fun equal..
+    fun notEqual..
+    ...
+  }
+}
+```
+- 위 코드가 태그 클래스의 예시이다.
+- 이러한 태그 클래스는 다양한 문제를 내포하고 있다. 
+- 서로 다른 책임을 한 클래스에 태그로 구분해서 넣는다는 것에서 문제가 시작된다.
+- 이러한 접근 방법에는 굉장히 많은 단점이 있다.
+  - 한 클래스에 여러 모드를 처리하기 위한 상용구가 추가됨
+  - 여러 목적으로 사용해야 하므로 프로퍼티가 일관적이지 않게 사용될 수 있으며, 더 많은 프로퍼티가 필요하다. 예를 들어 위의 예제에서 value는 모드가 LIST_EMPTY 또는 LIST_NOT_EMPTY일 때 아예 사용되지도 않는다.
+  - 요소가 여러 목적을 가지고, 요소를 여러 방법으로 설정할 수 있는 경우에는 상태의 일관성과 정확성을 지키기 어렵다.
+  - 팩토리 메서드를 사용해야 하는 경우가 많다. 그렇지 않으면 객체가 제대로 생성되었는지 확인하는 것 자체가 굉장히 어렵다.
+- 코틀린은 그래서 일반적으로 태그클래스보다 sealed 클래스를 많이 사용한다.
+- 한 클래스에 여러 모드를 만드는 방법 대신에, 각각의 모드를 여러 클래스로 만들고 타입 시스템과 다형성을 활용하는 것이다.
+```kotlin
+sealed class ValueMatcher<T> {
+  ...
+  class Equal...
+
+  class NotEqual...
+  ...
+}
+```
+- 이렇게 구현하면 책임이 분산되므로 훨씬 깔끔하다.
+  - 각각의 객체들은 자신에게 필요한 데이터만 있으며, 적절한 파라미터만 갖는다.
+
+
+**sealed 한정자**
+- sealed class대신 abstract 한정자를 사용할수도 있지만, sealed 한정자는 외부 파일에서 서브 클래스를 만드는 행위 자체를 모두 제한하므로 타입이 추가되지 않을 거라는게 보장된다.
+- when을 사용할 때 else 브랜치를 따로 만들 필요도 없다.
+- 각각의 서브클래스에 구현할 필요 없이, when을 활용하는 확장 함수로 정의하면 한번에 구현할수도 있다. 
+- 예시로 reversed 확장함수를 봐보자.
+```kotlin
+fun <T> ValueMatcher<T>.reversed(): ValueMatcher<T> = 
+when (this) {
+  is ValueMatcher.EmptyList -> ValueMatcher.NotEmptyList<T>()
+  ...
+}
+```
+- sealed 한정자를 사용하면, 확장 함수를 사용해서 클래스에 새로운 함수를 추가하거나, 클래스의 다양한 변경을 쉽게 처리할 수 있다.
+- abstract는 상속과 관련된 설계를 할 때 사용합니다.
+
+**태그 클래스와 상태 패턴의 차이**
+- 상태 패턴은 객체의 내부 상태가 변화할 때, 객체의 동작이 변하는 소프트웨어 디자인 패턴이다.
+- 타입 계층과 상태 패턴은 실질적으로 함께 사용하는 협력 관계라고 할 수 있다.
+- 하나의 뷰를 가지는 경우 보다는 여러 개의 상태로 구분할 수 있는 뷰를 가질 때 많이 활용된다.
