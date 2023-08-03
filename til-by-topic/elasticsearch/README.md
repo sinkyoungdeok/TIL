@@ -79,19 +79,19 @@
   - [주요 System 설정](#주요-system-설정)
   - [Closed Index 설정 변경](#closed-index-설정-변경)
 - [7. Index Modules](#7-index-modules)
-  - [Static Index Settings - 1. index.number\_of\_shards](#static-index-settings---1-indexnumber_of_shards)
-  - [Static Index Settings - 2. index.number\_of\_routing\_shards](#static-index-settings---2-indexnumber_of_routing_shards)
+  - [Static Index Settings - 1. index.number_of_shards](#static-index-settings---1-indexnumber_of_shards)
+  - [Static Index Settings - 2. index.number_of_routing_shards](#static-index-settings---2-indexnumber_of_routing_shards)
   - [Static Index Settings - 3. index.codec](#static-index-settings---3-indexcodec)
   - [Static Index Settings - 4. index.hidden](#static-index-settings---4-indexhidden)
-  - [Dynamic Index Settings - 1. index.number\_of\_replicas](#dynamic-index-settings---1-indexnumber_of_replicas)
-  - [Dynamic Index Settings - 2. index.refresh\_interval](#dynamic-index-settings---2-indexrefresh_interval)
-  - [Dynamic Index Settings - 3. index.max\_result\_window](#dynamic-index-settings---3-indexmax_result_window)
+  - [Dynamic Index Settings - 1. index.number_of_replicas](#dynamic-index-settings---1-indexnumber_of_replicas)
+  - [Dynamic Index Settings - 2. index.refresh_interval](#dynamic-index-settings---2-indexrefresh_interval)
+  - [Dynamic Index Settings - 3. index.max_result_window](#dynamic-index-settings---3-indexmax_result_window)
   - [Elasticsearch에서 검색을 실행하는 방법](#elasticsearch에서-검색을-실행하는-방법)
   - [scroll](#scroll)
-  - [search\_after 기능](#search_after-기능)
-  - [Dynamic Index Settings - 4. index.max\_inner\_result\_window](#dynamic-index-settings---4-indexmax_inner_result_window)
-  - [Dynamic Index Settings - 5. index.analyze.max\_token\_count](#dynamic-index-settings---5-indexanalyzemax_token_count)
-  - [Dynamic Index Settings - 6. index.max\_terms\_count](#dynamic-index-settings---6-indexmax_terms_count)
+  - [search_after 기능](#search_after-기능)
+  - [Dynamic Index Settings - 4. index.max_inner_result_window](#dynamic-index-settings---4-indexmax_inner_result_window)
+  - [Dynamic Index Settings - 5. index.analyze.max_token_count](#dynamic-index-settings---5-indexanalyzemax_token_count)
+  - [Dynamic Index Settings - 6. index.max_terms_count](#dynamic-index-settings---6-indexmax_terms_count)
   - [Dynamic Index Settings - 7. index.routing.allocation.enable](#dynamic-index-settings---7-indexroutingallocationenable)
   - [Dynamic Index Settings - 8. index.routing.rebalance.enable](#dynamic-index-settings---8-indexroutingrebalanceenable)
   - [Scroll 실습](#scroll-실습)
@@ -100,18 +100,18 @@
   - [Analyzer란](#analyzer란)
   - [Analyzer 종류](#analyzer-종류)
   - [Analyzer의 구성 항목](#analyzer의-구성-항목)
-  - [\_analyze API 구조](#_analyze-api-구조)
-  - [\_analyze API Parameters](#_analyze-api-parameters)
-  - [nori\_tokenizer](#nori_tokenizer)
-  - [nori\_part\_of\_speech token filter](#nori_part_of_speech-token-filter)
-  - [\_analyze API를 이용한 NoriAnalyzer 테스트](#_analyze-api를-이용한-norianalyzer-테스트)
+  - [_analyze API 구조](#_analyze-api-구조)
+  - [_analyze API Parameters](#_analyze-api-parameters)
+  - [nori_tokenizer](#nori_tokenizer)
+  - [nori_part_of_speech token filter](#nori_part_of_speech-token-filter)
+  - [_analyze API를 이용한 NoriAnalyzer 테스트](#_analyze-api를-이용한-norianalyzer-테스트)
 - [실전](#실전)
   - [Unassigned Shard 문제 해결](#unassigned-shard-문제-해결)
   - [Rolling Update 배포로 data 노드 배포 시 latency 생기는 현상 원인 및 해결 방법](#rolling-update-배포로-data-노드-배포-시-latency-생기는-현상-원인-및-해결-방법)
   - [Master, Data Node로만 구성했을 때 배포 시 Latency 튀는 현상 원인 및 해결 방법](#master-data-node로만-구성했을-때-배포-시-latency-튀는-현상-원인-및-해결-방법)
   - [Elasticsearch Warm Up](#elasticsearch-warm-up)
   - [Primary Shard, Replica Shard 성능 튜닝 관련 정리](#primary-shard-replica-shard-성능-튜닝-관련-정리)
-  - [node\_left.delayed\_timeout 설정으로 latency 지연 해결](#node_leftdelayed_timeout-설정으로-latency-지연-해결)
+  - [node_left.delayed_timeout 설정으로 latency 지연 해결](#node_leftdelayed_timeout-설정으로-latency-지연-해결)
     - [상황](#상황)
     - [배포 시 상황](#배포-시-상황)
     - [해결 방법](#해결-방법)
@@ -123,11 +123,12 @@
     - [Case 2) 샤드 갯수 1, 멀티 쿼리](#case-2-샤드-갯수-1-멀티-쿼리)
     - [Case 3) 샤드 갯수 n, 멀티 쿼리 (n: 코어의 갯수)](#case-3-샤드-갯수-n-멀티-쿼리-n-코어의-갯수)
     - [결론](#결론)
-  - [Query Cache \& Page Cache](#query-cache--page-cache)
+  - [Query Cache & Page Cache](#query-cache--page-cache)
     - [1. Query Cache](#1-query-cache)
     - [2. Page Cache](#2-page-cache)
   - [Replica Shard 갯수 조정 명령어](#replica-shard-갯수-조정-명령어)
   - [쿼리 Timeout 설정하기](#쿼리-timeout-설정하기)
+  - [reindex](#reindex)
 ## 0. ES 명령어 모음집 
 
 ### 1. alias 조회 
@@ -1889,3 +1890,28 @@ PUT /_cluster/settings
 - 검색 요청이 완료되기 전에 전역 검색 제한 시간이 만료되면 요청한 timeout를 활용해서 취소된다.
 - 전역 timeout 설정의 기본값은 -1(시간 제한 없음)이다. 
 - 경험상 500ms 내로 끊기길 원하면, timeout 설정을 250ms 정도로 해두면 적당한 것 같다.
+
+
+### reindex 
+
+- whitelist 설정 방법: index를 복제해서 받아올 서버쪽에 설정해야함. (ex 신규 클러스터 쪽) 
+- 참고) coordination 서버가 있으면 coordination 쪽에, master노드만 있다면 master노드 쪽에 설정해야함
+```
+reindex.remote.whitelist: oldhost:9200
+```
+
+- reindex 명령어 
+```
+POST _reindex
+{
+  "source": {
+    "index": "old-index-name",
+    "remote": {
+      "host": "http://my-old-es-cluster-host:9200"
+    },
+  },
+  "dest": {
+    "index": "new-index-name"
+  }
+}
+```
