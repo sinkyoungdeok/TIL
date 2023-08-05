@@ -1894,8 +1894,8 @@ PUT /_cluster/settings
 
 ### reindex 
 
-- whitelist 설정 방법: index를 복제해서 받아올 서버쪽에 설정해야함. (ex 신규 클러스터 쪽) 
-- 참고) coordination 서버가 있으면 coordination 쪽에, master노드만 있다면 master노드 쪽에 설정해야함
+- whitelist 설정 방법: index를 복제해서 받아올 ES쪽에 설정해야함. (ex 신규 클러스터 쪽) 
+- 참고) coordination 노드가 있으면 coordination 쪽에, master노드만 있다면 master노드 쪽에 설정해야함
 ```
 reindex.remote.whitelist: oldhost:9200
 ```
