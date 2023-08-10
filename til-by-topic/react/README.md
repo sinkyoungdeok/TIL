@@ -45,3 +45,19 @@ npx create-react-app begin-react
 cd begin-react
 yarn start
 ```
+
+## 3. 나의 첫번째 리액트 컴포넌트
+- 리액트 컴포넌트를 만들 땐 아래 코드를 통해 리액트를 불러와야 한다.
+```js
+import React from 'react';
+```
+
+- 리액트 컴포넌트에서 XML 형식의 값을 반환해줄 수 있는데 이를 JSX라고 부른다. 
+- 아래 코드는 Hello 라는 컴포넌트를 내보내겠다는 의미이다.
+```js
+export default Hello;
+```
+
+- 컴포넌트는 일종의 UI 조각이고, 쉽게 재사용할 수 있다. 
+- 실제 DOM 내부에 리액트 컴포넌트를 렌더링한다.
+- 리액트 컴포넌트가 렌더링 될 때에는, 렌더링된 결과물 위 div 내부에 렌더링되는 것이다.
