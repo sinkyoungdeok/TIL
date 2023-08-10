@@ -15,3 +15,33 @@
 - 그리고 나서 리액트 개발팀이 만든 매우 효율적인 비교 알고리즘을 통해 실제 브라우저에 보여지고 잇는 DOM과 비교 한 후, 차이가 있는 곳을 감지해서 DOM에 패치시켜준다.
 - 이를 통해서 "업데이트를 어떻게 할 지"에 대한 고민을 하지 않으면서 빠른 성능도 지켜낼 수 있었다.
 
+## 2. 작업환경 준비 
+- Node.js
+  - Webpack 과 Babel 같은 도구들이 js 런타임인 Node.js 기반으로 만들어져있어서 설치 필요.
+- Yarn
+  - npm의 개선된 버전. 
+  - npm은 Node.js를 설치할 때 같이 딸려오는 패키지 매니저 도구. 
+  - 프로젝트에서 사용되는 라이브러리를 설치하고 해당 라이브러리들의 버전 관리 할 때 사용. 
+  - Yarn을 사용하는 이유는, 더 나은 속도와 더 나은 캐싱 시스템을 사용하기 위함.
+- Webpack, Babel
+  - 리액트를 사용하면서 컴포넌트를 여러가지 파일로 분리해서 저장하는데, 이 컴포넌트는 일반 자바스크립트가 아닌 JSX 라는 문법으로 작성하게 된다. 
+  - 여러가지의 파일을 한개로 결합하기 위해서 Webpack 이라는 도구를 사용한다.
+  - JSX를 비롯한 새로운 자바스크립트 문법들을 사용하기 위해 Babel 이라는 도구를 사용한다.
+
+Node.js 설치
+```
+$ curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.8/install.sh | bash
+$ nvm install --lts
+``` 
+
+Yarn 설치
+```
+brew install yarn
+```
+
+새 프로젝트 만들어보기
+```
+npx create-react-app begin-react
+cd begin-react
+yarn start
+```
