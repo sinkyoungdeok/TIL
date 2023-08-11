@@ -129,6 +129,7 @@
   - [Replica Shard 갯수 조정 명령어](#replica-shard-갯수-조정-명령어)
   - [쿼리 Timeout 설정하기](#쿼리-timeout-설정하기)
   - [reindex](#reindex)
+  - [Mecab 설치 방법](#mecab-설치-방법)
 ## 0. ES 명령어 모음집 
 
 ### 1. alias 조회 
@@ -1914,4 +1915,39 @@ POST _reindex
     "index": "new-index-name"
   }
 }
+```
+
+### Mecab 설치 방법 
+```
+brew install automake
+brew install make 
+brew install gcc
+```
+
+
+mecab 설치 
+```
+wget https://bitbucket.org/eunjeon/mecab-ko/downloads/mecab-0.996-ko-0.9.2.tar.gz
+tar xvfz mecab-0.996-ko-0.9.2.tar.gz
+cd mecab-0.996-ko-0.9.2
+./configure
+make
+sudo make install
+```
+
+은전한닢 설치
+```
+wget https://bitbucket.org/eunjeon/mecab-ko-dic/downloads/mecab-ko-dic-2.1.1-20180720.tar.gz
+tar xvfz mecab-ko-dic-2.1.1-20180720.tar.gz
+cd mecab-ko-dic-2.1.1-20180720
+autoreconf
+./configure
+make
+sudo make install
+```
+
+mecab 실행
+```
+mecab -d /usr/local/lib/mecab/dic/mecab-ko-dic
+아버지가 방에 들어가신다.
 ```
