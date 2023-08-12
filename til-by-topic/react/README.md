@@ -73,3 +73,12 @@ export default Hello;
   - JSX안에 js 값 사용하려면 {}로 감싸줘야함.
   - CSS class를 설정할 땐 `class=` 가 아닌 `className=` 으로 설정해줘야 한다.
   - 주석은 {/* */}, // 으로 사용한다.
+
+## 5. props 를 통해 컴포넌트에게 값 전달하기 
+- props는 properties의 줄임말.
+- 어떠한 값을 컴포넌트에게 전달해줘야 할 때 사용함.
+
+- props의 기본 사용법
+- 여러 개의 props, 비구조화 할당
+- defaultProps로 기본값 설정
+- props.children
