@@ -82,3 +82,9 @@ export default Hello;
 - 여러 개의 props, 비구조화 할당
 - defaultProps로 기본값 설정
 - props.children
+
+## 6. 조건부 렌더링
+- 특정 조건에 따라 다른 결과물을 렌더링 하는 것을 의미
+- JSX에서 null, false, undefined를 렌더링하면 아무것도 나타나지 않는다.
+- 보통 삼항연산자를 사용해서 조건부 렌더링을 처리한다.
+- props 값 설정을 생략하면 ={true} 이다
