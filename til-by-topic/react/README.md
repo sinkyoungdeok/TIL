@@ -94,3 +94,10 @@ export default Hello;
 - 리액트 16.8에서 Hooks라는 기능이 도입되면서 함수형 컴포넌트에서도 상태를 관리할 수 있게 됐다.
 - useState라는 함수가 리액트의 Hooks 중 하나이다.
 - 함수형 업데이트는 주로 컴포넌트 최적화를 하게 될 때 사용하게 된다. 
+
+## 8. input 상태 관리하기 
+- 이번에도, useState를 사용
+- 이번에는 input의 `onChange` 라는 이벤트를 사용.
+- 이벤트에 등록하는 함수에서 이벤트 객체를 `e`를 파라미터로 받아와서 사용 하는데
+  - 이 객체의 `e.target`은 이벤트가 발생한 DOM 인 input DOM
+  - `e.tar.value`는 이 DOM의 `value` 값, 이값을 조회하면 현재 input에 입력한 값이 무엇인지 알 수 있음 
