@@ -130,6 +130,7 @@
   - [쿼리 Timeout 설정하기](#쿼리-timeout-설정하기)
   - [reindex](#reindex)
   - [Mecab 설치 방법](#mecab-설치-방법)
+  - [forcemerge segment 갯수조절](#forcemerge-segment-갯수조절)
 ## 0. ES 명령어 모음집 
 
 ### 1. alias 조회 
@@ -1952,3 +1953,17 @@ mecab 실행
 mecab -d /usr/local/lib/mecab/dic/mecab-ko-dic
 아버지가 방에 들어가신다.
 ```
+
+### forcemerge segment 갯수조절 
+
+명령어
+```
+POST /my_index/_forcemerge?max_num_segments=1
+```
+
+- segment 갯수에 따라서 인덱싱 속도와 검색속도의 trade-off 관계가 있다.
+  - segment 갯수가 적을 수록 검색속도가 증가하고 인덱싱 속도가 느려진다.
+  - segment 갯수가 많을 수록 검색속도가 느려지고 인덱싱 속도가 빨라진다.
+- segment 갯수를 세팅하면 primary + replica 수와 비례해서 세팅된다.
+  - primary shard 4, replica shard 1 로 세팅하면 shard 갯수는 8개다.
+  - 이상태에서 segment 갯수를 2개로 설정하면 총 segment 갯수는 8 * 2 = 16개이다.
