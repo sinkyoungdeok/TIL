@@ -1728,6 +1728,8 @@ PUT _all/_settings
   - primary shard 4, replica shard 1로 
   - 세팅했을 때가 가장 안정적으로 성능이 나왔다.
   - 안정적이라는게, 색인 + 배포를 동시에 진행하면서 검색했을 때를 말하는 것이다.
+  - 그렇다고 반드시 data 노드수에 반드시 동일한 세팅으로 primary shard를 지정하는게 좋은건 아니다. collection size에 따라서 노드수가 많아도, primary shard수를 낮게설정하는게 오히려 더 빠를 수 있다. 
+  - primary shard + node 수를 늘리면서 성능 이점을 얻을 수 있는 것은, 어디까지나 collection size가 어느정도 컸을 때에 해당한다. 
 
 ### node_left.delayed_timeout 설정으로 latency 지연 해결 
 
