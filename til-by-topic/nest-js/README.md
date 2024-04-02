@@ -9,10 +9,14 @@
   - [Board Controller 생성](#board-controller-생성)
   - [NestJS Providers, Service 란?](#nestjs-providers-service-란)
   - [Board Service 만들기](#board-service-만들기)
+- [3. CRUD 구현](#3-crud-구현)
+  - [모든 게시물을 가져오는 Service 만들기](#모든-게시물을-가져오는-service-만들기)
+  - [Board Model 정의](#board-model-정의)
+  - [Data Transfer Object(DTO)](#data-transfer-objectdto)
 
-# 1. Nest JS 소개
+## 1. Nest JS 소개
 
-## NestJS란?
+### NestJS란?
 
 **Nest JS 란?**
 - Nest(NestJS)는 효율적이고 확장 가능한 Node.js 서버측 애플리케이션을 구축하기 위한 프레이뭐크
@@ -27,7 +31,7 @@
 - Nest는 개발자와 팀이 고도로 테스트 가능하고 확장 가능하며 느슨하게 결합되고 유지 관리가 쉬운 애플리케이션을 만들 수 있는 즉시 사용 가능한 애플리케이션 아키텍처를 제공 
 - 아키텍처는 Angular에서 영감을 받음 
 
-## NestJS CLI 설치하기 
+### NestJS CLI 설치하기 
 아래 명령어로 새 프로젝트 디렉터리가 생성되고 초기 핵심 Nest 파일 및 지원 모듈로 디렉터리가 채워짐 
 
 ```
@@ -36,9 +40,9 @@ nest new project-name
 nest --version
 ```
 
-# 2. Nest JS 기본 요소
+## 2. Nest JS 기본 요소
 
-## NestJS 모듈 
+### NestJS 모듈 
 
 **Nest JS 모듈이란?**  
 - 모듈은 @Module {} 데코레이터로 주석이 달린 클래스 
@@ -47,12 +51,12 @@ nest --version
 - 같은 기능에 해당하는 것들은 하나의 모듈안에 넣어서 사용 (UserModule = UserController + UserService + UserEntity)
 - 모듈은 기본적으로 싱글 톤이므로 여러 모듈간에 쉽게 공급자의 동일한 인스턴스를 공유
 
-## Board Module 생성 
+### Board Module 생성 
 ```
 nest g module boards
 ```
 
-## NestJS Contrller란 ?
+### NestJS Contrller란 ?
 
 **Controller 란?**
 - 들어오는 요청을 처리하고 클라이언트에 응답을 반환
@@ -61,12 +65,12 @@ nest g module boards
 **Handler 란?**
 - @Get, @Post, @Delete 등과 같은 데코레이터로 장식 된 컨트롤러 클래스 내의 단순 메소드 
 
-## Board Controller 생성
+### Board Controller 생성
 ```
 nest g controller boards --no-spec
 ```
 
-## NestJS Providers, Service 란?
+### NestJS Providers, Service 란?
 
 **Providers 란?**
 - Nest의 기본 개념.
@@ -79,7 +83,28 @@ nest g controller boards --no-spec
 - 서비스는 컨트롤러에서 데이터의 유효성 체크를 하거나 데이터베이스에 아이템을 생성하는 등의 작업을 한다.
 - Service를 Controller에서 이용하려면 Dependency Injection을 해야 한다 
 
-## Board Service 만들기 
+### Board Service 만들기 
 ```
 nest g service boards --no-spec
 ```
+
+## 3. CRUD 구현 
+
+### 모든 게시물을 가져오는 Service 만들기 
+1. 클라이언트에서 요청을 보내면 컨트롤러에서 알맞은 요청 경로에 라우팅해서 해당 핸들러로 감 
+2. 요청을 처리해주기 위해서 서비스로 들어감
+3. 그 요청에 맞는 로직을 서비스에서 처리후 컨트롤러에 리턴값을 보냄
+4. 컨트롤러에서 클라에 결과값을 보내줌 
+
+### Board Model 정의 
+- 모델은 인터페이스 또는 클래스로 정의 가능 
+- 인터페이스: 변수의 타입만 체크
+- 클래스: 변수의 타입 체크 + 인스턴스 생성
+
+### Data Transfer Object(DTO)
+- 계층간 데이터 교환을 위한 객체
+- DB에서 데이터를 얻어 Servcie, Controller 등으로 보낼 때 사용하는 객체
+- 데이터가 네트워크를 통해 전송되는 방법을 정의하는 객체 
+- interface, class 를 이용할 수 있지만, Nest JS에서는 Class를 추천
+
+
