@@ -141,3 +141,36 @@ nest g service boards --no-spec
 ```
 npm install class-validator class-transformer --save
 ```
+
+
+## 5. Postgres & TypeORM 연동
+
+### PostgresSQL 설치 
+```bin/bash
+docker run -p 5432:5432 --name postgres -e POSTGRES_DB=board-app -e POSTGRES_USER=user -e POSTGRES_PASSWORD=test_user -d postgres
+```
+
+### TypeORM 소개
+
+**TypeORM 이란?**
+- node.js에서 실행되고 TypeScript로 작성된 객체 관계형 매퍼 라이브러리
+- MySQL, PostgreSQL, MariaDB, SQLite, MS SQL Server, Oracle, WebSQL 등 여러 DB를 지원
+
+
+**ORM이란?**
+- 객체와 관계형 데이터베이스의 데이터를 자동으로 변형 및 연결하는 작업
+- 객체지향의 클래스와 RDB의 테이블 간 불일치 존재하는데 이것을 매핑 시켜준다
+
+**TypeORM 특징과 이점**  
+- 모델을 기반으로 DB 테이블 체계를 자동으로 생성 
+- DB에서 객체를 쉽게 CRUD 할 수 있음
+- 테이블 간의 매핑(일대일, 일대 다 및 다대다)을 만들 수 있음
+- 간단한 CLI 명령을 제공
+- 간단한 코딩으로 ORM 프레임워크를 사용하기 쉬움
+- 다른 모듈과 쉽게 통합됨 
+
+### TypeORM 이용 
+```
+npm install pg typeorm @nestjs/typeorm --save
+```
+
