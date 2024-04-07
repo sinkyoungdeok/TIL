@@ -1,0 +1,25 @@
+### 특정 게시물을 찾을 때 없는 경우 결과 값 처리
+GET http://localhost:3000/boards/100
+
+
+### 없는 게시물을 지우려 할 때 결과 값 처리
+
+DELETE http://localhost:3000/boards/100
+
+
+### 커스텀 파이프를 이용한 유효성 체크 - 생성
+POST http://localhost:3000/boards
+Content-Type: application/json
+
+{
+    "title": "test",
+    "description": "test"
+}
+
+### 커스텀 파이프를 이용한 유효성 체크 - 수정
+PATCH localhost:3000/boards/7856b4b0-f4aa-11ee-af87-7d18972493d6/status
+Content-Type: application/json
+
+{
+    "status": "testa"
+}

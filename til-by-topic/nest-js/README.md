@@ -13,6 +13,9 @@
   - [모든 게시물을 가져오는 Service 만들기](#모든-게시물을-가져오는-service-만들기)
   - [Board Model 정의](#board-model-정의)
   - [Data Transfer Object(DTO)](#data-transfer-objectdto)
+- [4. Pipe 이용](#4-pipe-이용)
+  - [NestJS Pipes](#nestjs-pipes)
+  - [파이프를 이용한 유효성 체크](#파이프를-이용한-유효성-체크)
 
 ## 1. Nest JS 소개
 
@@ -108,3 +111,33 @@ nest g service boards --no-spec
 - interface, class 를 이용할 수 있지만, Nest JS에서는 Class를 추천
 
 
+## 4. Pipe 이용
+
+### NestJS Pipes
+- @Injectable() 데코레이터로 주석이 달린 클래스
+- data transformation, data validation 을 위해서 사용 
+- 파이프는 컨트롤러 경로 처리기에 의해 처리되는 인수에 대해 작동
+- Nest는 메서드가 호출되기 직전에 파이프를 삽입하고 파이프는 메서드로 향하는 인수를 수신하고 이에대해 작동
+
+
+**Data Transformation**
+- 입력 데이터를 원하는 형식으로 변환 (ex. 문자열을 정수로 변환)
+- 만약 숫자를 받길 원하는데 문자열 형식으로 오면 파이프에서 자동으로 숫자로 바꿔줌
+
+**Data Validation**
+- 입력 데이터를 평가하고 유효한 경우 변경되지 않은 상태로 전달하고, 유효하지 않으면 예외를 발생 시킴
+- ex. 이름의 길이가 10자 이하여야 하는데, 10자 이상이면 예외를 발생시킴
+
+**PIPE 사용법(Binding Pipes)**
+- 세가지로 나뉜다.
+- Handler Level, Parameter Level, Global Level
+- Handler Level: 특정한 핸들러에 적용 (모든 파라미터)
+- Parameter Level: 특정한 파라미터에만 적용
+- Global Level: 애플리케이션 전체 모든 요청에 적용
+- Built-in Pipes: Nest JS에 기본적으로 사용할 수 있게 만든 6가지 파이프가 존재
+  - ValidationPipe, ParseIntPipe, ParseBoolPipe, ParseArrayPipe, DefaultValuePipe, ParseUUIDPipe
+
+### 파이프를 이용한 유효성 체크 
+```
+npm install class-validator class-transformer --save
+```
