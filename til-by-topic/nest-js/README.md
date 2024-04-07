@@ -174,3 +174,10 @@ docker run -p 5432:5432 --name postgres -e POSTGRES_DB=board-app -e POSTGRES_USE
 npm install pg typeorm @nestjs/typeorm --save
 ```
 
+## 6. 데이터베이스를 이용한 CRUD 구현
+
+### 게시물 삭제하기 
+
+**remove() vs delete()**
+- remove: 존재하는 아이템을 삭제, 없으면 404
+- delete: 존재하면 지우고, 존재하지 않으면 아무런 영향 X

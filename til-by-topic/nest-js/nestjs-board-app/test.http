@@ -23,3 +23,29 @@ Content-Type: application/json
 {
     "status": "testa"
 }
+
+### 게시물 생성하기 - 생성
+POST http://localhost:3000/boards
+Content-Type: application/json
+
+{
+  "title": "title2",
+  "description": "description2"
+}
+
+### 게시물 생성하기 - 조회
+GET http://localhost:3000/boards/1
+
+### 게시물 삭제하기
+DELETE http://localhost:3000/boards/2
+
+### 게시물 상태 업데이트하기
+PATCH http://localhost:3000/boards/3/status
+Content-Type: application/json
+
+{
+  "status": "PRIVATE"
+}
+
+### 모든 게시물 가져오기
+GET http://localhost:3000/boards
