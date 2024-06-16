@@ -41,6 +41,7 @@
   - [1단계: 문제 이해 및 설계 범위 확정](#1단계-문제-이해-및-설계-범위-확정-2)
   - [2단계: 개략적 설계안 제시 및 동의 구하기](#2단계-개략적-설계안-제시-및-동의-구하기-2)
   - [3단계: 상세 설계](#3단계-상세-설계-2)
+  - [4단계: 마무리](#4단계-마무리-2)
 
 ## 1장 사용자 수에 따른 규모 확장성 
 한 명의 사용자를 지원하는 시스템에서 시작하여, 최종적으로는 몇백만 사용자를 지원하는 시스템을 설계해 볼 것이다.
@@ -48,7 +49,7 @@
 
 ### 단일 서버
 
-<img width="768" alt="image" src="https://github.com/sinkyoungdeok/TIL/assets/28394879/9b648507-0bfa-4a01-9e48-14fd42e7fcc1">
+<img width="768" alt="image" src="https://github.com/sinkyoungdeok/TIL/assets/28394879/9b648507-0bfa-4a01-9e48-14fd42e7fcc1">  
 
 웹, 앱, 데이터베이스, 캐시 등이 전부 서버 한대에서 실행된다.
 
@@ -63,7 +64,7 @@
 
 ### 데이터베이스
 
-<img width="768" alt="image" src="https://github.com/sinkyoungdeok/TIL/assets/28394879/262181b3-a2e9-4c0e-8529-a68fce7bdd9a">
+<img width="768" alt="image" src="https://github.com/sinkyoungdeok/TIL/assets/28394879/262181b3-a2e9-4c0e-8529-a68fce7bdd9a">  
 
 - 사용자가 늘면서 하나는 웹/모바일 트래픽 처리 용도의 서버, 다른 하나는 데이터베이스용 서버로 분리했다.
 - 분리함으로써 각각을 독립적으로 확장해 나갈 수 있게 됐다.
@@ -96,7 +97,7 @@
 
 **로드밸런서**  
 
-<img width="728" alt="image" src="https://github.com/sinkyoungdeok/TIL/assets/28394879/08338d86-af45-481b-8319-a1e5da13dd38">
+<img width="728" alt="image" src="https://github.com/sinkyoungdeok/TIL/assets/28394879/08338d86-af45-481b-8319-a1e5da13dd38">    
 
 - 사용자는 로드밸런서의 공개 IP 주소로 접속한다. 
 - 부하 분산 집합에 웹 서버를 하나 더 추가하고 나면 장애를 자동복구하지 못하는 문제(no failover)는 해소되며, 웹 계층의 가용성(availability)은 향상된다.
@@ -115,7 +116,7 @@ DB 다중화는 이런 문제를 해결하는 보편화된 기술이다.
 - 대부분의 애플리케이션은 읽기 연산 비중이 쓰기 연산보다 훨씬 높기 때문에, slave DB 수를 더 많이 구성한다.
 
 
-<img width="816" alt="image" src="https://github.com/sinkyoungdeok/TIL/assets/28394879/6c43457a-2c25-4da9-960a-5939cd149818">
+<img width="816" alt="image" src="https://github.com/sinkyoungdeok/TIL/assets/28394879/6c43457a-2c25-4da9-960a-5939cd149818">  
 
 - 데이터베이스를 다중화하면 다음과 같은 이득이 있다. 
   - 더 나은 성능: 병렬로 처리될 수 있는 query 수가 늘어나서 성능이 올라간다. 
@@ -135,8 +136,8 @@ DB 다중화는 이런 문제를 해결하는 보편화된 기술이다.
     - 부 서버에 보관된 데이터가 최신 상태가 아닐 수 있는데, 이 때에는 없는 데이터에 대해서 복구 스크립트를 돌려서 추가해야 한다. 
     - 다중 마스터(multi-masters)나 원형 다중화(circular replication) 방식을 도입하면 이런 상황을 대처하는데 도움이 되지만 구성이 훨씬 복잡해진다. 
 
-<img width="868" alt="image" src="https://github.com/sinkyoungdeok/TIL/assets/28394879/652e7778-0ae2-490f-84d8-94224e4cb10d">
-
+<img width="868" alt="image" src="https://github.com/sinkyoungdeok/TIL/assets/28394879/652e7778-0ae2-490f-84d8-94224e4cb10d">  
+ 
 - 로드밸런서 + DB 다중화를 고려한 설계 
 
 
@@ -151,7 +152,7 @@ DB 다중화는 이런 문제를 해결하는 보편화된 기술이다.
 - 캐시 계층은 데이터가 잠시 보관되는 곳으로 DB보다 훨씬 빠르다.
 - 성능 개선 뿐 아니라 DB 부하를 줄일 수 있고, 캐시 계층을 독립적으로 확장시키는 것도 가능하다. 
 
-<img width="802" alt="image" src="https://github.com/sinkyoungdeok/TIL/assets/28394879/cc0b0344-f7fb-44ac-83a2-fd3573a03173">
+<img width="802" alt="image" src="https://github.com/sinkyoungdeok/TIL/assets/28394879/cc0b0344-f7fb-44ac-83a2-fd3573a03173">  
 
 - 이러한 캐시 전략을 읽기 주도형 캐시 전략이라고 부른다.
 - 이것 이외에도 다양한 캐시 전략이 있는데, 캐시할 데이터 종류, 크기, 액세스 패턴에 맞는 캐시 전략을 선택하면 된다.
@@ -163,7 +164,7 @@ DB 다중화는 이런 문제를 해결하는 보편화된 기술이다.
 - 일관성은 어떻게 유지되는가? 저장소의 원본을 갱신하는 연산과 캐시를 갱신하는 연산이 단일 트랜잭션으로 처리되지 않는 경우 일관성은 깨질 수 있다. 
 - 장애에는 어떻게 대처할 것인가? 캐시 서버를 한 대만 두는 경우 SPOF가 될 수 있다. 특정 지점의 장애가 전체시스템의 동작을 중단시킬 수 있는 경우가 SPOF인데, SPOF를 피하려면 여러 지역에 걸쳐 캐시 서버를 분산시켜야 한다.
 
-<img width="781" alt="image" src="https://github.com/sinkyoungdeok/TIL/assets/28394879/5044d3ad-e628-4ac6-9072-5cef4f2de623">
+<img width="781" alt="image" src="https://github.com/sinkyoungdeok/TIL/assets/28394879/5044d3ad-e628-4ac6-9072-5cef4f2de623">  
 
 - 캐시 메모리는 얼마나 크게 잡을 것인가? 캐시 메모리가 너무 작으면 데이터가 너무 자주 캐시에서 밀려나버려 캐시 성능이 저하될 수 있다.
 - 데이터 방출(eviction) 정책은 무엇인가? 가장 널리 쓰이는 것은 LRU(마지막으로 사용된 데이터를 내보냄) 이다. LFU(사용 빈도가 가장 낮은 데이터를 내보내는 정책)이나 FIFO같은 것도 있는데 경우에 맞게 적용하자.
@@ -175,12 +176,12 @@ DB 다중화는 이런 문제를 해결하는 보편화된 기술이다.
 - 이미지, 비디오, CSS, js 파일 등을 캐시할 수 있다. 
 - request path, query string, cookie, request header 등의 정보에 기반하여 HTML 페이지를 캐시하는 것이다.
 
-<img width="781" alt="image" src="https://github.com/sinkyoungdeok/TIL/assets/28394879/62d15673-538f-4f8c-8b6b-7a9ee6fb3589">
+<img width="781" alt="image" src="https://github.com/sinkyoungdeok/TIL/assets/28394879/62d15673-538f-4f8c-8b6b-7a9ee6fb3589">  
 
 - 어떤 사용자가 웹사이트를 방문하면, 그 사용자에게 가장 가까운 CDN 서버가 정적 콘텐츠를 전달한다.
 
 
-<img width="781" alt="image" src="https://github.com/sinkyoungdeok/TIL/assets/28394879/d81941b6-ee99-4060-a3c4-adab36acc354">
+<img width="781" alt="image" src="https://github.com/sinkyoungdeok/TIL/assets/28394879/d81941b6-ee99-4060-a3c4-adab36acc354">  
 
 
 **CDN 사용 시 고려해야 할 사항**  
@@ -191,7 +192,7 @@ DB 다중화는 이런 문제를 해결하는 보편화된 기술이다.
   - CDN 서비스 사업자가 제공하는 API 사용 
   - 컨텐츠의 다른 버전을 서비스하도록 오브젝트 버저닝이용. 컨텐츠의 새로운 버전을 지정하기 위해서 URL 마지막에 버전 번호를 인자로 주면 된다. ex) image.png?v=2 
 
-<img width="781" alt="image" src="https://github.com/sinkyoungdeok/TIL/assets/28394879/5d1f04cf-70b2-46f2-873e-2aac12bb7ceb">
+<img width="781" alt="image" src="https://github.com/sinkyoungdeok/TIL/assets/28394879/5d1f04cf-70b2-46f2-873e-2aac12bb7ceb">  
 
 - CDN과 캐시가 추가된 설계
 - 변화된 부분
@@ -208,7 +209,7 @@ DB 다중화는 이런 문제를 해결하는 보편화된 기술이다.
 - 상태 정보를 보관하는 서버와 그렇지 않은 서버 사이에는 몇가지 중요한 차이가 있다.
 - 상태 정보를 보관하는 서버는 상태 정보를 요청들 사이에 공유되도록 한다. (무상태 서버에는 이런 장치가 없다)
 
-<img width="792" alt="image" src="https://github.com/sinkyoungdeok/TIL/assets/28394879/833392fb-a63b-44fb-aa75-39b4b2b76660">
+<img width="792" alt="image" src="https://github.com/sinkyoungdeok/TIL/assets/28394879/833392fb-a63b-44fb-aa75-39b4b2b76660">  
 
 - 같은 클라이언트로부터의 요청은 항상 같은 서버로 전송되어야 한다.
 - 대부분의 로드밸런서가 이를 지원하기 위해 고정 세션이라는 기능을 제공하는데, 이는 로드밸런서에 부담을 준다.
@@ -216,7 +217,7 @@ DB 다중화는 이런 문제를 해결하는 보편화된 기술이다.
 
 **무상태 아키텍처**  
 
-<img width="624" alt="image" src="https://github.com/sinkyoungdeok/TIL/assets/28394879/fbd1e93a-3dc9-44bf-8f4e-1b1304645a5a">
+<img width="624" alt="image" src="https://github.com/sinkyoungdeok/TIL/assets/28394879/fbd1e93a-3dc9-44bf-8f4e-1b1304645a5a">  
 
 - 이 구조에서는 HTTP 요청이 어떤 웹 서버로도 전달될 수 있다. 
 - 웹 서버는 상태 정보가 필요할 경우 공유 저장소로부터 데이터를 가져온다. 
@@ -234,13 +235,13 @@ DB 다중화는 이런 문제를 해결하는 보편화된 기술이다.
 
 ### 데이터 센터
 
-<img width="854" alt="image" src="https://github.com/sinkyoungdeok/TIL/assets/28394879/d87c323d-99d8-48be-862e-314b314af0cf">
+<img width="854" alt="image" src="https://github.com/sinkyoungdeok/TIL/assets/28394879/d87c323d-99d8-48be-862e-314b314af0cf">  
 
 - 두 개의 데이터 센터를 이용하는 사례다.
 - 장애가 없는 상황에서 사용자는 가장 가까운 데이터 센터로 안내되는데, 이것을 지리적 라우팅이라고(geoDNS-routing or geo-routing) 부른다.
 - 지리적 라우팅에서의 geoDNS는 사용자의 위치에 따라 도메인 이름을 어떤 IP 주소로 변환할지 결정할 수 있도록 해주는 DNS 서비스다.
 
-<img width="854" alt="image" src="https://github.com/sinkyoungdeok/TIL/assets/28394879/0345acc1-a6c7-444b-8f52-a3f313d2265a">
+<img width="854" alt="image" src="https://github.com/sinkyoungdeok/TIL/assets/28394879/0345acc1-a6c7-444b-8f52-a3f313d2265a">  
 
 - 데이터 센터 중 하나에 심각한 장애가 발생하면 모든 트래픽이 장애가 없는 데이터 센터로 전송된다.
 - 위 그림은 US-West에 장애가 발생하여, US-East로 전송되는 상황이다.
@@ -259,7 +260,7 @@ DB 다중화는 이런 문제를 해결하는 보편화된 기술이다.
 - 메시지 큐를 이용하면 서비스 또는 서버 간 결합이 느슨해져서, 규모 확장성이 보장되어야 하는 안정적 애플리케이션을 구성하기 좋다. 
 
 
-<img width="759" alt="image" src="https://github.com/sinkyoungdeok/TIL/assets/28394879/737f8c57-6d92-4747-92f6-b7f087553fbb">
+<img width="759" alt="image" src="https://github.com/sinkyoungdeok/TIL/assets/28394879/737f8c57-6d92-4747-92f6-b7f087553fbb">  
 
 - 이미지의 크로핑, 샤프닝, 블러핑 등을 지원하는 사진 보정 애플리케이션을 만든다고 해 보자.
 - 보정은 시간이 오래 걸릴 수 있는 프로세스이므로 비동기적으로 처리하면 편하다.
@@ -281,7 +282,7 @@ DB 다중화는 이런 문제를 해결하는 보편화된 기술이다.
 
 **메시지 큐, 로그, 메트릭, 자동화 등을 반영하여 수정한 설계안**  
 
-<img width="831" alt="image" src="https://github.com/sinkyoungdeok/TIL/assets/28394879/0ebc156a-6ab2-4ccb-a255-52b55b38f090">
+<img width="831" alt="image" src="https://github.com/sinkyoungdeok/TIL/assets/28394879/0ebc156a-6ab2-4ccb-a255-52b55b38f090">  
 
 1. 메시지큐는 각 컴포넌트가 느슨히 결합될 수 있도록 하고, 결함에 대한 내성을 높인다.
 2. 로그, 모니터링 메트릭, 자동화 등을 지원하기 위한 장치를 추가했다.
@@ -303,7 +304,7 @@ DB 다중화는 이런 문제를 해결하는 보편화된 기술이다.
 - 대규모 DB를 샤드라고 부르는 작은 단위로 분할하는 기술을 일컫는다. 
 - 모든 샤드는 같은 스키마를 쓰지만 샤드에 보관되는 데이터 사이에는 중복이 없다.
 
-<img width="834" alt="image" src="https://github.com/sinkyoungdeok/TIL/assets/28394879/71ac5974-e3c0-4203-8d4c-5f3cc64a27ed">
+<img width="834" alt="image" src="https://github.com/sinkyoungdeok/TIL/assets/28394879/71ac5974-e3c0-4203-8d4c-5f3cc64a27ed">  
 
 - 샤드로 분할된 데이터베이스의 예다.
 - 이 케이스에서는 사용자 데이터를 어느 샤드에 넣을지는 사용자 ID에 따라 정한다.
@@ -325,7 +326,7 @@ DB 다중화는 이런 문제를 해결하는 보편화된 기술이다.
   - 하나의 DB를 여러 샤드 서버로 쪼개고 나면, 여러 샤드에 걸친 데이터를 조인하기가 힘들어진다. 
   - 이를 해결하는 한 가지 방법은 DB를 비정규화하여 하나의 테이블에서 질의가 수행할 수 있도록 하는 것이다. 
 
-<img width="834" alt="image" src="https://github.com/sinkyoungdeok/TIL/assets/28394879/d259088b-afa8-4afc-9849-cfb544856613">
+<img width="834" alt="image" src="https://github.com/sinkyoungdeok/TIL/assets/28394879/d259088b-afa8-4afc-9849-cfb544856613">  
 
 - 샤딩을 적용 하고 DB에 대한 부하를 줄이기 위해 굳이 RDB가 요구되지 않는 기능들은 NoSQL로 이전했다.
 
@@ -1687,7 +1688,8 @@ key-value DB예시로는 ex) 아마존 다이나모, memcached, 레디스
   - 웹사이트의 호스트명과 다운로드를 수행하는 작업 스레드 사이의 관계를 유지
   - 즉, 다운로드 스레드는 별도 FIFO 큐를 갖고 있어서, 해당 큐에서 꺼낸 URL만 다운로드 한다.
 
-<img width="794" alt="image" src="https://github.com/sinkyoungdeok/TIL/assets/28394879/414944e8-753f-4f4b-a92a-51e12b1232e2">  
+<img width="794" alt="image" src="https://github.com/sinkyoungdeok/TIL/assets/28394879/414944e8-753f-4f4b-a92a-51e12b1232e2">    
+
 - 큐 라우터: 같은 호스트에 속한 URL은 언제나 같은 큐로 가도록 보장하는 역할 
 - 매핑 테이블: 호스트 이름과 큐 사이의 관계를 보관하는 테이블
 - FIFO 큐: 같은 호스트에 속한 URL은 언제나 같은 큐에 보관된다
@@ -1699,12 +1701,12 @@ key-value DB예시로는 ex) 아마존 다이나모, memcached, 레디스
 - 크롤러 입장에서는 중요한 페이지인 애플 홈페이지를 먼저 수집하도록 하는 것이 바람직하다.  
 - 유용성에 따라 URL의 우선순위를 나눌 때는 페이지랭크, 트래픽 양, 갱신 빈도 등 다양한 척도를 사용할 수 있다.  
 
-<img width="812" alt="image" src="https://github.com/sinkyoungdeok/TIL/assets/28394879/ce56236c-c0e7-4bd4-8b3d-6456072a9c7b">  
+<img width="812" alt="image" src="https://github.com/sinkyoungdeok/TIL/assets/28394879/ce56236c-c0e7-4bd4-8b3d-6456072a9c7b">   
 - 순위결정장치: URL 우선순위를 정하는 컴포넌트, URL을 입력으로 받고 우선순위를 계산
 - 큐: 우선순위별로 큐가 하나씩 할당. 우선순위가 높으면 선택될 확률도 올라감
 - 큐 선택기: 임의 큐에서 처리할 URL을 꺼내는 역할을 담당. 순위가 높은 큐에서 더 자주 꺼내도록 프로그램되어 있다.
 
-<img width="812" alt="image" src="https://github.com/sinkyoungdeok/TIL/assets/28394879/eecced00-3b39-48d1-a624-ef076077e041">  
+<img width="812" alt="image" src="https://github.com/sinkyoungdeok/TIL/assets/28394879/eecced00-3b39-48d1-a624-ef076077e041">    
 - 처리할 URL위에 후면 큐 선택기가 아니라, 전면 큐 선택기임. (그림 잘못됨)
 - 전면 큐: 우선순위 결정 과정을 처리
 - 후면 큐: 크롤러가 예의 바르게 동작하도록 보증
@@ -1735,3 +1737,83 @@ Robots.txt
 - 특정 사이트의 robots.txt 파일을 다운로드 받으려면 .../robots.txt 로 가보면 된다. 
 
 **성능 최적화**  
+HTML 다운로더에 사용할 수 있는 성능 최적화 기법들을 살펴보자.  
+
+1. 분산 크롤링  
+
+<img width="391" alt="image" src="https://github.com/sinkyoungdeok/TIL/assets/28394879/52d034da-b48c-4fce-b71d-58ae649f8a9f">  
+
+- 크롤링 작업을 여러 서버에 분산하는 방법.  
+- 각 서버는 여러 스레드를 돌려 다운로드 작업을 처리
+- 이 구성을 위해서는 URL 공간을 작은 단위로 분할하고, 각 서버가 그중 일부의 다운로드를 담당하도록 해야 한다.  
+
+2. 도메인 이름 변환 결과 캐시   
+
+- 도메인 이름 변환기는 크롤러 성능의 병목 중 하나, DNS 요청을 보내고 결과를 받는 작업의 동기적 특성 때문 (보통 10ms~200ms 소요)
+- 크롤러 스레드 가운데 어느 하나라도 이 작업을 하고 있으면 다른 스레드의 DNS의 요청은 전부 블록된다.  
+- 따라서 DNS 조회 결과로 얻어진 도메인 이름과 IP 주소를 캐시에 보관해놓고 크론잡 등을 돌려 주기적으로 갱신하도록 하면 성능을 효과적으로 높일 수 있다.  
+
+
+3. 지역성  
+
+- 크롤링 작업을 수행하는 서버를 지역별로 분산하는 방법.  
+- 크롤링 서버가 크롤링 대상 서버와 지역적으로 가까우면 페이지 다운로드 시간이 줄어들 것이다.  
+- 크롤 서버, 캐시, 큐, 저장소 등 대부분의 컴포넌트에 적용 가능 
+
+
+4. 짧은 타임아웃  
+
+- 어떤 웹 서버는 응답이 느리거나 응답하지 않을 수 있다.  
+- 특정 시간 동안 서버가 응답하지 않으면 크롤러는 해당 페이지 다운로드를 중단하고 다음 페이지로 넘어간다.
+
+
+**안정성**   
+최적화된 성능뿐 아니라 안정성도 다운로더 설계 시 중요하게 고려해야 할 부분이다.  
+시스템 안정성을 향상시키기 위한 접근법 중 중요한 몇 가지는 아래와 같다.  
+- 안정해시: 다운로더 서버들에 부하를 분산할 때 적용 가능한 기술.
+- 크롤링 상태 및 수집 데이터 저장: 장애가 발생한 경우에도 쉽게 복구할 수 있도록 크롤링 상태와 수집된 데이터를 지속적으로 저장장치에 기록해두는 것이 좋다. -> 중단되었던 크롤링을 쉽게 재시작할 수 있다.  
+- 예외처리: 예외가 발생해도 전체 시스템이 중단되는 일 없이 그 작업을 우아하게 이어나갈 수 있어야 한다.  
+- 데이터 검증
+
+**확장성**  
+<img width="651" alt="image" src="https://github.com/sinkyoungdeok/TIL/assets/28394879/f6e98514-0729-421b-859e-1ae94e67c240">  
+
+- 새로운 형태의 콘텐츠를 쉽게 지원할 수 있도록 신경 써야 한다.
+- 본 예제에서는 새로운 모듈을 끼워 넣음으로써 새로운 형태의 컨텐츠를 지원할 수 있도록 설계했다.  
+- PNG 다운로더: PNG파일을 다운로드하는 플러그인 모듈 
+- 웹 모니터: 웹을 모닡러이하여 저작권이나 상표권이 침해되는 일을 막는 모듈 
+
+**문제 있는 콘텐츠 감지 및 회피**  
+중복이거나 의미 없는, 또는 유해한 콘텐츠를 어떻게 감지하고 시스템으로부터 차단할지 살펴보자.  
+
+1. 중복 콘텐츠  
+
+- 해시나 체크섬을 사용해서 탐지
+
+2. 거미 덫  
+ 
+- 크롤러를 무한 루프에 빠뜨리도록 설계한 웹 페이지
+- 덫을 자동으로 피해가는 알고리즘을 만들어내는 것은 까다롭다.  
+- 한가지 방법은 사람이 수작업으로 덫을 확인하고 찾아낸후에 덫이 있는 사이트를 크롤러 탐색 대상에서 제외하거나 URL 필터 목록에 걸어두는것이다.
+
+3. 데이터 노이즈  
+
+- 어떤 콘텐츠는 거의 가치가 없다.  
+- 광고, 스크립트 코드, 스팸 URL 등 
+- 크롤러에 도움이 안되므올 가능하다면 제외하자.
+
+
+### 4단계: 마무리  
+좋은 크롤러가 갖추어야하는 특성: 규모 확장성, 예의, 확장성, 안정성  
+크롤러 설계안을 제시하고, 핵심 컴포넌트에 쓰이는 기술들을 살펴보았다.   
+
+시간이 허락한다면 면접관과 다음과 같은 것을 추가로 논의해보자.  
+- 서버 측 렌더링
+  - 많은 웹사이트가 js, ajax 등의 기술을 사용해서 링크를 즉성에서 만들어 낸다.  
+  - 웹 페이지를 그냥 있는 그대로 다운받아서 파싱해보면 동적으로 생성되는 링크는 발견할 수 없을 것이다.  
+  - 이 문제는 페이지를 파싱하기 전에 서버측 렌더링(동적 렌더링)을 적용하면 해결할 수 있다. 
+- 원치 않는 페이지 필터링: 스팸 방지 컴포넌트를 두어 품질이 조악하거나 스팸성인 페이지를 걸러내자.
+- 데이터베이스 다중화 및 샤딩: 데이터 계층의 가용성, 규모 확장성, 안정성 향상 
+- 수평적 규모 확장성
+- 가용성, 일관성, 안정성
+- 데이터 분석 솔루션
