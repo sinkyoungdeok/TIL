@@ -42,6 +42,7 @@
   - [2단계: 개략적 설계안 제시 및 동의 구하기](#2단계-개략적-설계안-제시-및-동의-구하기-2)
   - [3단계: 상세 설계](#3단계-상세-설계-2)
   - [4단계: 마무리](#4단계-마무리-2)
+  - [번외: 동적 크롤링 예시](#번외-동적-크롤링-예시)
 
 ## 1장 사용자 수에 따른 규모 확장성 
 한 명의 사용자를 지원하는 시스템에서 시작하여, 최종적으로는 몇백만 사용자를 지원하는 시스템을 설계해 볼 것이다.
@@ -1817,3 +1818,57 @@ HTML 다운로더에 사용할 수 있는 성능 최적화 기법들을 살펴�
 - 수평적 규모 확장성
 - 가용성, 일관성, 안정성
 - 데이터 분석 솔루션
+
+### 번외: 동적 크롤링 예시 
+```python3
+import csv
+import re
+import time
+
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.common.by import By
+from webdriver_manager.chrome import ChromeDriverManager
+
+csv_file = open('restaurants.csv', mode='w', newline='', encoding='utf-8')
+csv_writer = csv.writer(csv_file)
+csv_writer.writerow(['name', 'category', 'review_count', 'address', 'rating', 'number', 'image_url'])
+
+options = Options()
+options.add_argument("--disable-blink-features=AutomationControlled")
+
+user_agent = 'user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'
+options.add_argument(user_agent)
+
+options.add_experimental_option('excludeSwitches', ['enable-logging', 'enable-automation'])
+options.add_experimental_option("useAutomationExtension", False)
+options.add_argument("--remote-allow-origins=*")
+
+driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
+
+url = "https://map.naver.com/p/search/%EC%84%B1%EA%B7%A0%EA%B4%80%EB%8C%80%EC%97%AD%20%EC%9D%8C%EC%8B%9D%EC%A0%90?c=15.00,0,0,0,dh"
+driver.get(url)
+time.sleep(12)
+
+searchIFrame = driver.find_element(By.CSS_SELECTOR, "iframe#searchIframe")
+driver.switch_to.frame(searchIFrame)
+time.sleep(1)
+
+for _ in range(5):  # 6페이지까지
+    scrollable_div = driver.find_element(By.CSS_SELECTOR, "div.mFg6p")
+
+    scroll_div = driver.find_element(By.XPATH, "/html/body/div[3]/div/div[2]/div[1]")
+    for _ in range(10):
+        driver.execute_script("arguments[0].scrollBy(0,2000);", scroll_div)
+        time.sleep(2)
+
+    restaurant_names = driver.find_elements(By.XPATH, "//ul/li/div[1]/a[1]/div/div/span[1]")
+    restaurant_categories = driver.find_elements(By.XPATH,
+                                                 "//div[contains(@class, 'place_bluelink')]//span[@class='KCMnt']")
+    reviews = driver.find_elements(By.XPATH, "//div[contains(@class, 'Dr_06')]//span[@class='h69bs']")
+
+    print(len(restaurant_names))
+```
+
+출처: https://github.com/meokgu-skku/crawling/blob/main/naver_map_crawling.py
