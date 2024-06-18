@@ -1703,11 +1703,13 @@ key-value DB예시로는 ex) 아마존 다이나모, memcached, 레디스
 - 유용성에 따라 URL의 우선순위를 나눌 때는 페이지랭크, 트래픽 양, 갱신 빈도 등 다양한 척도를 사용할 수 있다.  
 
 <img width="812" alt="image" src="https://github.com/sinkyoungdeok/TIL/assets/28394879/ce56236c-c0e7-4bd4-8b3d-6456072a9c7b">   
+
 - 순위결정장치: URL 우선순위를 정하는 컴포넌트, URL을 입력으로 받고 우선순위를 계산
 - 큐: 우선순위별로 큐가 하나씩 할당. 우선순위가 높으면 선택될 확률도 올라감
 - 큐 선택기: 임의 큐에서 처리할 URL을 꺼내는 역할을 담당. 순위가 높은 큐에서 더 자주 꺼내도록 프로그램되어 있다.
 
 <img width="812" alt="image" src="https://github.com/sinkyoungdeok/TIL/assets/28394879/eecced00-3b39-48d1-a624-ef076077e041">    
+
 - 처리할 URL위에 후면 큐 선택기가 아니라, 전면 큐 선택기임. (그림 잘못됨)
 - 전면 큐: 우선순위 결정 과정을 처리
 - 후면 큐: 크롤러가 예의 바르게 동작하도록 보증
